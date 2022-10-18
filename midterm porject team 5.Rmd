@@ -37,13 +37,69 @@ bind by rows
 
 DF<-rbind(df_2016,df_2017,df_2018,df_2019,df_2020,df_2021)
 colnames(DF)
+str(DF)
 xkablesummary(DF)
 ```
 
+Create dataframe with only rows on while males. Data in 2021 has "Release Violations/Fugitive (Fug)" and "Release Violations/Fugitive (Warr)" in Arrest.Category although data in other years have "Release Violations/Fugitive" instead of them. Therefore, we will convert "Release Violations/Fugitive (Fug)" and "Release Violations/Fugitive (Warr)" to "Release Violations/Fugitive (Fug)".
+
+```{r}
+DF_WM <- subset(DF, subset = Defendant.Race=='WHITE' & Defendant.Sex=='MALE')
+DF_WM <- mutate(DF_WM, Arrest.Category = gsub(Arrest.Category, pattern = "Release Violations/Fugitive.*", replacement = "Release Violations/Fugitive"))
+str(DF_WM)
+xkablesummary(DF_WM)
+```
+
+The number of crimes is are follows.
+
+| year | the number of crimes |
+|:-----|:---------------------|
+| 2016 | `r nrow(subset(DF_WM, Arrest.Year==2016))` |
+| 2017 | `r nrow(subset(DF_WM, Arrest.Year==2017))` |
+| 2018 | `r nrow(subset(DF_WM, Arrest.Year==2018))` |
+| 2019 | `r nrow(subset(DF_WM, Arrest.Year==2019))` |
+| 2020 | `r nrow(subset(DF_WM, Arrest.Year==2020))` |
+| 2021 | `r nrow(subset(DF_WM, Arrest.Year==2021))` |
+| 2016 - 2019 (before COVID-19) | `r round(nrow(subset(DF_WM, Arrest.Year==2016 | Arrest.Year==2017 | Arrest.Year==2018 | Arrest.Year==2019)) / 4)` |
+| 2020 - 2021 (after COVID-19) | `r round(nrow(subset(DF_WM, Arrest.Year==2020 | Arrest.Year==2021)) / 2)`|
 
 
 ## Including Plots
 
+```{r}
+
+ggplot(DF_WM, aes(Arrest.Category)) +
+  ggtitle("Figure 1: Bar plot of crime in 2016 - 2021") + xlab("crime types") + geom_bar() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+```
+```{r, fig.show="hold", out.width="48%"}
+
+ggplot(subset(DF_WM,Arrest.Year == 2016), aes(Arrest.Category)) +
+  ggtitle("Figure 2: Bar plot of crime in 2016") + xlab("crime types") + geom_bar() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+ggplot(subset(DF_WM,Arrest.Year == 2017), aes(Arrest.Category)) +
+  ggtitle("Figure 3: Bar plot of crime in 2017") + xlab("crime types") + geom_bar() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+ggplot(subset(DF_WM,Arrest.Year == 2018), aes(Arrest.Category)) +
+  ggtitle("Figure 4: Bar plot of crime in 2018") + xlab("crime types") + geom_bar() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+ggplot(subset(DF_WM,Arrest.Year == 2019), aes(Arrest.Category)) +
+  ggtitle("Figure 5: Bar plot of crime in 2019") + xlab("crime types") + geom_bar() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+ggplot(subset(DF_WM,Arrest.Year == 2020), aes(Arrest.Category)) +
+  ggtitle("Figure 6: Bar plot of crime in 2020") + xlab("crime types") + geom_bar() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+ggplot(subset(DF_WM,Arrest.Year == 2021), aes(Arrest.Category)) +
+  ggtitle("Figure 7: Bar plot of crime in 2021") + xlab("crime types") + geom_bar() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+```
 
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
