@@ -1,6 +1,12 @@
 ---
 title: "midterm project team 5"
-output: html_document
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
 date: "2022-10-16"
 ---
 
@@ -19,23 +25,63 @@ library(readr)
 
 ## read data
 Read the data .CSV files of adults arrest in DC area from 2016-2021
-```{r }
 
-df_2016<-data.frame(read.csv("Arrests 2016 Public.csv"))[,1:14]
-df_2017<-data.frame(read.csv("Arrests 2017 Public.csv"))[,1:14]
-df_2018<-data.frame(read.csv("Arrests by Year, 2018.csv"))[,1:14]
-df_2019<-data.frame(read.csv("Arrests by Year, 2019.csv"))[,1:14]
-df_2020<-data.frame(read.csv("Arrests by Year 2020.csv"))[,1:14]
-df_2021<-data.frame(read.csv("2021 Adult Arrests.csv"))[,1:14]
+```{r }
+df_2016<-data.frame(read.csv("Arrests 2016 Public.csv"))
+df_2017<-data.frame(read.csv("Arrests 2017 Public.csv"))
+df_2018<-data.frame(read.csv("Arrests by Year, 2018.csv"))
+df_2019<-data.frame(read.csv("Arrests by Year, 2019.csv"))
+df_2020<-data.frame(read.csv("Arrests by Year 2020.csv"))
+df_2021<-data.frame(read.csv("2021 Adult Arrests.csv"))
+
+c16 <- c(colnames(df_2016))
+c18 <- c(colnames(df_2018))
 ```
-Note that the colnames of df_2016 and df_2017 are not the same with others. But those indices are just about arrest location which is not what we are investigating. Therefore I just combined them by the same indices that we need. (A-N columns)
-##Merge Multiple CSV Files
+Note that the colnames of df_2016 and df_2017 are not the same with others. We show the columns name of df_2016 and df_2018 in the below:
+
+|col #|2016       |2018       |
+|:---:|:---------:|:---------:|
+|  1  |`r c16[1]` |`r c18[1]` |
+|  2  |`r c16[2]` |`r c18[2]` |
+|  3  |`r c16[3]` |`r c18[3]` |
+|  4  |`r c16[4]` |`r c18[4]` |
+|  5  |`r c16[5]` |`r c18[5]` |
+|  6  |`r c16[6]` |`r c18[6]` |
+|  7  |`r c16[7]` |`r c18[7]` |
+|  8  |`r c16[8]` |`r c18[8]` |
+|  9  |`r c16[9]` |`r c18[9]` |
+| 10  |`r c16[10]`|`r c18[10]`|
+| 11  |`r c16[11]`|`r c18[11]`|
+| 12  |`r c16[12]`|`r c18[12]`|
+| 13  |`r c16[13]`|`r c18[13]`|
+| 14  |`r c16[14]`|`r c18[14]`|
+| 15  |`r c16[15]`|`r c18[15]`|
+| 16  |`r c16[16]`|`r c18[16]`|
+| 17  |`r c16[17]`|`r c18[17]`|
+| 18  |`r c16[18]`|`r c18[18]`|
+| 19  |`r c16[19]`|`r c18[19]`|
+| 20  |`r c16[20]`|`r c18[20]`|
+| 21  |`r c16[21]`|`r c18[21]`|
+| 22  |`r c16[22]`|`r c18[22]`|
+| 23  |`r c16[23]`|`r c18[23]`|
+| 24  |`r c16[24]`|`r c18[24]`|
+| 25  |`r c16[25]`|`r c18[25]`|
+| 26  |`r c16[26]`|`r c18[26]`|
+
+You can see that the columns name are same from the first column to the 14th column in both data. On the other hand, the name and order of 15th and latter columns are a bit different in those data. The latter columns are about locations, and we are not very interested in the detail location. Therefore, we will delete the latter columns except for the 16th and 22nd columns.
+
+## Merge Multiple CSV Files
 bind by rows
 
 ```{r}
+#bind df_2016 and df_2017, and delete some columns
+df_16_17 <- rbind(df_2016, df_2017)[,-c(15,17:21,23:26)]
+names(df_16_17)[c(15,16)] <- c('Arrest.Location.District','Offense.Location.District')   #rename columns
 
+#bind df_2018 - df_2021, and delete some columns
+df_18_21 <- rbind(df_2018, df_2019, df_2020, df_2021)[,-c(15,17:21,23:26)] 
 
-DF<-rbind(df_2016,df_2017,df_2018,df_2019,df_2020,df_2021)
+DF<-rbind(df_16_17,df_18_21)
 colnames(DF)
 str(DF)
 xkablesummary(DF)
@@ -50,7 +96,7 @@ str(DF_WM)
 xkablesummary(DF_WM)
 ```
 
-The number of crimes is are follows.
+The number of crimes is as follows.
 
 | year | the number of crimes |
 |:-----|:---------------------|
