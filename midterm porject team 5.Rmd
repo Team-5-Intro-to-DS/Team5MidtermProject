@@ -8,13 +8,15 @@ date: "2022-10-16"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-install some packages or libraries
-```{r}
 
+#install some packages or libraries
+```{r}
 library(ggplot2)
 library(ezids)
 library(dplyr)
 library(readr)
+library(tidyr)
+library(lubridate)
 ```
 
 ## read data
@@ -29,8 +31,10 @@ df_2020<-data.frame(read.csv("Arrests by Year 2020.csv"))
 df_2021<-data.frame(read.csv("2021 Adult Arrests.csv"))
 ```
 
+
 ###Some data cleaning.. Dropping, Binding and Renaming of columns as needed.
 ```{r}
+
 #bind the rows in the dataframes; 
 # data for year 2016 & 2017 have different column listings to the rest of the dataframes..
 
@@ -45,6 +49,7 @@ df_16_17 <- df_16_17 %>%
 # replace dots with underscore for clarity sake, i think..
 names(df_16_17) = gsub("[.]", "_", names(df_16_17))
 colnames(df_16_17)
+
 ```
 
 ```{r}
@@ -54,6 +59,7 @@ df_18_21 = rbind(df_2018,df_2019,df_2020,df_2021)[,-c(5,6,15,17:21,23:26)]
 # replace dots with underscore once more
 names(df_18_21) = gsub("[.]", "_", names(df_18_21))
 colnames(df_18_21)
+
 ```
 
 ```{r}
@@ -61,6 +67,7 @@ colnames(df_18_21)
 df_full = rbind(df_16_17,df_18_21)
 #check for column names
 colnames(df_full)
+
 ```
 
 ```{r}
@@ -85,6 +92,142 @@ df_full$Arrest_Category = gsub("Release Violations/Fugitive.*","Release Violatio
 
 #sort(unique(df_full$Arrest_Category)) - check that new changes were made.
 ```
+
+### Missing Values
+```{r}
+sapply(df_full, function(x) sum(is.na(x)))
+```
+##### Our variables of concern in thsi dataset contain rich data.. over 95% of data available in each useful column.. will not delete any rows
+
+
+```{r}
+#get month and day variables.. might be interesting, who knows?
+df_full <- separate(df_full, col = Arrest_Date, into = c("Year","Month","Day"), sep = "-", remove = FALSE, fill="left")
+#remove the new year column formed, it is redundant.. we already have Year column
+df_full = df_full[,-4]
+colnames(df_full)
+```
+
+
+```{r}
+# Factorize some variables
+df_full$Arrest_Year = as.factor(df_full$Arrest_Year)
+df_full$Month = as.factor(df_full$Month)
+df_full$Day = as.factor(df_full$Day)
+df_full$Defendant_Race = as.factor(df_full$Defendant_Race)
+df_full$Defendant_Sex = as.factor(df_full$Defendant_Sex)
+df_full$Arrest_Location_District = as.factor(df_full$Arrest_Location_District)
+df_full$Offense_Location_District = as.factor(df_full$Offense_Location_District)
+# convert to date format
+df_full$Arrest_Date = as.Date(df_full$Arrest_Date)
+# Day format
+df_full$Day = day(df_full$Arrest_Date)
+# i want to create a week-day variable
+df_full$Weekday = weekdays(df_full$Arrest_Date)
+df_full$Weekday = factor(df_full$Weekday, levels = as.character(wday(c(2:7,1), label=TRUE, abbr=FALSE)))
+```
+
+# EDA (?)
+
+### Daily Crime Trend (2016-2021)
+
+```{r echo=FALSE, warning=FALSE, fig.width=8, fig.height=5.5}
+
+by_date <- df_full %>% group_by(Arrest_Date) %>% dplyr::summarise(Total = n())
+ggplot(by_date, aes(Arrest_Date, Total, color = Arrest_Date)) + 
+  geom_line() 
+  #geom_vline(xintercept = "2020-03-11")
+
+```
+
+
+### All Crimes By Day, Month, Year
+
+#### Day  .. What day of the month has the highest crime incidents?
+```{r}
+by_day <- df_full %>% 
+           group_by(Day) %>% 
+           dplyr::summarise(Total = n())
+by_day
+
+ggplot(by_day, aes(Day, Total, color = Day)) + 
+    geom_line() + 
+    ggtitle("Crimes By Day") + 
+    xlab("Day of the Month") + 
+    ylab("Total Crimes")
+```
+
+#### Day of the week..
+```{r}
+by_weekday = df_full %>% group_by(Weekday) %>% 
+           dplyr::summarise(Total = n())
+by_weekday$Percent <- by_weekday$Total/dim(df_full)[1] * 100
+by_weekday
+
+ggplot(by_weekday, aes(Weekday, Total, fill = Weekday)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("Crimes By Weekday ") + 
+      xlab("Day of the Week") + ylab("Count") + 
+      theme(legend.position = "none")
+```
+
+
+
+### All Crimes By Year
+####Crime incidence grouped into yearly plots..
+```{r}
+by_year = df_full %>% group_by(Arrest_Year) %>% 
+           dplyr::summarise(Total = n())
+by_year$Percent <- by_year$Total/dim(df_full)[1] * 100
+by_year
+
+ggplot(by_year, aes(Arrest_Year, Total, fill = Arrest_Year)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("Crimes By Year ") + 
+      xlab("Year") + ylab("Count") + 
+      theme(legend.position = "none")
+
+```
+
+```{r}
+by_month <- df_full %>% 
+            group_by(Month) %>% 
+            dplyr::summarise(Total = n())
+
+by_month$Percent <- by_month$Total/dim(df_full)[1] * 100
+by_month
+
+ggplot(by_month, aes(Month, Total, fill = Month)) + 
+        geom_bar(stat = "identity") + 
+        ggtitle("Crimes By Month") + 
+        xlab("Month") + 
+        ylab("Count") + 
+        theme(legend.position = "none")
+
+ggplot(by_month, aes(x=Month, y=Total, group=1)) + geom_line()
+```
+
+
+## Time to investigate our main focus group - White Males - EDA
+
+```{r}
+#unique(df_full$Defendant_Race)
+#table(df_full$Defendant_Sex)
+df_wm = subset(df_full, subset = Defendant_Race == "WHITE" & Defendant_Sex == "MALE")
+head(df_wm, 20)
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
