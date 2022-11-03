@@ -225,17 +225,17 @@ code for creating a new dataframe
 #WHITE "Simple Assault"
 SIM_WHITE<-list()
 
-SIM_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE, )
+SIM_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE,. )
 
-SIM_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE, )
+SIM_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE,. )
 
-SIM_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE, )
+SIM_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE,. )
 
-SIM_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE, )
+SIM_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE,. )
 
-SIM_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE, )
+SIM_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE,. )
 
-SIM_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE, )
+SIM_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_WHITE, .)
 
 SIM_WHITE<-c(SIM_WHITE[[1]],SIM_WHITE[[2]],SIM_WHITE[[3]],SIM_WHITE[[4]],SIM_WHITE[[5]],SIM_WHITE[[6]])
 ```
@@ -244,17 +244,17 @@ SIM_WHITE<-c(SIM_WHITE[[1]],SIM_WHITE[[2]],SIM_WHITE[[3]],SIM_WHITE[[4]],SIM_WHI
 #Release Violations/Fugitive
 RVF_WHITE<-list()
 
-RVF_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE, )
+RVF_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE, .)
 
-RVF_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE, )
+RVF_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE,. )
 
-RVF_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE, )
+RVF_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE,. )
 
-RVF_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE, )
+RVF_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE,. )
 
-RVF_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE, )
+RVF_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_WHITE,. )
 
-RVF_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Release Violations/Fugitive (Warr)")["TRUE"]%>%sum()%>%append(RVF_WHITE, )
+RVF_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Release Violations/Fugitive (Warr)")["TRUE"]%>%sum()%>%append(RVF_WHITE,. )
 
 RVF_WHITE<-c(RVF_WHITE[[1]],RVF_WHITE[[2]],RVF_WHITE[[3]],RVF_WHITE[[4]],RVF_WHITE[[5]],RVF_WHITE[[6]])
 ```
@@ -266,17 +266,17 @@ RVF_WHITE<-c(RVF_WHITE[[1]],RVF_WHITE[[2]],RVF_WHITE[[3]],RVF_WHITE[[4]],RVF_WHI
 #Traffic Violations
 TRA_WHITE<-list()
 
-TRA_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE, )
+TRA_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE,. )
 
-TRA_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE, )
+TRA_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE,. )
 
-TRA_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE, )
+TRA_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE,. )
 
-TRA_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE, )
+TRA_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE,. )
 
-TRA_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE, )
+TRA_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE,. )
 
-TRA_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE, )
+TRA_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_WHITE, .)
 
 TRA_WHITE<-c(TRA_WHITE[[1]],TRA_WHITE[[2]],TRA_WHITE[[3]],TRA_WHITE[[4]],TRA_WHITE[[5]],TRA_WHITE[[6]])
 ```
@@ -286,17 +286,17 @@ TRA_WHITE<-c(TRA_WHITE[[1]],TRA_WHITE[[2]],TRA_WHITE[[3]],TRA_WHITE[[4]],TRA_WHI
 #Narcotics
 NAR_WHITE<-list()
 
-NAR_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, )
+NAR_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE,. )
 
-NAR_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, )
+NAR_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE,. )
 
-NAR_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, )
+NAR_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, .)
 
-NAR_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, )
+NAR_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE,. )
 
-NAR_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, )
+NAR_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, .)
 
-NAR_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, )
+NAR_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Narcotics")["TRUE"]%>%sum()%>%append(NAR_WHITE, .)
 
 NAR_WHITE<-c(NAR_WHITE[[1]],NAR_WHITE[[2]],NAR_WHITE[[3]],NAR_WHITE[[4]],NAR_WHITE[[5]],NAR_WHITE[[6]])
 ```
@@ -306,17 +306,17 @@ NAR_WHITE<-c(NAR_WHITE[[1]],NAR_WHITE[[2]],NAR_WHITE[[3]],NAR_WHITE[[4]],NAR_WHI
 #Theft
 THEFT_WHITE<-list()
 
-THEFT_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE, )
+THEFT_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE,. )
 
-THEFT_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE, )
+THEFT_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE,. )
 
-THEFT_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE, )
+THEFT_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE, .)
 
-THEFT_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE, )
+THEFT_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE, .)
 
-THEFT_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE, )
+THEFT_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE,. )
 
-THEFT_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE, )
+THEFT_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_WHITE,. )
 
 THEFT_WHITE<-c(THEFT_WHITE[[1]],THEFT_WHITE[[2]],THEFT_WHITE[[3]],THEFT_WHITE[[4]],THEFT_WHITE[[5]],THEFT_WHITE[[6]])
 ```
@@ -326,17 +326,17 @@ THEFT_WHITE<-c(THEFT_WHITE[[1]],THEFT_WHITE[[2]],THEFT_WHITE[[3]],THEFT_WHITE[[4
 #Other Crimes
 OTH_WHITE<-list()
 
-OTH_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE, )
+OTH_WHITE<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE,. )
 
-OTH_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE, )
+OTH_WHITE<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE, .)
 
-OTH_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE, )
+OTH_WHITE<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE,. )
 
-OTH_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE, )
+OTH_WHITE<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE,. )
 
-OTH_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE, )
+OTH_WHITE<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE,. )
 
-OTH_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE, )
+OTH_WHITE<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_WHITE,.)
 
 OTH_WHITE<-c(OTH_WHITE[[1]],OTH_WHITE[[2]],OTH_WHITE[[3]],OTH_WHITE[[4]],OTH_WHITE[[5]],OTH_WHITE[[6]])
 ```
@@ -374,7 +374,7 @@ ggplot()+geom_line(data = DF_white,aes(x = x_year,y = SIM_WHITE,colour = "Simple
   geom_line(data =  DF_white,aes(x = x_year,y =OTH_WHITE,colour ="Other Crimes"),size=1) + 
   geom_point(data =  DF_white,aes(x = x_year,y = OTH_WHITE,colour = "Other Crimes"),size=3)+
   
-  scale_colour_manual("",values = c("darkolivegreen","darkolivegreen1","darkolivegreen2","darkolivegreen3","darkolivegreen4","darkorange"))+
+  scale_colour_manual("",values = c("red","orange","green","blue","purple","black"))+
   xlab("Year")+ylab("CRIME COUNTS")+ ggtitle("CRIME TREND IN DC \n from 2016 to 2021 among white males")+
   theme(plot.title = element_text(lineheight = .8,size = 14, face = "bold.italic"))+
   theme(axis.title.x = element_text(vjust = 2, size = 12),
@@ -384,7 +384,559 @@ ggplot()+geom_line(data = DF_white,aes(x = x_year,y = SIM_WHITE,colour = "Simple
 
 
 ```
+```{r}
+DF_white_new<-DF_white
+colnames(DF_white_new)[2:7]=c("Simple Assault","Release Violations/Fugitive","Traffic Violations","Narcotics","Theft","Other Crimes")
+head(DF_white_new)
+
+```
+
+I group by different age stages (white men)
+young 18-29 middle-aged 30-50 elder >50
+
+Simple Assault
+```{r}
+#"Simple Assault" 18-29
+SIM_young<-list()
+SIM_mid<-list()
+SIM_old<-list()
+
+#YOUNG
+SIM_young<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='29'][DF_2016$Age>='18']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_young,.)
+
+SIM_young<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='29'][DF_2017$Age>='18']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_young,.)
+
+SIM_young<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='29'][DF_2018$Age>='18']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_young,.)
+
+SIM_young<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='29'][DF_2019$Age>='18']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_young,.)
+
+SIM_young<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='29'][DF_2020$Age>='18']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_young,.)
+
+SIM_young<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='29'][DF_2021$Age>='18']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_young,.)
+
+SIM_young<-c(SIM_young[[1]],SIM_young[[2]],SIM_young[[3]],SIM_young[[4]],SIM_young[[5]],SIM_young[[6]])
+
+#MID
+SIM_mid<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='50'][DF_2016$Age>='30']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_mid,.)
+
+SIM_mid<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='50'][DF_2017$Age>='30']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_mid,.)
+
+SIM_mid<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='50'][DF_2018$Age>='30']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_mid,.)
+
+SIM_mid<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='50'][DF_2019$Age>='30']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_mid,.)
+
+SIM_mid<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='50'][DF_2020$Age>='30']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_mid,.)
+
+SIM_mid<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='50'][DF_2021$Age>='30']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_mid,.)
+
+SIM_mid<-c(SIM_mid[[1]],SIM_mid[[2]],SIM_mid[[3]],SIM_mid[[4]],SIM_mid[[5]],SIM_mid[[6]])
+
+#OLD
+
+SIM_old<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age>="51"]=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_old,.)
+
+SIM_old<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age>='51']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_old,.)
+
+SIM_old<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age>='51']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_old,.)
+
+SIM_old<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age>='51']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_old,.)
+
+SIM_old<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age>='51']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_old,.)
+
+SIM_old<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age>='51']=="Simple Assault")["TRUE"]%>%sum()%>%append(SIM_old,.)
+
+SIM_old<-c(SIM_old[[1]],SIM_old[[2]],SIM_old[[3]],SIM_old[[4]],SIM_old[[5]],SIM_old[[6]])
+
+
+```
+
+Release Violations/Fugitive
+
+```{r}
+
+#Release Violations/Fugitive
+RVF_young<-list()
+RVF_mid<-list()
+RVF_old<-list()
+
+#YOUNG
+RVF_young<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='29'][DF_2016$Age>='18']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_young,.)
+
+RVF_young<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='29'][DF_2017$Age>='18']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_young,.)
+
+RVF_young<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='29'][DF_2018$Age>='18']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_young,.)
+
+RVF_young<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='29'][DF_2019$Age>='18']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_young,.)
+
+RVF_young<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='29'][DF_2020$Age>='18']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_young,.)
+
+RVF_young<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='29'][DF_2021$Age>='18']=="Release Violations/Fugitive (Warr)")["TRUE"]%>%sum()%>%append(RVF_young,.)
+
+RVF_young<-c(RVF_young[[1]],RVF_young[[2]],RVF_young[[3]],RVF_young[[4]],RVF_young[[5]],RVF_young[[6]])
+
+#MID
+RVF_mid<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='50'][DF_2016$Age>='30']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_mid,.)
+
+RVF_mid<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='50'][DF_2017$Age>='30']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_mid,.)
+
+RVF_mid<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='50'][DF_2018$Age>='30']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_mid,.)
+
+RVF_mid<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='50'][DF_2019$Age>='30']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_mid,.)
+
+RVF_mid<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='50'][DF_2020$Age>='30']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_mid,.)
+
+RVF_mid<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='50'][DF_2021$Age>='30']=="Release Violations/Fugitive (Warr)")["TRUE"]%>%sum()%>%append(RVF_mid,.)
+
+RVF_mid<-c(RVF_mid[[1]],RVF_mid[[2]],RVF_mid[[3]],RVF_mid[[4]],RVF_mid[[5]],RVF_mid[[6]])
+
+#OLD
+
+RVF_old<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age>="51"]=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_old,.)
+
+RVF_old<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age>='51']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_old,.)
+
+RVF_old<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age>='51']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_old,.)
+
+RVF_old<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age>='51']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_old,.)
+
+RVF_old<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age>='51']=="Release Violations/Fugitive")["TRUE"]%>%sum()%>%append(RVF_old,.)
+
+RVF_old<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age>='51']=="Release Violations/Fugitive (Warr)")["TRUE"]%>%sum()%>%append(RVF_old,.)
+
+RVF_old<-c(RVF_old[[1]],RVF_old[[2]],RVF_old[[3]],RVF_old[[4]],RVF_old[[5]],RVF_old[[6]])
+
+```
+
+Traffic Violations
+
+```{r}
+
+TRA_young<-list()
+TRA_mid<-list()
+TRA_old<-list()
+
+#YOUNG
+TRA_young<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='29'][DF_2016$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_young,.)
+
+TRA_young<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='29'][DF_2017$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_young,.)
+
+TRA_young<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='29'][DF_2018$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_young,.)
+
+TRA_young<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='29'][DF_2019$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_young,.)
+
+TRA_young<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='29'][DF_2020$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_young,.)
+
+TRA_young<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='29'][DF_2021$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_young,.)
+
+TRA_young<-c(TRA_young[[1]],TRA_young[[2]],TRA_young[[3]],TRA_young[[4]],TRA_young[[5]],TRA_young[[6]])
+
+#MID
+TRA_mid<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='50'][DF_2016$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_mid,.)
+
+TRA_mid<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='50'][DF_2017$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_mid,.)
+
+TRA_mid<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='50'][DF_2018$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_mid,.)
+
+TRA_mid<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='50'][DF_2019$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_mid,.)
+
+TRA_mid<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='50'][DF_2020$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_mid,.)
+
+TRA_mid<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='50'][DF_2021$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_mid,.)
+
+TRA_mid<-c(TRA_mid[[1]],TRA_mid[[2]],TRA_mid[[3]],TRA_mid[[4]],TRA_mid[[5]],TRA_mid[[6]])
+
+#OLD
+
+TRA_old<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age>="51"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_old,.)
+
+TRA_old<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_old,.)
+
+TRA_old<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_old,.)
+
+TRA_old<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_old,.)
+
+TRA_old<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_old,.)
+
+TRA_old<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(TRA_old,.)
+
+TRA_old<-c(TRA_old[[1]],TRA_old[[2]],TRA_old[[3]],TRA_old[[4]],TRA_old[[5]],TRA_old[[6]])
+
+```
+
+Narcotics
+```{r}
+NAR_young<-list()
+NAR_mid<-list()
+NAR_old<-list()
+
+#YOUNG
+NAR_young<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='29'][DF_2016$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_young,.)
+
+NAR_young<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='29'][DF_2017$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_young,.)
+
+NAR_young<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='29'][DF_2018$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_young,.)
+
+NAR_young<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='29'][DF_2019$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_young,.)
+
+NAR_young<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='29'][DF_2020$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_young,.)
+
+NAR_young<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='29'][DF_2021$Age>='18']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_young,.)
+
+NAR_young<-c(NAR_young[[1]],NAR_young[[2]],NAR_young[[3]],NAR_young[[4]],NAR_young[[5]],NAR_young[[6]])
+
+#MID
+NAR_mid<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='50'][DF_2016$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_mid,.)
+
+NAR_mid<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='50'][DF_2017$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_mid,.)
+
+NAR_mid<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='50'][DF_2018$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_mid,.)
+
+NAR_mid<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='50'][DF_2019$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_mid,.)
+
+NAR_mid<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='50'][DF_2020$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_mid,.)
+
+NAR_mid<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='50'][DF_2021$Age>='30']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_mid,.)
+
+NAR_mid<-c(NAR_mid[[1]],NAR_mid[[2]],NAR_mid[[3]],NAR_mid[[4]],NAR_mid[[5]],NAR_mid[[6]])
+
+#OLD
+
+NAR_old<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age>="51"]=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_old,.)
+
+NAR_old<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_old,.)
+
+NAR_old<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_old,.)
+
+NAR_old<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_old,.)
+
+NAR_old<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_old,.)
+
+NAR_old<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age>='51']=="Traffic Violations")["TRUE"]%>%sum()%>%append(NAR_old,.)
+
+NAR_old<-c(NAR_old[[1]],NAR_old[[2]],NAR_old[[3]],NAR_old[[4]],NAR_old[[5]],NAR_old[[6]])
+
+```
+
+THEFT
+```{r}
+#THEFT
+THEFT_young<-list()
+THEFT_mid<-list()
+THEFT_old<-list()
+
+#YOUNG
+THEFT_young<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='29'][DF_2016$Age>='18']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_young,.)
+
+THEFT_young<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='29'][DF_2017$Age>='18']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_young,.)
+
+THEFT_young<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='29'][DF_2018$Age>='18']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_young,.)
+
+THEFT_young<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='29'][DF_2019$Age>='18']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_young,.)
+
+THEFT_young<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='29'][DF_2020$Age>='18']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_young,.)
+
+THEFT_young<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='29'][DF_2021$Age>='18']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_young,.)
+
+THEFT_young<-c(THEFT_young[[1]],THEFT_young[[2]],THEFT_young[[3]],THEFT_young[[4]],THEFT_young[[5]],THEFT_young[[6]])
+
+#MID
+THEFT_mid<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='50'][DF_2016$Age>='30']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_mid,.)
+
+THEFT_mid<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='50'][DF_2017$Age>='30']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_mid,.)
+
+THEFT_mid<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='50'][DF_2018$Age>='30']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_mid,.)
+
+THEFT_mid<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='50'][DF_2019$Age>='30']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_mid,.)
+
+THEFT_mid<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='50'][DF_2020$Age>='30']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_mid,.)
+
+THEFT_mid<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='50'][DF_2021$Age>='30']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_mid,.)
+
+THEFT_mid<-c(THEFT_mid[[1]],THEFT_mid[[2]],THEFT_mid[[3]],THEFT_mid[[4]],THEFT_mid[[5]],THEFT_mid[[6]])
+
+#OLD
+
+THEFT_old<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age>="51"]=="Theft")["TRUE"]%>%sum()%>%append(THEFT_old,.)
+
+THEFT_old<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age>='51']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_old,.)
+
+THEFT_old<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age>='51']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_old,.)
+
+THEFT_old<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age>='51']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_old,.)
+
+THEFT_old<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age>='51']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_old,.)
+
+THEFT_old<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age>='51']=="Theft")["TRUE"]%>%sum()%>%append(THEFT_old,.)
+
+THEFT_old<-c(THEFT_old[[1]],THEFT_old[[2]],THEFT_old[[3]],THEFT_old[[4]],THEFT_old[[5]],THEFT_old[[6]])
+
+```
+
+Other Crimes
+```{r}
+#Other Crimes
+OTH_young<-list()
+OTH_mid<-list()
+OTH_old<-list()
+
+#YOUNG
+OTH_young<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='29'][DF_2016$Age>='18']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_young,.)
+
+OTH_young<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='29'][DF_2017$Age>='18']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_young,.)
+
+OTH_young<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='29'][DF_2018$Age>='18']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_young,.)
+
+OTH_young<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='29'][DF_2019$Age>='18']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_young,.)
+
+OTH_young<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='29'][DF_2020$Age>='18']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_young,.)
+
+OTH_young<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='29'][DF_2021$Age>='18']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_young,.)
+
+OTH_young<-c(OTH_young[[1]],OTH_young[[2]],OTH_young[[3]],OTH_young[[4]],OTH_young[[5]],OTH_young[[6]])
+
+#MID
+OTH_mid<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age<='50'][DF_2016$Age>='30']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_mid,.)
+
+OTH_mid<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age<='50'][DF_2017$Age>='30']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_mid,.)
+
+OTH_mid<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age<='50'][DF_2018$Age>='30']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_mid,.)
+
+OTH_mid<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age<='50'][DF_2019$Age>='30']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_mid,.)
+
+OTH_mid<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age<='50'][DF_2020$Age>='30']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_mid,.)
+
+OTH_mid<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age<='50'][DF_2021$Age>='30']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_mid,.)
+
+OTH_mid<-c(OTH_mid[[1]],OTH_mid[[2]],OTH_mid[[3]],OTH_mid[[4]],OTH_mid[[5]],OTH_mid[[6]])
+
+#OLD
+
+OTH_old<-table(DF_2016$Arrest.Category[DF_2016$Defendant.Race=="WHITE"][DF_2016$Age>="51"]=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_old,.)
+
+OTH_old<-table(DF_2017$Arrest.Category[DF_2017$Defendant.Race=="WHITE"][DF_2017$Age>='51']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_old,.)
+
+OTH_old<-table(DF_2018$Arrest.Category[DF_2018$Defendant.Race=="WHITE"][DF_2018$Age>='51']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_old,.)
+
+OTH_old<-table(DF_2019$Arrest.Category[DF_2019$Defendant.Race=="WHITE"][DF_2019$Age>='51']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_old,.)
+
+OTH_old<-table(DF_2020$Arrest.Category[DF_2020$Defendant.Race=="WHITE"][DF_2020$Age>='51']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_old,.)
+
+OTH_old<-table(DF_2021$Arrest.Category[DF_2021$Defendant.Race=="WHITE"][DF_2021$Age>='51']=="Other Crimes")["TRUE"]%>%sum()%>%append(OTH_old,.)
+
+OTH_old<-c(OTH_old[[1]],OTH_old[[2]],OTH_old[[3]],OTH_old[[4]],OTH_old[[5]],OTH_old[[6]])
+
+
+```
+
+###Build a new DataFrame
+
+```{r}
+#dataframe of 3 age stages
+DF_white_age<-data.frame(x_year,SIM_young,SIM_mid,SIM_old,RVF_young,RVF_mid,RVF_old,TRA_young,TRA_mid,TRA_old,NAR_young,NAR_mid,NAR_old,THEFT_young,THEFT_mid,THEFT_old,OTH_young,OTH_mid,OTH_old)
+DF_white_age
+```
+
+```{r}
+DF_white_young<-data.frame(year=x_year,"Simple Assault"=SIM_young,"Release Violations/Fugitive"=RVF_young,"Traffic Violations"=TRA_young,"Narcotics"=NAR_young,"Theft"=THEFT_young,"Other Crimes"=OTH_young)
+DF_white_mid<-data.frame(year=x_year,"Simple Assault"=SIM_mid,"Release Violations/Fugitive"=RVF_mid,"Traffic Violations"=TRA_mid,"Narcotics"=NAR_mid,"Theft"=THEFT_mid,"Other Crimes"=OTH_mid)
+DF_white_old<-data.frame(year=x_year,"Simple Assault"=SIM_old,"Release Violations/Fugitive"=RVF_old,"Traffic Violations"=TRA_old,"Narcotics"=NAR_old,"Theft"=THEFT_old,"Other Crimes"=OTH_old)
+head(DF_white_young)
+DF_white_young<-transform(DF_white_young,age="young")
+DF_white_mid<-transform(DF_white_mid,age="mid")
+DF_white_old<-transform(DF_white_old,age="old")
+DF_white_age2<-rbind(DF_white_young,DF_white_mid,DF_white_old)
+tail(DF_white_age2)
+```
+
+make a plot
+```{r}
+
+#color_ls<-list("darkorange","darkorange1","darkorange2","darkorange3","darkorange4","darkolivegreen4")
+plot_young<-ggplot()+geom_line(data = DF_white_age,aes(x = x_year,y = SIM_young,colour = "Simple Assault"),size=1)+
+  geom_point(data =  DF_white_age,aes(x = x_year,y = SIM_young,colour = "Simple Assault"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = RVF_young,colour ="Release Violations/Fugitive"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = RVF_young,colour = "Release Violations/Fugitive"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = TRA_young,colour ="Traffic Violations"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = TRA_young,colour = "Traffic Violations"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = NAR_young,colour ="Narcotics"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = NAR_young,colour = "Narcotics"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = THEFT_young,colour ="Theft"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = THEFT_young,colour = "Theft"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y =OTH_young,colour ="Other Crimes"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = OTH_young,colour = "Other Crimes"),size=3)+
+  
+  scale_colour_manual("",values = c("red","orange","yellow","green","blue","purple"))+
+  xlab("Year")+ylab("CRIME COUNTS")+ ggtitle("Young (18-29)")+
+  
+  
+ theme(panel.grid.major = element_line(color = "gray10", size = .5),
+        panel.grid.minor = element_line(color = "gray70", size = .25))
+
+plot_mid<-ggplot()+geom_line(data = DF_white_age,aes(x = x_year,y = SIM_mid,colour = "Simple Assault"),size=1)+
+  geom_point(data =  DF_white_age,aes(x = x_year,y = SIM_mid,colour = "Simple Assault"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = RVF_mid,colour ="Release Violations/Fugitive"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = RVF_mid,colour = "Release Violations/Fugitive"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = TRA_mid,colour ="Traffic Violations"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = TRA_mid,colour = "Traffic Violations"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = NAR_mid,colour ="Narcotics"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = NAR_mid,colour = "Narcotics"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = THEFT_mid,colour ="Theft"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = THEFT_mid,colour = "Theft"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y =OTH_mid,colour ="Other Crimes"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = OTH_mid,colour = "Other Crimes"),size=3)+
+  
+  scale_colour_manual("",values = c("red","orange","yellow","green","blue","purple"))+
+  xlab("Year")+ylab("CRIME COUNTS")+ ggtitle("Middle age (30-50)")+
+  
+  
+ theme(panel.grid.major = element_line(color = "gray10", size = .5),
+        panel.grid.minor = element_line(color = "gray70", size = .25))
+
+
+plot_old<-ggplot()+geom_line(data = DF_white_age,aes(x = x_year,y = SIM_old,colour = "Simple Assault"),size=1)+
+  geom_point(data =  DF_white_age,aes(x = x_year,y = SIM_old,colour = "Simple Assault"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = RVF_old,colour ="Release Violations/Fugitive"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = RVF_old,colour = "Release Violations/Fugitive"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = TRA_old,colour ="Traffic Violations"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = TRA_old,colour = "Traffic Violations"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = NAR_old,colour ="Narcotics"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = NAR_old,colour = "Narcotics"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y = THEFT_old,colour ="Theft"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = THEFT_old,colour = "Theft"),size=3)+
+  
+  geom_line(data =  DF_white_age,aes(x = x_year,y =OTH_old,colour ="Other Crimes"),size=1) + 
+  geom_point(data =  DF_white_age,aes(x = x_year,y = OTH_old,colour = "Other Crimes"),size=3)+
+  
+  scale_colour_manual("",values = c("red","orange","yellow","green","blue","purple"))+
+  xlab("Year")+ylab("CRIME COUNTS")+ ggtitle("Old age (>50)")+
+  
+ 
+ theme(panel.grid.major = element_line(color = "gray10", size = .5),
+        panel.grid.minor = element_line(color = "gray70", size = .25))
+```
+
+```{r}
+plot_young
+plot_mid
+plot_old
+```
+
+```{r}
+library(gridExtra)
+library(grid)
+library(ggplot2)
+library(lattice)
+grid.arrange(
+arrangeGrob(plot_young, plot_mid, plot_old, ncol=1, nrow=3), 
+  top = "Crime trend among differenge ages",
+  bottom = textGrob(
+    "2016-2021 in DC",
+    gp = gpar(fontface = 3, fontsize = 9),
+    hjust = 1,
+    x = 1
+  )
+)
+```
+
+```{r}
+barplot(as.matrix(DF_white_new)[,2:7],
+        main="Crime among all white males \n 2016-2021",
+         
+        # setting y label only
+        # because x-label will be our
+        # barplots name
+        ylab="Count",
+         las=0, cex.names=0.55,
+        # to plot the bars vertically
+        beside=TRUE,
+)
+ 
+
+```
+```{r}
+
+head(DF_white_age2)
+#ggplot(DF_white_age2,aes((Narcotics)))+geom_boxplot(aes(fill=age))
 
 
 
-We can also goup them by ages like 20-30, 30-40....
+
+ggplot(DF_white_age2, aes(fill=age, y=Simple.Assault, x=year)) + 
+    geom_bar(position="stack", stat="identity") 
+
+ggplot(DF_white_age2, aes(fill=age, y=Release.Violations.Fugitive, x=year)) + 
+    geom_bar(position="stack", stat="identity") 
+
+ggplot(DF_white_age2, aes(fill=age, y=Traffic.Violations
+, x=year)) + 
+    geom_bar(position="stack", stat="identity") 
+
+ggplot(DF_white_age2, aes(fill=age, y=Narcotics, x=year)) + 
+    geom_bar(position="stack", stat="identity") 
+
+ggplot(DF_white_age2, aes(fill=age, y=Theft, x=year)) + 
+    geom_bar(position="stack", stat="identity") 
+
+ggplot(DF_white_age2, aes(fill=age, y=Other.Crimes
+, x=year)) + 
+    geom_bar(position="stack", stat="identity") 
+
+
+
+```
+
+```{r}
+
+
+bar_young<-barplot(as.matrix(DF_white_young[,2:7]),
+        main="Young white males \n 2016-2021",
+         
+        # setting y label only
+        # because x-label will be our
+        # barplots name
+        ylab="Count",
+         las=0, cex.names=0.55,
+        # to plot the bars vertically
+        beside=TRUE,
+)
+
+bar_mid<-barplot(as.matrix(DF_white_mid[,2:7]),
+        main="Middle age white males \n 2016-2021",
+         
+        # setting y label only
+        # because x-label will be our
+        # barplots name
+        ylab="Count",
+         las=0, cex.names=0.55,
+        # to plot the bars vertically
+        beside=TRUE,
+)
+
+bar_old<-barplot(as.matrix(DF_white_old[,2:7]),
+        main="Old white males \n 2016-2021",
+         
+        # setting y label only
+        # because x-label will be our
+        # barplots name
+        ylab="Count",
+         las=0, cex.names=0.55,
+        # to plot the bars vertically
+        beside=TRUE,
+)
+
+```
+
