@@ -125,6 +125,9 @@ df_full$Day = day(df_full$Arrest_Date)
 # i want to create a week-day variable
 df_full$Weekday = weekdays(df_full$Arrest_Date)
 df_full$Weekday = factor(df_full$Weekday, levels = as.character(wday(c(2:7,1), label=TRUE, abbr=FALSE)))
+
+# convert crime types to factors
+df_full$Arrest_Category = as.factor(df_full$Arrest_Category)
 ```
 
 # EDA (?)
@@ -141,7 +144,24 @@ ggplot(by_date, aes(Arrest_Date, Total, color = Arrest_Date)) +
 ```
 
 
-### All Crimes By Day, Month, Year
+### All Crimes By Hour, Day, Month, Year
+
+
+#### Hour of the day.. at what time do these crimes occur the most?
+
+```{r}
+by_hour <- df_full %>% 
+           group_by(Arrest_Hour) %>% 
+           dplyr::summarise(Total = n())
+by_hour
+
+ggplot(by_hour, aes(Arrest_Hour, Total, color = Arrest_Hour)) + 
+    geom_line() + 
+    ggtitle("Crimes By Hour") + 
+    xlab("Hour of the Day") + 
+    ylab("Total Crimes") 
+```
+
 
 #### Day  .. What day of the month has the highest crime incidents?
 ```{r}
@@ -171,24 +191,7 @@ ggplot(by_weekday, aes(Weekday, Total, fill = Weekday)) +
       theme(legend.position = "none")
 ```
 
-
-
-### All Crimes By Year
-####Crime incidence grouped into yearly plots..
-```{r}
-by_year = df_full %>% group_by(Arrest_Year) %>% 
-           dplyr::summarise(Total = n())
-by_year$Percent <- by_year$Total/dim(df_full)[1] * 100
-by_year
-
-ggplot(by_year, aes(Arrest_Year, Total, fill = Arrest_Year)) + 
-      geom_bar(stat = "identity") +
-      ggtitle("Crimes By Year ") + 
-      xlab("Year") + ylab("Count") + 
-      theme(legend.position = "none")
-
-```
-
+#### Monthly crime incidence
 ```{r}
 by_month <- df_full %>% 
             group_by(Month) %>% 
@@ -207,6 +210,24 @@ ggplot(by_month, aes(Month, Total, fill = Month)) +
 ggplot(by_month, aes(x=Month, y=Total, group=1)) + geom_line()
 ```
 
+### All Crimes By Year
+####Crime incidence grouped into yearly plots..
+```{r}
+by_year = df_full %>% group_by(Arrest_Year) %>% 
+           dplyr::summarise(Total = n())
+by_year$Percent <- by_year$Total/dim(df_full)[1] * 100
+by_year
+
+ggplot(by_year, aes(Arrest_Year, Total, fill = Arrest_Year)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("Crimes By Year ") + 
+      xlab("Year") + ylab("Count") + 
+      theme(legend.position = "none")
+
+ggplot(by_year, aes(x=Arrest_Year, y=Total, group=1)) + geom_line()
+```
+
+
 
 ## Time to investigate our main focus group - White Males - EDA
 
@@ -215,6 +236,109 @@ ggplot(by_month, aes(x=Month, y=Total, group=1)) + geom_line()
 #table(df_full$Defendant_Sex)
 df_wm = subset(df_full, subset = Defendant_Race == "WHITE" & Defendant_Sex == "MALE")
 head(df_wm, 20)
+
+# i want to create a week-day variable
+df_wm$Weekday = weekdays(df_wm$Arrest_Date)
+df_wm$Weekday = factor(df_wm$Weekday, levels = as.character(wday(c(2:7,1), label=TRUE, abbr=FALSE)))
+```
+
+same pattern here as above, will dig into a few other stuff too..
+
+#### White Men - By the Hour
+```{r}
+wm_by_hour <- df_wm %>% 
+           group_by(Arrest_Hour) %>% 
+           dplyr::summarise(Total = n())
+wm_by_hour
+
+ggplot(wm_by_hour, aes(Arrest_Hour, Total, color = Arrest_Hour)) + 
+    geom_line() + 
+    ggtitle("White Males - Crimes By Hour") + 
+    xlab("Hour of the Day") + 
+    ylab("Total Crimes")
+```
+
+
+#### White Men - What day of the month has the highest crime incidents?
+```{r}
+wm_by_day <- df_wm %>% 
+           group_by(Day) %>% 
+           dplyr::summarise(Total = n())
+wm_by_day
+
+ggplot(wm_by_day, aes(Day, Total, color = Day)) + 
+    geom_line() + 
+    ggtitle("White Males - Crimes By Day") + 
+    xlab("Day of the Month") + 
+    ylab("Total Crimes")
+```
+
+#### White Men - What Day of the Week has the highest crime incidents?
+```{r}
+wm_by_weekday = df_wm %>% group_by(Weekday) %>% 
+           dplyr::summarise(Total = n())
+wm_by_weekday$Percent <- wm_by_weekday$Total/dim(df_wm)[1] * 100
+wm_by_weekday
+
+ggplot(wm_by_weekday, aes(Weekday, Total, fill = Weekday)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("White Males - Crimes By Weekday ") + 
+      xlab("Day of the Week") + ylab("Count") + 
+      theme(legend.position = "none")
+```
+
+#### White Males - By Month
+```{r}
+wm_by_month <- df_wm %>% 
+            group_by(Month) %>% 
+            dplyr::summarise(Total = n())
+
+wm_by_month$Percent <- wm_by_month$Total/dim(df_wm)[1] * 100
+wm_by_month
+
+ggplot(wm_by_month, aes(Month, Total, fill = Month)) + 
+        geom_bar(stat = "identity") + 
+        ggtitle("White Males - Crimes By Month") + 
+        xlab("Month") + 
+        ylab("Count") + 
+        theme(legend.position = "none")
+
+ggplot(wm_by_month, aes(x=Month, y=Total, group=1)) + geom_line()
+```
+
+####White Men - Yearly Crime Incidents
+```{r}
+wm_by_year = df_wm %>% group_by(Arrest_Year) %>% 
+           dplyr::summarise(Total = n())
+wm_by_year$Percent <- wm_by_year$Total/dim(df_wm)[1] * 100
+wm_by_year
+
+ggplot(wm_by_year, aes(Arrest_Year, Total, fill = Arrest_Year)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("White Males - Crimes By Year ") + 
+      xlab("Year") + ylab("Count") + 
+      theme(legend.position = "none")
+
+ggplot(wm_by_year, aes(x=Arrest_Year, y=Total, group=1)) + geom_line()
+```
+
+
+#### Let us get into crime types...
+
+```{r}
+wm_by_cat <- df_wm %>% 
+          group_by(Arrest_Category) %>% 
+          dplyr::summarise(Total = n()) %>% 
+          arrange(desc(Total))
+
+wm_by_cat[1:10,]
+
+ggplot(wm_by_cat, aes(reorder(Arrest_Category, Total), Total)) + 
+    geom_bar(stat = "identity") + coord_flip() +  
+    scale_y_continuous(breaks = seq(0,3000,500)) + 
+    ggtitle("Crimes By Arrest Category") + 
+    xlab("Crime Type") + 
+    ylab("Number of Incidents")
 ```
 
 
@@ -222,20 +346,5 @@ head(df_wm, 20)
 
 
 
-
-
-
-
-
-
-
-
-
-
-## Including Plots
-
-
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 
