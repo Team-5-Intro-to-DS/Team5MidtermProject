@@ -12,16 +12,18 @@ date: "`r Sys.Date()`"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-install some packages or libraries
-```{r}
-
 library(ggplot2)
 library(ezids)
 library(dplyr)
 library(readr)
+library(tidyr)
+library(knitr)
+library(magrittr)
 ```
+
+
+# Research Topic  
+Our research topic is **Trend of Major Types of Crimes commited by White Males in the DC Area in 2016-2021**. We chose this topic because we are interested in the impact of COVID-19 on crimes. We will use [the data provided by the Metropolitan Police of DC](https://mpdc.dc.gov/node/1379551) regarding adult arrests over a time period stretching between 2016-2021.
 
 # Data Shaping
 ## Read Data
@@ -38,7 +40,7 @@ df_2021<-data.frame(read.csv("2021 Adult Arrests.csv"))
 c16 <- c(colnames(df_2016))
 c18 <- c(colnames(df_2018))
 ```
-Note that the colnames of df_2016 and df_2017 are not the same with others. We show the columns name of df_2016 and df_2018 in the below:
+The column names of the data in 2016 and 2017 are not the same with others. The below table shows the column names of the data in 2016 and the data in 2016.
 
 |col #|2016       |2018       |
 |:---:|:---------:|:---------:|
@@ -70,12 +72,21 @@ Note that the colnames of df_2016 and df_2017 are not the same with others. We s
 | 26  |`r c16[26]`|`r c18[26]`|
 
 
-## Merge Multiple CSV Files  
-You can see that the columns name are same from the first column to the 14th column in both data. On the other hand, the name and order of 15th and latter columns are a bit different in those data. The latter columns are about locations, and we are not very interested in the detail location. Therefore, we will delete the latter columns except for the 16th and 22nd columns. In addition, we will drop `CNN` (col #5) and `Arrest.Number.` (col #6) because they are IDs and useless for our analysis.
+## Merge Multiple CSV Files and Drop Ssome Columns  
+You can see that the column names are same from the first column to the 14th column in both data. On the other hand, the name and order of 15th and latter columns are a bit different in those data. The latter columns are about locations, and we are not very interested in the detail location. Therefore, we will delete the latter columns except for the 16th and 22nd columns. In addition, we will drop `CNN` (col #5) and `Arrest.Number.` (col #6) because they are IDs and useless for our analysis.
   
-After deleting some columns, we will bind data frames by rows.
+The format of date is different from years; the data in 2016 and 2017 has the format like `r df_2016$Arrest.Date[1]`, the data in 2018 to 2020 has the format like `r df_2018$Arrest.Date[1]`, and the data in 2021 has the format like `r df_2021$Arrest.Date[1]`. We will covert Since different date formats for different years are difficult to analyze, we will unify the date format to "yyyy-mm-dd".
+  
+After deleting some columns and changing the date format, we will bind data frames by rows.
+
 
 ```{r}
+# convert format
+df_2018$Arrest.Date <- as.Date(df_2018$Arrest.Date, format = "%m/%d/%Y") %>% format()
+df_2019$Arrest.Date <- as.Date(df_2019$Arrest.Date, format = "%m/%d/%Y") %>% format()
+df_2020$Arrest.Date <- as.Date(df_2020$Arrest.Date, format = "%m/%d/%Y") %>% format()
+df_2021$Arrest.Date <- as.Date(df_2021$Arrest.Date, format = "%Y/%m/%d") %>% format()
+
 #bind df_2016 and df_2017, and delete some columns
 df_16_17 <- rbind(df_2016, df_2017)[,-c(5,6,15,17:21,23:26)]
 names(df_16_17)[c(13,14)] <- c('Arrest.Location.District','Offense.Location.District')   #rename columns
@@ -84,11 +95,10 @@ names(df_16_17)[c(13,14)] <- c('Arrest.Location.District','Offense.Location.Dist
 df_18_21 <- rbind(df_2018, df_2019, df_2020, df_2021)[,-c(5,6,15,17:21,23:26)] 
 
 DF<-rbind(df_16_17,df_18_21)
-colnames(DF)
-str(DF)
-xkablesummary(DF)
 ```
-## Drop some rows  
+
+  
+## Drop Some Rows and Revise Some Values 
 Since we are interested in crimes committed by while males, we will drop rows where the value of `Defendant.Race` is not "White".
   
 In addition, `Arrest.Category` has some different values for 2021 and other years:  
@@ -96,15 +106,22 @@ In addition, `Arrest.Category` has some different values for 2021 and other year
 * Data in 2021 has "Release Violations/Fugitive (Fug)" and "Release Violations/Fugitive (Warr)" although data in other years have "Release Violations/Fugitive" instead of them.  
 * Data in 2021 has "Fraud and Financial Crimes (Frau)" although data in other years have "Fraud and Financial Crimes".  
 
-Therefore, we wil covert these values in 2021 into the correspond values in other years.
+Therefore, we will covert these values in 2021 into the correspond values in other years.  
+
+The structure of data frame after data shaping is shown in the below table.
 
 
 ```{r}
 DF_WM <- subset(DF, subset = Defendant.Race=='WHITE' & Defendant.Sex=='MALE')
 DF_WM <- mutate(DF_WM, Arrest.Category = gsub(Arrest.Category, pattern = "Release Violations/Fugitive.*", replacement = "Release Violations/Fugitive"))
 DF_WM <- mutate(DF_WM, Arrest.Category = gsub(Arrest.Category, pattern = "Fraud and Financial Crimes.*", replacement = "Fraud and Financial Crimes"))
-str(DF_WM)
-xkablesummary(DF_WM)
+
+
+data.frame(column_name = names(DF_WM),
+           class = sapply(DF_WM, typeof),
+           first_values = sapply(DF_WM, function(x) paste0(head(x),  collapse = ", ")),
+           row.names = NULL) %>% 
+  kable("simple", caption = 'Data frame structure')
 ```
 
 
@@ -220,9 +237,49 @@ The top 6 crimes (or 7 crimes when 'Other Crimes' are included) in each year are
 
 
 ### Line plots
-In order to check changes in crime trends, the graph below illustrates, for each crime type, the change over time in the percentage of crimes of that crime type in all crimes.
+To see the trend of the above major crimes, we create a line plot as follows.
 
 ```{r}
+SA_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Simple Assault',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Simple Assault',]$Arrest.Year==x)})
+TV_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Traffic Violations',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Traffic Violations',]$Arrest.Year==x)})
+RV_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Release Violations/Fugitive',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Release Violations/Fugitive',]$Arrest.Year==x)})
+DI_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Driving/Boating While Intoxicated',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Driving/Boating While Intoxicated',]$Arrest.Year==x)})
+N_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Narcotics',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Narcotics',]$Arrest.Year==x)})
+LV_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Liquor Law Violations',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Liquor Law Violations',]$Arrest.Year==x)})
+T_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Theft',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Theft',]$Arrest.Year==x)})
+DV_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Offenses Against Family & Children',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Offenses Against Family & Children',]$Arrest.Year==x)})
+DC_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Disorderly Conduct',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Disorderly Conduct',]$Arrest.Year==x)})
+P_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Prostitution',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Prostitution',]$Arrest.Year==x)})
+DP_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Damage to Property',]$Arrest.Year),
+                       function(x){sum(DF_WM[DF_WM$Arrest.Category=='Damage to Property',]$Arrest.Year==x)})
+year_lst <- 2016:2021
+
+major_crimes_df <- data.frame(year_lst, SA_cnt, TV_cnt, RV_cnt, DI_cnt, N_cnt, LV_cnt, T_cnt, DV_cnt, DC_cnt, P_cnt, DP_cnt)
+
+colnames(major_crimes_df) <- c('Year', 'Simple Assault', 'Traffic Violations', 'Release Violations/Fugitive', 'Driving/Boating While Intoxicated',
+                               'Narcotics', 'Liquor Law Violations', 'Theft', 'Offenses Against Family & Children', 'Disorderly Conduct', 'Prostitution', 'Damage to Property')
+
+major_crimes_df2 <- major_crimes_df %>% gather(key = 'Crimes', value = "Count", -Year)
+
+ggplot(data=major_crimes_df2, aes(x=Year, y=Count, color=Crimes)) +
+  geom_line() + geom_point()
+
+```
+  
+**"Simple Assault"**, **"Traffic Violations"**, and **"Theft"** have clearly declined since 2020. On the other, **"Offenses Against Family & Children"** has increased in 2020 and 2021 compared to previous years. In the following, we will analyze these four crimes in detail.
+
+
+```{r, include=FALSE}
 #  table of the number of each crime type in each year
 table_freq <- xtabs(~Arrest.Year+Arrest.Category,DF_WM)
 
@@ -247,7 +304,7 @@ DF_rfreq$Arrest.Year <- as.character(DF_rfreq$Arrest.Year) %>% as.numeric()
 ```
 
 
-```{r}
+```{r, include=FALSE}
 
 ggplot(DF_rfreq, aes(x=Arrest.Year, y=Freq, color=Arrest.Category, group=Arrest.Category)) +
   ggtitle("Figure 10: Line plot of percentage of a crime vs year") + xlab("Year") + 
@@ -259,7 +316,7 @@ ggplot(DF_rfreq, aes(x=Arrest.Year, y=Freq, color=Arrest.Category, group=Arrest.
 ```
 
 
-```{r}
+```{r, include=FALSE}
 #install.packages("ggrepel") 
 library(ggrepel)
 
@@ -287,7 +344,7 @@ ggplot(DF_rfreq_10, aes(x=Arrest.Year, y=Freq, color=Arrest.Category, group=Arre
   lims(x = c(2016, 2023))
 ```
 
-```{r}
+```{r, include=FALSE}
 DF_rfreq_non10 <- subset(DF_rfreq, Arrest.Category %in% tmp[-c(1:10)])
 
 ggplot(DF_rfreq_non10, aes(x=Arrest.Year, y=Freq, color=Arrest.Category, group=Arrest.Category)) +
@@ -307,7 +364,6 @@ ggplot(DF_rfreq_non10, aes(x=Arrest.Year, y=Freq, color=Arrest.Category, group=A
   lims(x = c(2016, 2022))
 ```
 
-"Simple Assault" and "Offenses Against Family & Children" seem to be increasing after COVID-19. On the other hand, "Traffic Violations" seems to be decreasing after COVID-19.
 
 # Analysis
 
@@ -692,6 +748,106 @@ ggplot(data_CI_SA) +
 
 ```
 
+## Theft
+
+```{r}
+DF_WM_16_19_T <- DF_WM_16_19[DF_WM_16_19$Arrest.Category=='Theft',]
+
+# table of date and the number of occurrences
+T_day_16_19 <- sapply(unique(DF_WM_16_19_T$Arrest.Date),
+                       function(x){sum(DF_WM_16_19_T$Arrest.Date==x)})
+```
+
+| # of occurrences per day | Frequency | Relative frequency |
+|:------------------------:|:---------:|:------------------:|
+|0|`r 365*4+1 - length(T_day_16_19)`|`r (365*4+1 - length(T_day_16_19))/(365*4+1)`|
+|1|`r length(T_day_16_19[T_day_16_19==1])`|`r length(T_day_16_19[T_day_16_19==1])/(365*4+1)`|
+|2|`r length(T_day_16_19[T_day_16_19==2])`|`r length(T_day_16_19[T_day_16_19==2])/(365*4+1)`|
+|3|`r length(T_day_16_19[T_day_16_19==3])`|`r length(T_day_16_19[T_day_16_19==3])/(365*4+1)`|
+|4|`r length(T_day_16_19[T_day_16_19==4])`|`r length(T_day_16_19[T_day_16_19==4])/(365*4+1)`|
+|5|`r length(T_day_16_19[T_day_16_19==5])`|`r length(T_day_16_19[T_day_16_19==5])/(365*4+1)`|
+
+```{r, fig.show="hold", out.width="48%"}
+
+x_T <- 0:5
+y_T <- c(972,399,79,10,1,0)
+fx <- dpois(x=x_T, lambda=sum(T_day_16_19)/(365*4+1))
+data_T <- data.frame(x_T, y_T, fx)
+
+ggplot(data_T, aes(x=x_T,y=y_T)) +
+  ggtitle("Figure : Histogram of Theft in 2016 - 2019") + 
+  xlab("Number of occurrences per day") + 
+  ylab("Frequency") +
+  geom_bar(stat = "identity") 
+
+ggplot(data_T) +
+  ggtitle("Figure : Relative frequency histogram of Theft in 2016 - 2019 \n and Poisson distribution with lambda = 0.405") + 
+  xlab("Number of occurrences per day") + 
+  ylab("Relative frequency") +
+  geom_bar(aes(x=x_T,y=y_T/(365*4+1)), stat = "identity") +
+  geom_line(aes(x=x_T,y=fx), color='red') +
+  geom_point(aes(x=x_T,y=fx), color='red')
+
+```
+
+```{r}
+DF_WM_20_21_T <- DF_WM_20_21[DF_WM_20_21$Arrest.Category=='Theft',]
+
+# table of date and the number of occurrences
+T_day_20_21 <- sapply(unique(DF_WM_20_21_T$Arrest.Date),
+                       function(x){sum(DF_WM_20_21_T$Arrest.Date==x)})
+```
+
+
+| # of occurrences per day | Frequency | Relative frequency |
+|:------------------------:|:---------:|:------------------:|
+|0|`r 365*2+1 - length(T_day_20_21)`|`r (365*2+1 - length(T_day_20_21))/(365*2+1)`|
+|1|`r length(T_day_20_21[T_day_20_21==1])`|`r length(T_day_20_21[T_day_20_21==1])/(365*2+1)`|
+|2|`r length(T_day_20_21[T_day_20_21==2])`|`r length(T_day_20_21[T_day_20_21==2])/(365*2+1)`|
+|3|`r length(T_day_20_21[T_day_20_21==3])`|`r length(T_day_20_21[T_day_20_21==3])/(365*2+1)`|
+
+```{r, fig.show="hold", out.width="48%"}
+
+x_T <- 0:3
+y_T <- c(653,72,6,0)
+fx <- dpois(x=x_T, lambda=sum(T_day_20_21)/(365*2+1))
+data_T <- data.frame(x_T, y_T, fx)
+
+ggplot(data_T, aes(x=x_T,y=y_T)) +
+  ggtitle("Figure : Histogram of Theft in 2020 - 2021") + 
+  xlab("Number of occurrences per day") + 
+  ylab("Frequency") +
+  geom_bar(stat = "identity") 
+
+ggplot(data_T) +
+  ggtitle("Figure : Relative frequency histogram of Theft in 2020 - 2021 \n and Poisson distribution with lambda = 0.115") + 
+  xlab("Number of occurrences per day") + 
+  ylab("Relative frequency") +
+  geom_bar(aes(x=x_T,y=y_T/(365*2+1)), stat = "identity") +
+  geom_line(aes(x=x_T,y=fx), color='red') +
+  geom_point(aes(x=x_T,y=fx), color='red')
+
+```
+
+```{r}
+
+x <- c('Before COVID-19','After COVID-19')
+pre_covid_interval <- c(sum(T_day_16_19)/(365*4+1) - 2.58*(sum(T_day_16_19)/(365*4+1)/(356*4+1))**0.5,
+                        sum(T_day_16_19)/(365*4+1) + 2.58*(sum(T_day_16_19)/(365*4+1)/(356*4+1))**0.5)
+post_covid_interval <- c(sum(T_day_20_21)/(365*2+1) - 2.58*(sum(T_day_20_21)/(365*2+1)/(356*2+1))**0.5,
+                         sum(T_day_20_21)/(365*2+1) + 2.58*(sum(T_day_20_21)/(365*2+1)/(356*2+1))**0.5)
+data_CI_T <- data.frame(x,pre_covid_interval,post_covid_interval)
+
+ggplot(data_CI_T) +
+  ggtitle("Figure : 99% Confidence Interval of lambda for Theft") + 
+  ylab("99% Confidence Interval of lambda") + 
+  xlab("") +
+  coord_flip() +
+  geom_linerange(aes(x=x[1], ymin=pre_covid_interval[1], ymax=pre_covid_interval[2])) +
+  geom_linerange(aes(x=x[2], ymin=post_covid_interval[1], ymax=post_covid_interval[2]))
+  
+
+```
 
 ### check  
 
@@ -933,7 +1089,7 @@ mean21
 var21
 ```
 
-
+# Other crimes
 ## Release Violations/Fugitive  
 
 ```{r}
@@ -1359,106 +1515,6 @@ ggplot(data_CI_LV) +
 
 ```
 
-## Theft
-
-```{r}
-DF_WM_16_19_T <- DF_WM_16_19[DF_WM_16_19$Arrest.Category=='Theft',]
-
-# table of date and the number of occurrences
-T_day_16_19 <- sapply(unique(DF_WM_16_19_T$Arrest.Date),
-                       function(x){sum(DF_WM_16_19_T$Arrest.Date==x)})
-```
-
-| # of occurrences per day | Frequency | Relative frequency |
-|:------------------------:|:---------:|:------------------:|
-|0|`r 365*4+1 - length(T_day_16_19)`|`r (365*4+1 - length(T_day_16_19))/(365*4+1)`|
-|1|`r length(T_day_16_19[T_day_16_19==1])`|`r length(T_day_16_19[T_day_16_19==1])/(365*4+1)`|
-|2|`r length(T_day_16_19[T_day_16_19==2])`|`r length(T_day_16_19[T_day_16_19==2])/(365*4+1)`|
-|3|`r length(T_day_16_19[T_day_16_19==3])`|`r length(T_day_16_19[T_day_16_19==3])/(365*4+1)`|
-|4|`r length(T_day_16_19[T_day_16_19==4])`|`r length(T_day_16_19[T_day_16_19==4])/(365*4+1)`|
-|5|`r length(T_day_16_19[T_day_16_19==5])`|`r length(T_day_16_19[T_day_16_19==5])/(365*4+1)`|
-
-```{r, fig.show="hold", out.width="48%"}
-
-x_T <- 0:5
-y_T <- c(972,399,79,10,1,0)
-fx <- dpois(x=x_T, lambda=sum(T_day_16_19)/(365*4+1))
-data_T <- data.frame(x_T, y_T, fx)
-
-ggplot(data_T, aes(x=x_T,y=y_T)) +
-  ggtitle("Figure : Histogram of Theft in 2016 - 2019") + 
-  xlab("Number of occurrences per day") + 
-  ylab("Frequency") +
-  geom_bar(stat = "identity") 
-
-ggplot(data_T) +
-  ggtitle("Figure : Relative frequency histogram of Theft in 2016 - 2019 \n and Poisson distribution with lambda = 0.405") + 
-  xlab("Number of occurrences per day") + 
-  ylab("Relative frequency") +
-  geom_bar(aes(x=x_T,y=y_T/(365*4+1)), stat = "identity") +
-  geom_line(aes(x=x_T,y=fx), color='red') +
-  geom_point(aes(x=x_T,y=fx), color='red')
-
-```
-
-```{r}
-DF_WM_20_21_T <- DF_WM_20_21[DF_WM_20_21$Arrest.Category=='Theft',]
-
-# table of date and the number of occurrences
-T_day_20_21 <- sapply(unique(DF_WM_20_21_T$Arrest.Date),
-                       function(x){sum(DF_WM_20_21_T$Arrest.Date==x)})
-```
-
-
-| # of occurrences per day | Frequency | Relative frequency |
-|:------------------------:|:---------:|:------------------:|
-|0|`r 365*2+1 - length(T_day_20_21)`|`r (365*2+1 - length(T_day_20_21))/(365*2+1)`|
-|1|`r length(T_day_20_21[T_day_20_21==1])`|`r length(T_day_20_21[T_day_20_21==1])/(365*2+1)`|
-|2|`r length(T_day_20_21[T_day_20_21==2])`|`r length(T_day_20_21[T_day_20_21==2])/(365*2+1)`|
-|3|`r length(T_day_20_21[T_day_20_21==3])`|`r length(T_day_20_21[T_day_20_21==3])/(365*2+1)`|
-
-```{r, fig.show="hold", out.width="48%"}
-
-x_T <- 0:3
-y_T <- c(653,72,6,0)
-fx <- dpois(x=x_T, lambda=sum(T_day_20_21)/(365*2+1))
-data_T <- data.frame(x_T, y_T, fx)
-
-ggplot(data_T, aes(x=x_T,y=y_T)) +
-  ggtitle("Figure : Histogram of Theft in 2020 - 2021") + 
-  xlab("Number of occurrences per day") + 
-  ylab("Frequency") +
-  geom_bar(stat = "identity") 
-
-ggplot(data_T) +
-  ggtitle("Figure : Relative frequency histogram of Theft in 2020 - 2021 \n and Poisson distribution with lambda = 0.115") + 
-  xlab("Number of occurrences per day") + 
-  ylab("Relative frequency") +
-  geom_bar(aes(x=x_T,y=y_T/(365*2+1)), stat = "identity") +
-  geom_line(aes(x=x_T,y=fx), color='red') +
-  geom_point(aes(x=x_T,y=fx), color='red')
-
-```
-
-```{r}
-
-x <- c('Before COVID-19','After COVID-19')
-pre_covid_interval <- c(sum(T_day_16_19)/(365*4+1) - 2.58*(sum(T_day_16_19)/(365*4+1)/(356*4+1))**0.5,
-                        sum(T_day_16_19)/(365*4+1) + 2.58*(sum(T_day_16_19)/(365*4+1)/(356*4+1))**0.5)
-post_covid_interval <- c(sum(T_day_20_21)/(365*2+1) - 2.58*(sum(T_day_20_21)/(365*2+1)/(356*2+1))**0.5,
-                         sum(T_day_20_21)/(365*2+1) + 2.58*(sum(T_day_20_21)/(365*2+1)/(356*2+1))**0.5)
-data_CI_T <- data.frame(x,pre_covid_interval,post_covid_interval)
-
-ggplot(data_CI_T) +
-  ggtitle("Figure : 99% Confidence Interval of lambda for Theft") + 
-  ylab("99% Confidence Interval of lambda") + 
-  xlab("") +
-  coord_flip() +
-  geom_linerange(aes(x=x[1], ymin=pre_covid_interval[1], ymax=pre_covid_interval[2])) +
-  geom_linerange(aes(x=x[2], ymin=post_covid_interval[1], ymax=post_covid_interval[2]))
-  
-
-```
 
 
 
