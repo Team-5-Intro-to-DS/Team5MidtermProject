@@ -341,8 +341,45 @@ ggplot(wm_by_cat, aes(reorder(Arrest_Category, Total), Total)) +
     ylab("Number of Incidents")
 ```
 
+```{r}
+wm_by_cat_year <- df_wm %>% group_by(Arrest_Year, Arrest_Category) %>% 
+                dplyr::summarise(Total = n())
+
+wm_by_cat_year[1:10,]
+
+ggplot(wm_by_cat_year, aes(reorder(Arrest_Category, Total), Total, fill = Arrest_Year)) + 
+    geom_bar(stat = "identity") + 
+    scale_y_continuous(breaks = seq(0,3000,500)) + 
+    coord_flip() + ggtitle("Crimes By Code and Year") + 
+    xlab("Crime Text Code") + 
+    ylab("Total Crimes")
+```
 
 
+## Some Top Crimes
+
+```{r echo=FALSE, warning=FALSE, fig.width=9, fig.height=5.5}
+plotcrime  <- function(crime) {
+    crimes <- df_wm[df_wm$Arrest_Category == crime,] 
+    
+    crimes_by_date <- crimes %>% group_by(Arrest_Date) %>% dplyr::summarise(Total = n())
+    crimes_by_date$Arrest_Date <- as.Date(crimes_by_date$Arrest_Date)
+    plot <- ggplot(crimes_by_date, aes(Arrest_Date, Total, color = Arrest_Date )) + geom_line() + ggtitle(paste(crime," - (Daily Count - 2016-2021)", sep = " ")) + xlab("Date") 
+    
+    plot
+}
+
+plotcrime("Simple Assault")
+plotcrime("Traffic Violations")
+plotcrime("Release Violations/Fugitive")
+plotcrime("Driving/Boating While Intoxicated")
+plotcrime("Theft")
+plotcrime("Narcotics")
+plotcrime("Liquor Law Violations")
+plotcrime("Disorderly Conduct")
+plotcrime("Damage to Property")
+plotcrime("Prostitution")
+```
 
 
 
