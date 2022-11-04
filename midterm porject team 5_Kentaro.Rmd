@@ -27,7 +27,7 @@ Our research topic is **Trend of Major Types of Crimes commited by White Males i
 
 # Data Shaping
 ## Read Data
-Read the data .CSV files of adults arrest in DC area from 2016-2021
+We read the data .CSV files of adults arrest in DC area from 2016-2021
 
 ```{r }
 df_2016<-data.frame(read.csv("Arrests 2016 Public.csv"))
@@ -40,7 +40,8 @@ df_2021<-data.frame(read.csv("2021 Adult Arrests.csv"))
 c16 <- c(colnames(df_2016))
 c18 <- c(colnames(df_2018))
 ```
-The column names of the data in 2016 and 2017 are not the same with others. The below table shows the column names of the data in 2016 and the data in 2016.
+
+The column names of the data in 2016 and 2017 were not the same with others. The below table shows the column names of the data in 2016 and the data in 2016.
 
 |col #|2016       |2018       |
 |:---:|:---------:|:---------:|
@@ -72,12 +73,12 @@ The column names of the data in 2016 and 2017 are not the same with others. The 
 | 26  |`r c16[26]`|`r c18[26]`|
 
 
-## Merge Multiple CSV Files and Drop Ssome Columns  
-You can see that the column names are same from the first column to the 14th column in both data. On the other hand, the name and order of 15th and latter columns are a bit different in those data. The latter columns are about locations, and we are not very interested in the detail location. Therefore, we will delete the latter columns except for the 16th and 22nd columns. In addition, we will drop `CNN` (col #5) and `Arrest.Number.` (col #6) because they are IDs and useless for our analysis.
+## Merge Multiple CSV Files and Drop Some Columns  
+The column names were same from the first column to the 14th column in both data. On the other hand, the name and order of 15th and latter columns were a bit different in those data. The latter columns were about locations, and we were not very interested in the detail location. Therefore, we deleted the latter columns except for the 16th and 22nd columns. In addition, we dropped `CNN` (col #5) and `Arrest.Number.` (col #6) because they were IDs and useless for our analysis.
   
-The format of date is different from years; the data in 2016 and 2017 has the format like `r df_2016$Arrest.Date[1]`, the data in 2018 to 2020 has the format like `r df_2018$Arrest.Date[1]`, and the data in 2021 has the format like `r df_2021$Arrest.Date[1]`. We will covert Since different date formats for different years are difficult to analyze, we will unify the date format to "yyyy-mm-dd".
+The format of date was different from years; the data in 2016 and 2017 has the format like `r df_2016$Arrest.Date[1]`, the data in 2018 to 2020 has the format like `r df_2018$Arrest.Date[1]`, and the data in 2021 has the format like `r df_2021$Arrest.Date[1]`. We coverted Since different date formats for different years are difficult to analyze, we will unify the date format to "yyyy-mm-dd".
   
-After deleting some columns and changing the date format, we will bind data frames by rows.
+After deleting some columns and changing the date format, we binded data frames by rows.
 
 
 ```{r}
@@ -98,24 +99,40 @@ DF<-rbind(df_16_17,df_18_21)
 ```
 
   
-## Drop Some Rows and Revise Some Values 
-Since we are interested in crimes committed by while males, we will drop rows where the value of `Defendant.Race` is not "White".
-  
-In addition, `Arrest.Category` has some different values for 2021 and other years:  
+## Correct Anomalies   
+### Remove abnormal values  
+To see whether there were abnormal values, we created the table showing some statistics for numerical variables.
 
-* Data in 2021 has "Release Violations/Fugitive (Fug)" and "Release Violations/Fugitive (Warr)" although data in other years have "Release Violations/Fugitive" instead of them.  
-* Data in 2021 has "Fraud and Financial Crimes (Frau)" although data in other years have "Fraud and Financial Crimes".  
+```{r}
+xkablesummary(subset(DF,select=c(Arrest.Year, Arrest.Hour, Age)))
+```
 
-Therefore, we will covert these values in 2021 into the correspond values in other years.  
+The maximum age was too old. `r nrow(DF[DF$Age>=100,])` rows were assigned an age of over 100 years (`r min(DF[DF$Age>=100,]$Age)`-`r max(DF[DF$Age>=100,]$Age)` ) in these data, and it seemed to be wrong. Therefore, we dropped these rows.  
 
-The structure of data frame after data shaping is shown in the below table.
+```{r}
+DF <- DF[!DF$Age>=100,]
+```
+
+
+### Correct inconsistent values    
+`Arrest.Category` had some different values for 2021 and other years:  
+
+* Data in 2021 had "Release Violations/Fugitive (Fug)" and "Release Violations/Fugitive (Warr)" although data in other years have "Release Violations/Fugitive" instead of them.  
+* Data in 2021 had "Fraud and Financial Crimes (Frau)" although data in other years have "Fraud and Financial Crimes".  
+
+Therefore, we coverted these values in 2021 into the correspond values in other years.  
 
 
 ```{r}
-DF_WM <- subset(DF, subset = Defendant.Race=='WHITE' & Defendant.Sex=='MALE')
-DF_WM <- mutate(DF_WM, Arrest.Category = gsub(Arrest.Category, pattern = "Release Violations/Fugitive.*", replacement = "Release Violations/Fugitive"))
-DF_WM <- mutate(DF_WM, Arrest.Category = gsub(Arrest.Category, pattern = "Fraud and Financial Crimes.*", replacement = "Fraud and Financial Crimes"))
+DF <- mutate(DF, Arrest.Category = gsub(Arrest.Category, pattern = "Release Violations/Fugitive.*", replacement = "Release Violations/Fugitive"))
+DF <- mutate(DF, Arrest.Category = gsub(Arrest.Category, pattern = "Fraud and Financial Crimes.*", replacement = "Fraud and Financial Crimes"))
+```
 
+## Remove Unnecessary Rows  
+Since we were interested in crimes committed by while males, we dropped rows where the value of `Defendant.Race` was not "White". The structure of the final data is shown in the below table.
+
+```{r}
+DF_WM <- subset(DF, subset = Defendant.Race=='WHITE' & Defendant.Sex=='MALE')
 
 data.frame(column_name = names(DF_WM),
            class = sapply(DF_WM, typeof),
@@ -127,7 +144,7 @@ data.frame(column_name = names(DF_WM),
 
 # EDA
 
-The number of crimes is as follows. Crime occurrences seem to have decreased after COVID-19.
+The number of crimes is as follows. Crime occurrences have decreased after COVID-19.
 
 | year | the number of crimes |
 |:-----|:---------------------|
@@ -140,9 +157,8 @@ The number of crimes is as follows. Crime occurrences seem to have decreased aft
 | 2016 - 2019 (before COVID-19) | `r round(nrow(subset(DF_WM, Arrest.Year==2016 | Arrest.Year==2017 | Arrest.Year==2018 | Arrest.Year==2019)) / 4)` |
 | 2020 - 2021 (after COVID-19) | `r round(nrow(subset(DF_WM, Arrest.Year==2020 | Arrest.Year==2021)) / 2)`|
 
-## Including Plots
-### Bar plot
-We will create some bar plots to see the number of occurrences per type of crime.  
+## Number of Each Crime
+We created some bar plots to see the number of occurrences per type of crime.  
 The Bar plot of crimes in 2016 - 2021 is as follows:
 ```{r}
 
@@ -232,12 +248,10 @@ The top 6 crimes (or 7 crimes when 'Other Crimes' are included) in each year are
 |5|`r crime_2016[5]`|`r crime_2017[5]`|`r crime_2018[5]`|`r crime_2019[5]`|`r crime_2020[5]`|`r crime_2021[5]`|
 |6|`r crime_2016[6]`|`r crime_2017[6]`|`r crime_2018[6]`|`r crime_2019[6]`|`r crime_2020[6]`|`r crime_2021[6]`|
 |7|`r crime_2016[7]`|`r crime_2017[7]`|`r crime_2018[7]`|`r crime_2019[7]`|`r crime_2020[7]`|`r crime_2021[7]`|
-  
-**`r crime_2016[1:3]`, and `r crime_2016[4]`** are included in the above table all years. **`r crime_2018[5]`** is in three different years, and **`r crime_2016[5]`, `r crime_2018[6]`, and `r crime_2020[5]`** are in two different years. Since these crimes seems to be major crimes, we will analyze these crimes.
 
 
-### Line plots
-To see the trend of the above major crimes, we create a line plot as follows.
+## Time Series Change in the Number of Major Crimes
+To see the trend of the above major crimes, we created a line plot as follows.
 
 ```{r}
 SA_cnt <- sapply(unique(DF_WM[DF_WM$Arrest.Category=='Simple Assault',]$Arrest.Year),
@@ -276,7 +290,9 @@ ggplot(data=major_crimes_df2, aes(x=Year, y=Count, color=Crimes)) +
 
 ```
   
-**"Simple Assault"**, **"Traffic Violations"**, and **"Theft"** have clearly declined since 2020. On the other, **"Offenses Against Family & Children"** has increased in 2020 and 2021 compared to previous years. In the following, we will analyze these four crimes in detail.
+**"Simple Assault"**, **"Traffic Violations"**, and **"Theft"** have clearly declined since 2020. On the other, **"Offenses Against Family & Children"** has increased in 2020 and 2021 compared to previous years. COVID-19 seems to be related to these trend change. We posed the following SMART QUESTION, and we will analyze these four crimes in detail in the following.  
+  
+**Is there a significant difference in "Simple Assault", "Traffic Violations", "Theft", and "Offenses Against Family & Children" trends among adult white males within the DC area between 2016 and 2021, and could COVID protocols play a role in these trend shifts?**
 
 
 ```{r, include=FALSE}
@@ -584,7 +600,7 @@ The calculated $\lambda = 0.306$. The histogram and the poisson distribution wit
 ```{r, fig.show="hold", out.width="48%"}
 
 x_TV <- 0:10
-y_TV <- c(545,157,23,3,3,0,0,0,0,0,0)
+y_TV <- c(546,156,23,3,3,0,0,0,0,0,0)
 fx <- dpois(x=x_TV, lambda=sum(TV_day_20_21)/(365*2+1))
 data_TV <- data.frame(x_TV, y_TV, fx)
 
@@ -633,6 +649,7 @@ ggplot(data_CI_TV) +
 ```
 
 ## Simple Assault  
+### Before COVID-19
 
 ```{r}
 DF_WM_16_19_SA <- DF_WM_16_19[DF_WM_16_19$Arrest.Category=='Simple Assault',]
@@ -679,7 +696,8 @@ ggplot(data_SA) +
   geom_point(aes(x=x_SA,y=fx), color='red')
 
 ```
-
+  
+### After COVID-19
 
 ```{r}
 DF_WM_20_21_SA <- DF_WM_20_21[DF_WM_20_21$Arrest.Category=='Simple Assault',]
@@ -725,8 +743,8 @@ ggplot(data_SA) +
   geom_point(aes(x=x_SA,y=fx), color='red')
 
 ```
-
-
+  
+### Comparing Confidence Intervals  
 
 ```{r}
 
@@ -748,7 +766,8 @@ ggplot(data_CI_SA) +
 
 ```
 
-## Theft
+## Theft  
+### Before COVID-19  
 
 ```{r}
 DF_WM_16_19_T <- DF_WM_16_19[DF_WM_16_19$Arrest.Category=='Theft',]
@@ -770,7 +789,7 @@ T_day_16_19 <- sapply(unique(DF_WM_16_19_T$Arrest.Date),
 ```{r, fig.show="hold", out.width="48%"}
 
 x_T <- 0:5
-y_T <- c(972,399,79,10,1,0)
+y_T <- c(973,398,79,10,1,0)
 fx <- dpois(x=x_T, lambda=sum(T_day_16_19)/(365*4+1))
 data_T <- data.frame(x_T, y_T, fx)
 
@@ -781,7 +800,7 @@ ggplot(data_T, aes(x=x_T,y=y_T)) +
   geom_bar(stat = "identity") 
 
 ggplot(data_T) +
-  ggtitle("Figure : Relative frequency histogram of Theft in 2016 - 2019 \n and Poisson distribution with lambda = 0.405") + 
+  ggtitle("Figure : Relative frequency histogram of Theft in 2016 - 2019 \n and Poisson distribution with lambda = 0.404") + 
   xlab("Number of occurrences per day") + 
   ylab("Relative frequency") +
   geom_bar(aes(x=x_T,y=y_T/(365*4+1)), stat = "identity") +
@@ -789,7 +808,9 @@ ggplot(data_T) +
   geom_point(aes(x=x_T,y=fx), color='red')
 
 ```
-
+  
+### After COVID-19
+  
 ```{r}
 DF_WM_20_21_T <- DF_WM_20_21[DF_WM_20_21$Arrest.Category=='Theft',]
 
@@ -828,7 +849,9 @@ ggplot(data_T) +
   geom_point(aes(x=x_T,y=fx), color='red')
 
 ```
-
+  
+### Comparing Confidence Intervals    
+  
 ```{r}
 
 x <- c('Before COVID-19','After COVID-19')
@@ -849,7 +872,7 @@ ggplot(data_CI_T) +
 
 ```
 
-### check  
+## check  
 
 ```{r, fig.show="hold", out.width="48%"}
 
