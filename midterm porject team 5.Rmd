@@ -1,7 +1,13 @@
 ---
 title: "midterm project team 5"
-output: html_document
-date: "2022-10-16"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+date: "`r Sys.Date()`"
 ---
 
 ```{r setup, include=FALSE}
@@ -9,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-#install some packages or libraries
+### Install some packages or libraries
 ```{r}
 library(ggplot2)
 library(ezids)
@@ -17,12 +23,13 @@ library(dplyr)
 library(readr)
 library(tidyr)
 library(lubridate)
+library(knitr)
+library(magrittr)
 ```
 
-## read data
+### Read data
 Read the data .CSV files of adults arrest in DC area from 2016-2021
 ```{r }
-
 df_2016<-data.frame(read.csv("Arrests 2016 Public.csv"))
 df_2017<-data.frame(read.csv("Arrests 2017 Public.csv"))
 df_2018<-data.frame(read.csv("Arrests by Year, 2018.csv"))
@@ -32,7 +39,7 @@ df_2021<-data.frame(read.csv("2021 Adult Arrests.csv"))
 ```
 
 
-###Some data cleaning.. Dropping, Binding and Renaming of columns as needed.
+### Some data cleaning.. Dropping, Binding and Renaming of columns as needed.
 ```{r}
 
 #bind the rows in the dataframes; 
@@ -48,7 +55,7 @@ df_16_17 <- df_16_17 %>%
 
 # replace dots with underscore for clarity sake, i think..
 names(df_16_17) = gsub("[.]", "_", names(df_16_17))
-colnames(df_16_17)
+#colnames(df_16_17)
 
 ```
 
@@ -58,7 +65,7 @@ df_18_21 = rbind(df_2018,df_2019,df_2020,df_2021)[,-c(5,6,15,17:21,23:26)]
 
 # replace dots with underscore once more
 names(df_18_21) = gsub("[.]", "_", names(df_18_21))
-colnames(df_18_21)
+#colnames(df_18_21)
 
 ```
 
@@ -210,7 +217,8 @@ ggplot(by_month, aes(Month, Total, fill = Month)) +
 ggplot(by_month, aes(x=Month, y=Total, group=1)) + geom_line()
 ```
 
-### All Crimes By Year
+
+
 ####Crime incidence grouped into yearly plots..
 ```{r}
 by_year = df_full %>% group_by(Arrest_Year) %>% 
@@ -379,9 +387,88 @@ plotcrime("Liquor Law Violations")
 plotcrime("Disorderly Conduct")
 plotcrime("Damage to Property")
 plotcrime("Prostitution")
+plotcrime("Offenses Against Family & Children")
 ```
 
+#### Location Stuff
+```{r}
+unique(df_wm$Arrest_Location_District)
+table(df_wm$Arrest_Location_District)
+unique(df_wm$Offense_Location_District)
+table(df_wm$Offense_Location_District)
 
+### drop the unknowns here .. they are few..
+```
+
+```{r}
+wm_by_ALD <- df_wm %>% group_by(Arrest_Location_District) %>% 
+         dplyr::summarise(Total = n()) %>% 
+         dplyr::arrange(desc(Total))
+wm_by_ALD2 = wm_by_ALD[1:7,]
+
+wm_by_OLD <- df_wm %>% group_by(Offense_Location_District) %>% 
+         dplyr::summarise(Total = n()) %>% 
+         dplyr::arrange(desc(Total))
+wm_by_OLD2 = wm_by_OLD[1:7,]
+
+ggplot(wm_by_ALD2, aes(reorder(Arrest_Location_District, -Total), Total)) + 
+      geom_bar(stat = "identity") + 
+      ggtitle("Crimes by Arrest Location District") + 
+      xlab("Location District") + 
+      ylab("Total Crimes") 
+
+ggplot(wm_by_OLD2, aes(reorder(Offense_Location_District, -Total), Total)) + 
+      geom_bar(stat = "identity") + 
+      ggtitle("Crimes by Offense Location District") + 
+      xlab("Location District") + 
+      ylab("Total Crimes") 
+
+# top 5 crimes in each district
+#ALD_dc_top7 <- wm_by_ALD$Arrest_Location_District[1:5]
+
+#ALD_top7_dc <- subset(df_wm, Arrest_Location_District %in% wm_by_ALD$Arrest_Location_District[1:5])
+#ALD_top7_dc$Arrest_Location_District <- factor(ALD_top7_dc$Arrest_Location_District)
+
+#ggplot(ALD_top7_dc, aes(Arrest_Category, fill = Arrest_Location_District)) + 
+      #geom_bar(position = "dodge") + 
+      #ggtitle("Crimes by District Police HeadQuarters - Top 5") + 
+      #xlab("Police HQ") + 
+      #ylab("Total Crimes") 
+
+#top crime by ARREST Location District 
+ALD_by_crime <- df_wm  %>% 
+      group_by(Arrest_Location_District, Arrest_Category) %>% 
+      dplyr::summarise(Total = n()) %>% 
+      arrange(desc(Total)) %>% top_n(n = 1)
+ALD_by_crime1 = ALD_by_crime[1:7,]
+
+#dc_by_crime <- as.data.frame(dc_by_crime)
+#dc_by_crime$Dc_Dist <- factor(dc_by_crime$Dc_Dist)
+#dc_by_crime$Text_General_Code <- factor(dc_by_crime$Text_General_Code)
+
+ggplot(ALD_by_crime1, aes(Arrest_Location_District, Total, fill = Arrest_Category)) + 
+      geom_bar(stat = "identity") + 
+      ggtitle("Top Crime by Arrest Location District") + 
+      xlab("Location District") + 
+      ylab("Total") 
+
+#top crime by OFFENSE Location District
+OLD_by_crime <- df_wm  %>% 
+      group_by(Offense_Location_District, Arrest_Category) %>% 
+      dplyr::summarise(Total = n()) %>% 
+      arrange(desc(Total)) %>% top_n(n = 1)
+OLD_by_crime1 = OLD_by_crime[1:7,]
+
+#dc_by_crime <- as.data.frame(dc_by_crime)
+#dc_by_crime$Dc_Dist <- factor(dc_by_crime$Dc_Dist)
+#dc_by_crime$Text_General_Code <- factor(dc_by_crime$Text_General_Code)
+
+ggplot(OLD_by_crime1, aes(Offense_Location_District, Total, fill = Arrest_Category)) + 
+      geom_bar(stat = "identity") + 
+      ggtitle("Top Crime by Offense Location District") + 
+      xlab("Location District") + 
+      ylab("Total") 
+```
 
 
 
