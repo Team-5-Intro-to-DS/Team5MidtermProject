@@ -1,0 +1,474 @@
+---
+title: "midterm project team 5"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Install some packages or libraries
+```{r}
+library(ggplot2)
+library(ezids)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(lubridate)
+library(knitr)
+library(magrittr)
+```
+
+### Read data
+Read the data .CSV files of adults arrest in DC area from 2016-2021
+```{r }
+df_2016<-data.frame(read.csv("Arrests 2016 Public.csv"))
+df_2017<-data.frame(read.csv("Arrests 2017 Public.csv"))
+df_2018<-data.frame(read.csv("Arrests by Year, 2018.csv"))
+df_2019<-data.frame(read.csv("Arrests by Year, 2019.csv"))
+df_2020<-data.frame(read.csv("Arrests by Year 2020.csv"))
+df_2021<-data.frame(read.csv("2021 Adult Arrests.csv"))
+```
+
+
+### Some data cleaning.. Dropping, Binding and Renaming of columns as needed.
+```{r}
+
+#bind the rows in the dataframes; 
+# data for year 2016 & 2017 have different column listings to the rest of the dataframes..
+
+colnames(df_2016) = colnames(df_2017)
+df_16_17 = rbind(df_2016,df_2017)
+
+#also remove certain hard-coded columns that are not really needed in this analysis (leaving district location for now)
+df_16_17 = df_16_17[-c(5,6,15,17:21,23:26)]
+df_16_17 <- df_16_17 %>% 
+       rename("Offense.Location.District" = "Offense.District")
+
+# replace dots with underscore for clarity sake, i think..
+names(df_16_17) = gsub("[.]", "_", names(df_16_17))
+#colnames(df_16_17)
+
+```
+
+```{r}
+# since col names in 2018-2021 are the same, we repeat same processes as above.
+df_18_21 = rbind(df_2018,df_2019,df_2020,df_2021)[,-c(5,6,15,17:21,23:26)]
+
+# replace dots with underscore once more
+names(df_18_21) = gsub("[.]", "_", names(df_18_21))
+#colnames(df_18_21)
+
+```
+
+```{r}
+#Now bind both newly created dataframes into 1 whole table.
+df_full = rbind(df_16_17,df_18_21)
+#check for column names
+colnames(df_full)
+
+```
+
+```{r}
+#find unique values in the race, sex and arrest_category columns.
+#unique(df_full$Defendant_Race)
+#unique(df_full$Defendant_Sex)
+#unique(df_full$Arrest_Category)
+
+# most likely "UNK" is the same as "Unknown", so we can change this
+df_full$Defendant_Race[df_full$Defendant_Race == 'UNK'] <- 'UNKNOWN'
+#unique(df_full$Defendant_Race) - check that it changed
+
+#same issue, "unk" is very likely "unknown", so change it.
+df_full$Defendant_Sex[df_full$Defendant_Sex == 'UNK'] <- 'UNKNOWN'
+#unique(df_full$Defendant_Sex) - check that it changed
+
+# Arrest category -  4 different types of Fraud & Financial crimes , 3 types of Release Violations/Fugitive -- group them into one.
+
+df_full$Arrest_Category = gsub("Fraud and Financial Crimes.*","Fraud and Financial Crimes", df_full$Arrest_Category)
+
+df_full$Arrest_Category = gsub("Release Violations/Fugitive.*","Release Violations/Fugitive",df_full$Arrest_Category)
+
+#sort(unique(df_full$Arrest_Category)) - check that new changes were made.
+```
+
+### Missing Values
+```{r}
+sapply(df_full, function(x) sum(is.na(x)))
+```
+##### Our variables of concern in thsi dataset contain rich data.. over 95% of data available in each useful column.. will not delete any rows
+
+
+```{r}
+#get month and day variables.. might be interesting, who knows?
+df_full <- separate(df_full, col = Arrest_Date, into = c("Year","Month","Day"), sep = "-", remove = FALSE, fill="left")
+#remove the new year column formed, it is redundant.. we already have Year column
+df_full = df_full[,-4]
+colnames(df_full)
+```
+
+
+```{r}
+# Factorize some variables
+df_full$Arrest_Year = as.factor(df_full$Arrest_Year)
+df_full$Month = as.factor(df_full$Month)
+df_full$Day = as.factor(df_full$Day)
+df_full$Defendant_Race = as.factor(df_full$Defendant_Race)
+df_full$Defendant_Sex = as.factor(df_full$Defendant_Sex)
+df_full$Arrest_Location_District = as.factor(df_full$Arrest_Location_District)
+df_full$Offense_Location_District = as.factor(df_full$Offense_Location_District)
+# convert to date format
+df_full$Arrest_Date = as.Date(df_full$Arrest_Date)
+# Day format
+df_full$Day = day(df_full$Arrest_Date)
+# i want to create a week-day variable
+df_full$Weekday = weekdays(df_full$Arrest_Date)
+df_full$Weekday = factor(df_full$Weekday, levels = as.character(wday(c(2:7,1), label=TRUE, abbr=FALSE)))
+
+# convert crime types to factors
+df_full$Arrest_Category = as.factor(df_full$Arrest_Category)
+```
+
+# EDA (?)
+
+### Daily Crime Trend (2016-2021)
+
+```{r echo=FALSE, warning=FALSE, fig.width=8, fig.height=5.5}
+
+by_date <- df_full %>% group_by(Arrest_Date) %>% dplyr::summarise(Total = n())
+ggplot(by_date, aes(Arrest_Date, Total, color = Arrest_Date)) + 
+  geom_line() 
+  #geom_vline(xintercept = "2020-03-11")
+
+```
+
+
+### All Crimes By Hour, Day, Month, Year
+
+
+#### Hour of the day.. at what time do these crimes occur the most?
+
+```{r}
+by_hour <- df_full %>% 
+           group_by(Arrest_Hour) %>% 
+           dplyr::summarise(Total = n())
+by_hour
+
+ggplot(by_hour, aes(Arrest_Hour, Total, color = Arrest_Hour)) + 
+    geom_line() + 
+    ggtitle("Crimes By Hour") + 
+    xlab("Hour of the Day") + 
+    ylab("Total Crimes") 
+```
+
+
+#### Day  .. What day of the month has the highest crime incidents?
+```{r}
+by_day <- df_full %>% 
+           group_by(Day) %>% 
+           dplyr::summarise(Total = n())
+by_day
+
+ggplot(by_day, aes(Day, Total, color = Day)) + 
+    geom_line() + 
+    ggtitle("Crimes By Day") + 
+    xlab("Day of the Month") + 
+    ylab("Total Crimes")
+```
+
+#### Day of the week..
+```{r}
+by_weekday = df_full %>% group_by(Weekday) %>% 
+           dplyr::summarise(Total = n())
+by_weekday$Percent <- by_weekday$Total/dim(df_full)[1] * 100
+by_weekday
+
+ggplot(by_weekday, aes(Weekday, Total, fill = Weekday)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("Crimes By Weekday ") + 
+      xlab("Day of the Week") + ylab("Count") + 
+      theme(legend.position = "none")
+```
+
+#### Monthly crime incidence
+```{r}
+by_month <- df_full %>% 
+            group_by(Month) %>% 
+            dplyr::summarise(Total = n())
+
+by_month$Percent <- by_month$Total/dim(df_full)[1] * 100
+by_month
+
+ggplot(by_month, aes(Month, Total, fill = Month)) + 
+        geom_bar(stat = "identity") + 
+        ggtitle("Crimes By Month") + 
+        xlab("Month") + 
+        ylab("Count") + 
+        theme(legend.position = "none")
+
+ggplot(by_month, aes(x=Month, y=Total, group=1)) + geom_line()
+```
+
+
+
+####Crime incidence grouped into yearly plots..
+```{r}
+by_year = df_full %>% group_by(Arrest_Year) %>% 
+           dplyr::summarise(Total = n())
+by_year$Percent <- by_year$Total/dim(df_full)[1] * 100
+by_year
+
+ggplot(by_year, aes(Arrest_Year, Total, fill = Arrest_Year)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("Crimes By Year ") + 
+      xlab("Year") + ylab("Count") + 
+      theme(legend.position = "none")
+
+ggplot(by_year, aes(x=Arrest_Year, y=Total, group=1)) + geom_line()
+```
+
+
+
+## Time to investigate our main focus group - White Males - EDA
+
+```{r}
+#unique(df_full$Defendant_Race)
+#table(df_full$Defendant_Sex)
+df_wm = subset(df_full, subset = Defendant_Race == "WHITE" & Defendant_Sex == "MALE")
+head(df_wm, 20)
+
+# i want to create a week-day variable
+df_wm$Weekday = weekdays(df_wm$Arrest_Date)
+df_wm$Weekday = factor(df_wm$Weekday, levels = as.character(wday(c(2:7,1), label=TRUE, abbr=FALSE)))
+```
+
+same pattern here as above, will dig into a few other stuff too..
+
+#### White Men - By the Hour
+```{r}
+wm_by_hour <- df_wm %>% 
+           group_by(Arrest_Hour) %>% 
+           dplyr::summarise(Total = n())
+wm_by_hour
+
+ggplot(wm_by_hour, aes(Arrest_Hour, Total, color = Arrest_Hour)) + 
+    geom_line() + 
+    ggtitle("White Males - Crimes By Hour") + 
+    xlab("Hour of the Day") + 
+    ylab("Total Crimes")
+```
+
+
+#### White Men - What day of the month has the highest crime incidents?
+```{r}
+wm_by_day <- df_wm %>% 
+           group_by(Day) %>% 
+           dplyr::summarise(Total = n())
+wm_by_day
+
+ggplot(wm_by_day, aes(Day, Total, color = Day)) + 
+    geom_line() + 
+    ggtitle("White Males - Crimes By Day") + 
+    xlab("Day of the Month") + 
+    ylab("Total Crimes")
+```
+
+#### White Men - What Day of the Week has the highest crime incidents?
+```{r}
+wm_by_weekday = df_wm %>% group_by(Weekday) %>% 
+           dplyr::summarise(Total = n())
+wm_by_weekday$Percent <- wm_by_weekday$Total/dim(df_wm)[1] * 100
+wm_by_weekday
+
+ggplot(wm_by_weekday, aes(Weekday, Total, fill = Weekday)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("White Males - Crimes By Weekday ") + 
+      xlab("Day of the Week") + ylab("Count") + 
+      theme(legend.position = "none")
+```
+
+#### White Males - By Month
+```{r}
+wm_by_month <- df_wm %>% 
+            group_by(Month) %>% 
+            dplyr::summarise(Total = n())
+
+wm_by_month$Percent <- wm_by_month$Total/dim(df_wm)[1] * 100
+wm_by_month
+
+ggplot(wm_by_month, aes(Month, Total, fill = Month)) + 
+        geom_bar(stat = "identity") + 
+        ggtitle("White Males - Crimes By Month") + 
+        xlab("Month") + 
+        ylab("Count") + 
+        theme(legend.position = "none")
+
+ggplot(wm_by_month, aes(x=Month, y=Total, group=1)) + geom_line()
+```
+
+####White Men - Yearly Crime Incidents
+```{r}
+wm_by_year = df_wm %>% group_by(Arrest_Year) %>% 
+           dplyr::summarise(Total = n())
+wm_by_year$Percent <- wm_by_year$Total/dim(df_wm)[1] * 100
+wm_by_year
+
+ggplot(wm_by_year, aes(Arrest_Year, Total, fill = Arrest_Year)) + 
+      geom_bar(stat = "identity") +
+      ggtitle("White Males - Crimes By Year ") + 
+      xlab("Year") + ylab("Count") + 
+      theme(legend.position = "none")
+
+ggplot(wm_by_year, aes(x=Arrest_Year, y=Total, group=1)) + geom_line()
+```
+
+
+#### Let us get into crime types...
+
+```{r}
+wm_by_cat <- df_wm %>% 
+          group_by(Arrest_Category) %>% 
+          dplyr::summarise(Total = n()) %>% 
+          arrange(desc(Total))
+
+wm_by_cat[1:10,]
+
+ggplot(wm_by_cat, aes(reorder(Arrest_Category, Total), Total)) + 
+    geom_bar(stat = "identity") + coord_flip() +  
+    scale_y_continuous(breaks = seq(0,3000,500)) + 
+    ggtitle("Crimes By Arrest Category") + 
+    xlab("Crime Type") + 
+    ylab("Number of Incidents")
+```
+
+```{r}
+wm_by_cat_year <- df_wm %>% group_by(Arrest_Year, Arrest_Category) %>% 
+                dplyr::summarise(Total = n())
+
+wm_by_cat_year[1:10,]
+
+ggplot(wm_by_cat_year, aes(reorder(Arrest_Category, Total), Total, fill = Arrest_Year)) + 
+    geom_bar(stat = "identity") + 
+    scale_y_continuous(breaks = seq(0,3000,500)) + 
+    coord_flip() + ggtitle("Crimes By Code and Year") + 
+    xlab("Crime Text Code") + 
+    ylab("Total Crimes")
+```
+
+
+## Some Top Crimes
+
+```{r echo=FALSE, warning=FALSE, fig.width=9, fig.height=5.5}
+plotcrime  <- function(crime) {
+    crimes <- df_wm[df_wm$Arrest_Category == crime,] 
+    
+    crimes_by_date <- crimes %>% group_by(Arrest_Date) %>% dplyr::summarise(Total = n())
+    crimes_by_date$Arrest_Date <- as.Date(crimes_by_date$Arrest_Date)
+    plot <- ggplot(crimes_by_date, aes(Arrest_Date, Total, color = Arrest_Date )) + geom_line() + ggtitle(paste(crime," - (Daily Count - 2016-2021)", sep = " ")) + xlab("Date") 
+    
+    plot
+}
+
+plotcrime("Simple Assault")
+plotcrime("Traffic Violations")
+plotcrime("Release Violations/Fugitive")
+plotcrime("Driving/Boating While Intoxicated")
+plotcrime("Theft")
+plotcrime("Narcotics")
+plotcrime("Liquor Law Violations")
+plotcrime("Disorderly Conduct")
+plotcrime("Damage to Property")
+plotcrime("Prostitution")
+plotcrime("Offenses Against Family & Children")
+```
+
+#### Location Stuff
+```{r}
+unique(df_wm$Arrest_Location_District)
+table(df_wm$Arrest_Location_District)
+unique(df_wm$Offense_Location_District)
+table(df_wm$Offense_Location_District)
+
+### drop the unknowns here .. they are few..
+```
+
+```{r}
+wm_by_ALD <- df_wm %>% group_by(Arrest_Location_District) %>% 
+         dplyr::summarise(Total = n()) %>% 
+         dplyr::arrange(desc(Total))
+wm_by_ALD2 = wm_by_ALD[1:7,]
+
+wm_by_OLD <- df_wm %>% group_by(Offense_Location_District) %>% 
+         dplyr::summarise(Total = n()) %>% 
+         dplyr::arrange(desc(Total))
+wm_by_OLD2 = wm_by_OLD[1:7,]
+
+ggplot(wm_by_ALD2, aes(reorder(Arrest_Location_District, -Total), Total)) + 
+      geom_bar(stat = "identity") + 
+      ggtitle("Crimes by Arrest Location District") + 
+      xlab("Location District") + 
+      ylab("Total Crimes") 
+
+ggplot(wm_by_OLD2, aes(reorder(Offense_Location_District, -Total), Total)) + 
+      geom_bar(stat = "identity") + 
+      ggtitle("Crimes by Offense Location District") + 
+      xlab("Location District") + 
+      ylab("Total Crimes") 
+
+# top 5 crimes in each district
+#ALD_dc_top7 <- wm_by_ALD$Arrest_Location_District[1:5]
+
+#ALD_top7_dc <- subset(df_wm, Arrest_Location_District %in% wm_by_ALD$Arrest_Location_District[1:5])
+#ALD_top7_dc$Arrest_Location_District <- factor(ALD_top7_dc$Arrest_Location_District)
+
+#ggplot(ALD_top7_dc, aes(Arrest_Category, fill = Arrest_Location_District)) + 
+      #geom_bar(position = "dodge") + 
+      #ggtitle("Crimes by District Police HeadQuarters - Top 5") + 
+      #xlab("Police HQ") + 
+      #ylab("Total Crimes") 
+
+#top crime by ARREST Location District 
+ALD_by_crime <- df_wm  %>% 
+      group_by(Arrest_Location_District, Arrest_Category) %>% 
+      dplyr::summarise(Total = n()) %>% 
+      arrange(desc(Total)) %>% top_n(n = 1)
+ALD_by_crime1 = ALD_by_crime[1:7,]
+
+#dc_by_crime <- as.data.frame(dc_by_crime)
+#dc_by_crime$Dc_Dist <- factor(dc_by_crime$Dc_Dist)
+#dc_by_crime$Text_General_Code <- factor(dc_by_crime$Text_General_Code)
+
+ggplot(ALD_by_crime1, aes(Arrest_Location_District, Total, fill = Arrest_Category)) + 
+      geom_bar(stat = "identity") + 
+      ggtitle("Top Crime by Arrest Location District") + 
+      xlab("Location District") + 
+      ylab("Total") 
+
+#top crime by OFFENSE Location District
+OLD_by_crime <- df_wm  %>% 
+      group_by(Offense_Location_District, Arrest_Category) %>% 
+      dplyr::summarise(Total = n()) %>% 
+      arrange(desc(Total)) %>% top_n(n = 1)
+OLD_by_crime1 = OLD_by_crime[1:7,]
+
+#dc_by_crime <- as.data.frame(dc_by_crime)
+#dc_by_crime$Dc_Dist <- factor(dc_by_crime$Dc_Dist)
+#dc_by_crime$Text_General_Code <- factor(dc_by_crime$Text_General_Code)
+
+ggplot(OLD_by_crime1, aes(Offense_Location_District, Total, fill = Arrest_Category)) + 
+      geom_bar(stat = "identity") + 
+      ggtitle("Top Crime by Offense Location District") + 
+      xlab("Location District") + 
+      ylab("Total") 
+```
+
+
+
