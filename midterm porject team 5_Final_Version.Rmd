@@ -83,10 +83,10 @@ After deleting some columns and changing the date format, we binded data frames 
 
 ```{r}
 # convert format
-df_2018$Arrest.Date <- as.Date(df_2018$Arrest.Date, format = "%m/%d/%Y") %>% format()
-df_2019$Arrest.Date <- as.Date(df_2019$Arrest.Date, format = "%m/%d/%Y") %>% format()
-df_2020$Arrest.Date <- as.Date(df_2020$Arrest.Date, format = "%m/%d/%Y") %>% format()
-df_2021$Arrest.Date <- as.Date(df_2021$Arrest.Date, format = "%Y/%m/%d") %>% format()
+#df_2018$Arrest.Date <- as.Date(df_2018$Arrest.Date, format = "%m/%d/%Y") %>% format()
+#df_2019$Arrest.Date <- as.Date(df_2019$Arrest.Date, format = "%m/%d/%Y") %>% format()
+#df_2020$Arrest.Date <- as.Date(df_2020$Arrest.Date, format = "%m/%d/%Y") %>% format()
+#df_2021$Arrest.Date <- as.Date(df_2021$Arrest.Date, format = "%Y/%m/%d") %>% format()
 
 #bind df_2016 and df_2017, and delete some columns
 df_16_17 <- rbind(df_2016, df_2017)[,-c(5,6,15,17:21,23:26)]
@@ -240,6 +240,21 @@ ggplot(by_hour, aes(Arrest_Hour, Total, color = Arrest_Hour)) +
     ggtitle("Crimes By Hour") + 
     xlab("Hour of the Day") + 
     ylab("Total Crimes") 
+```
+
+`Arrest_Hour` of data in 2019 contains only 1 - 12, so we removed the data in 2019 in the below plot. 
+
+```{r}
+#by_hour <- DF %>% subset(.,Arrest_Year%in%c(2016,2017,2018,2020,2021)) %>%
+#           group_by(Arrest_Hour) %>% 
+#           dplyr::summarise(Total = n())
+#by_hour
+
+#ggplot(by_hour, aes(Arrest_Hour, Total, color = Arrest_Hour)) + 
+#    geom_line() + 
+#    ggtitle("Crimes By Hour (except for 2019 data)") + 
+#    xlab("Hour of the Day") + 
+#    ylab("Total Crimes") 
 ```
 
 
@@ -434,6 +449,20 @@ ggplot(wm_by_hour, aes(Arrest_Hour, Total, color = Arrest_Hour)) +
     ylab("Total Crimes")
 ```
 
+`Arrest_Hour` of data in 2019 contains only 1 - 12, so we removed the data in 2019 in the below plot. 
+
+```{r}
+#wm_by_hour <- df_wm %>% subset(.,Arrest_Year%in%c(2016,2017,2018,2020,2021)) %>%
+#           group_by(Arrest_Hour) %>% 
+#           dplyr::summarise(Total = n())
+#wm_by_hour
+
+#ggplot(wm_by_hour, aes(Arrest_Hour, Total, color = Arrest_Hour)) + 
+#    geom_line() + 
+#    ggtitle("White Males - Crimes By Hour (except for 2019 data)") + 
+#    xlab("Hour of the Day") + 
+#    ylab("Total Crimes")
+```
 
 ### White Men - What day of the month has the highest crime incidents?
 ```{r}
@@ -925,6 +954,7 @@ TV_day_16_19 <- sapply(unique(DF_WM_16_19_TV$Arrest_Date),
 |7|0|0|
 
 The calculated $\lambda = 0.907$. The histogram and the poisson distribution with $\lambda = 0.907$ are shown in Figure 19.
+
 
 ```{r, fig.show="hold", out.width="48%"}
 
