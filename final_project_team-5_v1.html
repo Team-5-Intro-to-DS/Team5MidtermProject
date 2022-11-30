@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2022-11-25" />
+<meta name="date" content="2022-11-29" />
 
 <title>final project team 5</title>
 
@@ -1803,216 +1803,369 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">final project team 5</h1>
-<h4 class="date">2022-11-25</h4>
+<h4 class="date">2022-11-29</h4>
 
 </div>
 
 
-<div id="poisson-regression-log-linear" class="section level1">
-<h1>Poisson Regression (Log-linear)</h1>
+<div id="log-linear-model" class="section level1">
+<h1>Log-linear model</h1>
 <p>I calculated <span class="math inline">\(\lambda\)</span> without
 considering the effects of “Month”, “Weekday” and “District” in the
-midterm project. For final project, I will check these effects on <span class="math inline">\(\lambda\)</span> using Poisson regression.</p>
-<p>According to <a href="https://online.stat.psu.edu/stat504/lesson/9">The Pennsylvania
-State University website</a>,</p>
-<blockquote>
-<p>Poisson regression is also a special case of the generalized linear
-model, where the random component is specified by the Poisson
-distribution. This usually works well when the response variable is a
-count of some occurrence.</p>
-</blockquote>
-<p>I can get a count of each crime from our dataset, so I will try
-Poisson regression.</p>
-<p>In Poisson regression, response are assumed to be follow a Poisson
-distribution, and the link function is log. Therefore, the model will be
-as follows:<br />
-<span class="math display">\[\log(\mu=\lambda) = b_0 + b_1x_1 + b_2x_2 +
-\cdot\cdot\cdot + b_nx_n,\]</span> where <span class="math inline">\(x_i\)</span> is explanatory variables. “Month”,
-“Weekday” and “District” are categorical, so <span class="math inline">\(x_i\)</span> are dummy variables in our model.</p>
-<p>According to <a href="https://online.stat.psu.edu/stat504/lesson/9">The Pennsylvania
-State University website</a>,</p>
-<blockquote>
-<p>When all explanatory variables are discrete, the Poisson regression
-model is equivalent to the log-linear model</p>
-</blockquote>
-<p>Therefore, to be precise, our model would be a log-linear model.</p>
+midterm project. For final project, I will check these effects on the
+counts of each major crime using a Log-linear model.</p>
+<p>In a Log-linear model, response variable is a count of some
+occurrence that follows a Poisson distribution, and explanatory
+variables are categorical variables. The expected counts <span class="math inline">\(\mu_{ij}\)</span> is modeled as follows: <span class="math display">\[ \log(\mu_{ij})=\lambda + \lambda^A_i +
+\lambda^B_j + \lambda^{AB}_{ij}, \]</span> where <span class="math inline">\(\lambda\)</span> is a ground effect, <span class="math inline">\(\lambda^A_i\)</span> is the main effect of
+categorical variable A, and <span class="math inline">\(\lambda^{AB}_{ij}\)</span> is the interaction
+effect of A and B (if any).</p>
 <div id="simple-assault" class="section level2">
 <h2>Simple Assault</h2>
-Our data is as follows:<br />
-
-<table class="table table-striped" style="width: auto !important; ">
-<caption>
-First five rows
-</caption>
+<div id="models" class="section level3">
+<h3>Models</h3>
+<p>I will model the relationship between the counts of “Simple Assault”
+and categorical variables (“District” and “Month”) using independence
+models: <span class="math display">\[{\rm{Model \ 1:}} \
+\log(\mu_{ij})=\lambda.\]</span> <span class="math display">\[{\rm{Model
+\ 2:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i.\]</span> <span class="math display">\[{\rm{Model \ 3:}} \ \log(\mu_{ij})=\lambda +
+\lambda^{Month}_j.\]</span> <span class="math display">\[{\rm{Model \
+4:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i +
+\lambda^{Month}_j.\]</span> I also create a saturated model: <span class="math display">\[{\rm{Model \ 5:}} \ \log(\mu_{ij})=\lambda +
+\lambda^{District}_i + \lambda^{Month}_j +
+\lambda^{District,Month}_{ij}.\]</span></p>
+</div>
+<div id="model-selection" class="section level3">
+<h3>Model selection</h3>
+<div id="deviance" class="section level4">
+<h4>Deviance</h4>
+<p>I will use “residual deviance” to test the below hypothesis at a
+siginificance level <span class="math inline">\(\alpha=0.05\)</span>:
+<span class="math display">\[H_0: \ \rm{Reduced \ model \ is \
+true.}\]</span> <span class="math display">\[H_1: \ \rm{Satureated \
+model \ (Model \ 5) \ is \ true}\]</span> To test the hypothesis, I will
+calculate p-value:</p>
+<p><strong>2016</strong></p>
+<table>
 <thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:left;">
-Category
-</th>
-<th style="text-align:left;">
-Month
-</th>
-<th style="text-align:left;">
-Weekday
-</th>
-<th style="text-align:left;">
-District
-</th>
-<th style="text-align:left;">
-Year
-</th>
-<th style="text-align:right;">
-Count
-</th>
-<th style="text-align:left;">
-Weekend
-</th>
+<tr class="header">
+<th align="center">Model</th>
+<th align="center">Deviance</th>
+<th align="center">df</th>
+<th align="center">p-value</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-16
-</td>
-<td style="text-align:left;">
-Simple Assault
-</td>
-<td style="text-align:left;">
-04
-</td>
-<td style="text-align:left;">
-Monday
-</td>
-<td style="text-align:left;">
-1D
-</td>
-<td style="text-align:left;">
-2016
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-0
-</td>
+<tr class="odd">
+<td align="center">Model 1</td>
+<td align="center">434.9002068</td>
+<td align="center">83</td>
+<td align="center">3.9621108^{-49}</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-22
-</td>
-<td style="text-align:left;">
-Simple Assault
-</td>
-<td style="text-align:left;">
-06
-</td>
-<td style="text-align:left;">
-Monday
-</td>
-<td style="text-align:left;">
-1D
-</td>
-<td style="text-align:left;">
-2016
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
-0
-</td>
+<tr class="even">
+<td align="center">Model 2</td>
+<td align="center">90.6327394</td>
+<td align="center">77</td>
+<td align="center">0.1372632</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-27
-</td>
-<td style="text-align:left;">
-Simple Assault
-</td>
-<td style="text-align:left;">
-09
-</td>
-<td style="text-align:left;">
-Monday
-</td>
-<td style="text-align:left;">
-1D
-</td>
-<td style="text-align:left;">
-2016
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-0
-</td>
+<tr class="odd">
+<td align="center">Model 3</td>
+<td align="center">423.9685737</td>
+<td align="center">72</td>
+<td align="center">2.6343906^{-51}</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-30
-</td>
-<td style="text-align:left;">
-Simple Assault
-</td>
-<td style="text-align:left;">
-10
-</td>
-<td style="text-align:left;">
-Monday
-</td>
-<td style="text-align:left;">
-1D
-</td>
-<td style="text-align:left;">
-2016
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-56
-</td>
-<td style="text-align:left;">
-Simple Assault
-</td>
-<td style="text-align:left;">
-07
-</td>
-<td style="text-align:left;">
-Tuesday
-</td>
-<td style="text-align:left;">
-1D
-</td>
-<td style="text-align:left;">
-2016
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-0
-</td>
+<tr class="even">
+<td align="center">Model 4</td>
+<td align="center">79.7011062</td>
+<td align="center">66</td>
+<td align="center">0.1198214</td>
 </tr>
 </tbody>
 </table>
-<p>I will divide this data into pre-COVID (2016-2019) and post-COVID
-(2020-2021), and create models for each data.</p>
-<div id="models-for-pre-covid" class="section level3">
-<h3>Models for pre-COVID</h3>
-<div id="model1-count-month-weekday-district" class="section level5">
-<h5>Model1: Count ~ Month + Weekday + District</h5>
+<p>For Model 2 and Model 4, <span class="math inline">\(H_0\)</span> is
+not rejected.</p>
+<p><strong>2017</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Model</th>
+<th align="center">Deviance</th>
+<th align="center">df</th>
+<th align="center">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model 1</td>
+<td align="center">379.1276569</td>
+<td align="center">83</td>
+<td align="center">2.0392215^{-39}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 2</td>
+<td align="center">93.0209194</td>
+<td align="center">77</td>
+<td align="center">0.1031411</td>
+</tr>
+<tr class="odd">
+<td align="center">Model 3</td>
+<td align="center">370.0640784</td>
+<td align="center">72</td>
+<td align="center">1.178733^{-41}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 4</td>
+<td align="center">83.9573409</td>
+<td align="center">66</td>
+<td align="center">0.0671897</td>
+</tr>
+</tbody>
+</table>
+<p>For Model 2 and Model 4, <span class="math inline">\(H_0\)</span> is
+not rejected.</p>
+<p><strong>2018</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Model</th>
+<th align="center">Deviance</th>
+<th align="center">df</th>
+<th align="center">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model 1</td>
+<td align="center">436.7731995</td>
+<td align="center">83</td>
+<td align="center">1.8466265^{-49}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 2</td>
+<td align="center">101.1247286</td>
+<td align="center">77</td>
+<td align="center">0.0340731</td>
+</tr>
+<tr class="odd">
+<td align="center">Model 3</td>
+<td align="center">413.218893</td>
+<td align="center">72</td>
+<td align="center">2.3269183^{-49}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 4</td>
+<td align="center">77.5704221</td>
+<td align="center">66</td>
+<td align="center">0.1560413</td>
+</tr>
+</tbody>
+</table>
+<p>For Model 4, <span class="math inline">\(H_0\)</span> is not
+rejected.</p>
+<p><strong>2019</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Model</th>
+<th align="center">Deviance</th>
+<th align="center">df</th>
+<th align="center">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model 1</td>
+<td align="center">416.5260823</td>
+<td align="center">83</td>
+<td align="center">6.8060046^{-46}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 2</td>
+<td align="center">96.5791058</td>
+<td align="center">77</td>
+<td align="center">0.0650642</td>
+</tr>
+<tr class="odd">
+<td align="center">Model 3</td>
+<td align="center">410.2265078</td>
+<td align="center">72</td>
+<td align="center">8.0673568^{-49}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 4</td>
+<td align="center">90.2795313</td>
+<td align="center">66</td>
+<td align="center">0.0252882</td>
+</tr>
+</tbody>
+</table>
+<p>For Model 2, <span class="math inline">\(H_0\)</span> is not
+rejected.</p>
+<p><strong>2020</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Model</th>
+<th align="center">Deviance</th>
+<th align="center">df</th>
+<th align="center">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model 1</td>
+<td align="center">292.2893352</td>
+<td align="center">83</td>
+<td align="center">4.2322996^{-25}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 2</td>
+<td align="center">112.2420991</td>
+<td align="center">77</td>
+<td align="center">0.0054352</td>
+</tr>
+<tr class="odd">
+<td align="center">Model 3</td>
+<td align="center">269.7659399</td>
+<td align="center">72</td>
+<td align="center">1.2142859^{-24}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 4</td>
+<td align="center">89.7187038</td>
+<td align="center">66</td>
+<td align="center">0.0277279</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math inline">\(H_0\)</span> is rejected for all
+models.</p>
+<p><strong>2021</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Model</th>
+<th align="center">Deviance</th>
+<th align="center">df</th>
+<th align="center">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model 1</td>
+<td align="center">260.6740172</td>
+<td align="center">83</td>
+<td align="center">3.1505913^{-20}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 2</td>
+<td align="center">84.5044791</td>
+<td align="center">77</td>
+<td align="center">0.2612615</td>
+</tr>
+<tr class="odd">
+<td align="center">Model 3</td>
+<td align="center">239.6384183</td>
+<td align="center">72</td>
+<td align="center">7.0042624^{-20}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 4</td>
+<td align="center">63.4688802</td>
+<td align="center">66</td>
+<td align="center">0.5655013</td>
+</tr>
+</tbody>
+</table>
+<p>For Model 2 and Model 4, <span class="math inline">\(H_0\)</span> is
+not rejected.</p>
+</div>
+<div id="likelihood-ratio-tests" class="section level4">
+<h4>Likelihood Ratio Tests</h4>
+<p>For the 2016, 2017 and 2021 data, Model 2 and Model 4 remained as
+candidates. If there is no significant difference between Model 2 and
+Model 4, then Model 2, the simpler model, is preferred. Therefore, I
+will perform likelihood ratio tests on the following hypotheses to
+select the model.<br />
+<span class="math display">\[H_0: \ \rm{Model \ 2 \ and \ Model \ 4 \
+fit \ the \ data \ equally \ well.}\]</span> <span class="math display">\[H_1: \ \rm{Model \ 4 \ fits \ the \ data \ better
+\ than \ Model \ 2.}\]</span></p>
+<p><strong>2016</strong></p>
+<pre><code>## Likelihood ratio test
+## 
+## Model 1: Count ~ District
+## Model 2: Count ~ District + Month
+##   #Df  LogLik Df  Chisq Pr(&gt;Chisq)
+## 1   7 -171.81                     
+## 2  18 -166.34 11 10.932      0.449</code></pre>
+<p><span class="math inline">\(H_0\)</span> is not rejected, so I choose
+Model 2.</p>
+<p><strong>2017</strong></p>
+<pre><code>## Likelihood ratio test
+## 
+## Model 1: Count ~ District
+## Model 2: Count ~ District + Month
+##   #Df  LogLik Df  Chisq Pr(&gt;Chisq)
+## 1   7 -171.14                     
+## 2  18 -166.60 11 9.0636      0.616</code></pre>
+<p><span class="math inline">\(H_0\)</span> is not rejected, so I choose
+Model 2.</p>
+<p><strong>2021</strong></p>
+<pre><code>## Likelihood ratio test
+## 
+## Model 1: Count ~ District
+## Model 2: Count ~ District + Month
+##   #Df  LogLik Df  Chisq Pr(&gt;Chisq)  
+## 1   7 -154.16                       
+## 2  18 -143.64 11 21.036      0.033 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p><span class="math inline">\(H_0\)</span> is rejected, so I choose
+Model 4.</p>
+</div>
+</div>
+<div id="best-models" class="section level3">
+<h3>Best Models</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Year</th>
+<th align="center">Best Model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">2016</td>
+<td align="center">Model 2</td>
+</tr>
+<tr class="even">
+<td align="center">2017</td>
+<td align="center">Model 2</td>
+</tr>
+<tr class="odd">
+<td align="center">2018</td>
+<td align="center">Model 4</td>
+</tr>
+<tr class="even">
+<td align="center">2019</td>
+<td align="center">Model 2</td>
+</tr>
+<tr class="odd">
+<td align="center">2020</td>
+<td align="center">Model 5</td>
+</tr>
+<tr class="even">
+<td align="center">2021</td>
+<td align="center">Model 4</td>
+</tr>
+</tbody>
+</table>
+<div id="parameters" class="section level4">
+<h4>Parameters</h4>
+<strong>2016</strong>
 <table class="table table-striped" style="width: auto !important; ">
 <caption>
-Model: Count ~ Month + Weekday + District
+Model: Count ~ District
 </caption>
 <thead>
 <tr>
@@ -2038,13 +2191,192 @@ Pr(&gt;|z|)
 (Intercept)
 </td>
 <td style="text-align:right;">
--0.3917
+1.9339
 </td>
 <td style="text-align:right;">
-0.1135
+0.1098
 </td>
 <td style="text-align:right;">
--3.4505
+17.6190
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D
+</td>
+<td style="text-align:right;">
+0.5648
+</td>
+<td style="text-align:right;">
+0.1375
+</td>
+<td style="text-align:right;">
+4.1083
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D
+</td>
+<td style="text-align:right;">
+0.3603
+</td>
+<td style="text-align:right;">
+0.1430
+</td>
+<td style="text-align:right;">
+2.5193
+</td>
+<td style="text-align:right;">
+0.0118
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D
+</td>
+<td style="text-align:right;">
+0.4938
+</td>
+<td style="text-align:right;">
+0.1393
+</td>
+<td style="text-align:right;">
+3.5453
+</td>
+<td style="text-align:right;">
+0.0004
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D
+</td>
+<td style="text-align:right;">
+-0.4870
+</td>
+<td style="text-align:right;">
+0.1779
+</td>
+<td style="text-align:right;">
+-2.7372
+</td>
+<td style="text-align:right;">
+0.0062
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D
+</td>
+<td style="text-align:right;">
+-2.4729
+</td>
+<td style="text-align:right;">
+0.3936
+</td>
+<td style="text-align:right;">
+-6.2832
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D
+</td>
+<td style="text-align:right;">
+-3.0325
+</td>
+<td style="text-align:right;">
+0.5119
+</td>
+<td style="text-align:right;">
+-5.9242
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+</tbody>
+</table>
+<strong>2017</strong>
+<table class="table table-striped" style="width: auto !important; ">
+<caption>
+Model: Count ~ District
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+Std. Error
+</th>
+<th style="text-align:right;">
+z value
+</th>
+<th style="text-align:right;">
+Pr(&gt;|z|)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+1.8326
+</td>
+<td style="text-align:right;">
+0.1155
+</td>
+<td style="text-align:right;">
+15.8706
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D
+</td>
+<td style="text-align:right;">
+0.4532
+</td>
+<td style="text-align:right;">
+0.1477
+</td>
+<td style="text-align:right;">
+3.0689
+</td>
+<td style="text-align:right;">
+0.0021
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D
+</td>
+<td style="text-align:right;">
+0.5028
+</td>
+<td style="text-align:right;">
+0.1463
+</td>
+<td style="text-align:right;">
+3.4372
 </td>
 <td style="text-align:right;">
 0.0006
@@ -2052,342 +2384,19 @@ Pr(&gt;|z|)
 </tr>
 <tr>
 <td style="text-align:left;">
-Month02
-</td>
-<td style="text-align:right;">
--0.2380
-</td>
-<td style="text-align:right;">
-0.1155
-</td>
-<td style="text-align:right;">
--2.0599
-</td>
-<td style="text-align:right;">
-0.0394
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month03
-</td>
-<td style="text-align:right;">
--0.0178
-</td>
-<td style="text-align:right;">
-0.1090
-</td>
-<td style="text-align:right;">
--0.1634
-</td>
-<td style="text-align:right;">
-0.8702
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month04
-</td>
-<td style="text-align:right;">
--0.1119
-</td>
-<td style="text-align:right;">
-0.1116
-</td>
-<td style="text-align:right;">
--1.0026
-</td>
-<td style="text-align:right;">
-0.3161
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month05
-</td>
-<td style="text-align:right;">
--0.0178
-</td>
-<td style="text-align:right;">
-0.1090
-</td>
-<td style="text-align:right;">
--0.1634
-</td>
-<td style="text-align:right;">
-0.8702
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month06
-</td>
-<td style="text-align:right;">
-0.0953
-</td>
-<td style="text-align:right;">
-0.1060
-</td>
-<td style="text-align:right;">
-0.8994
-</td>
-<td style="text-align:right;">
-0.3684
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month07
-</td>
-<td style="text-align:right;">
--0.0732
-</td>
-<td style="text-align:right;">
-0.1105
-</td>
-<td style="text-align:right;">
--0.6624
-</td>
-<td style="text-align:right;">
-0.5077
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month08
-</td>
-<td style="text-align:right;">
--0.0924
-</td>
-<td style="text-align:right;">
-0.1111
-</td>
-<td style="text-align:right;">
--0.8318
-</td>
-<td style="text-align:right;">
-0.4055
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month09
-</td>
-<td style="text-align:right;">
--0.0178
-</td>
-<td style="text-align:right;">
-0.1090
-</td>
-<td style="text-align:right;">
--0.1634
-</td>
-<td style="text-align:right;">
-0.8702
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month10
-</td>
-<td style="text-align:right;">
-0.1625
-</td>
-<td style="text-align:right;">
-0.1043
-</td>
-<td style="text-align:right;">
-1.5579
-</td>
-<td style="text-align:right;">
-0.1193
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month11
-</td>
-<td style="text-align:right;">
--0.0544
-</td>
-<td style="text-align:right;">
-0.1100
-</td>
-<td style="text-align:right;">
--0.4946
-</td>
-<td style="text-align:right;">
-0.6209
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month12
-</td>
-<td style="text-align:right;">
--0.0299
-</td>
-<td style="text-align:right;">
-0.1093
-</td>
-<td style="text-align:right;">
--0.2732
-</td>
-<td style="text-align:right;">
-0.7847
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayTuesday
-</td>
-<td style="text-align:right;">
--0.1655
-</td>
-<td style="text-align:right;">
-0.0961
-</td>
-<td style="text-align:right;">
--1.7221
-</td>
-<td style="text-align:right;">
-0.0850
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayWednesday
-</td>
-<td style="text-align:right;">
--0.0522
-</td>
-<td style="text-align:right;">
-0.0933
-</td>
-<td style="text-align:right;">
--0.5594
-</td>
-<td style="text-align:right;">
-0.5759
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayThursday
-</td>
-<td style="text-align:right;">
--0.1120
-</td>
-<td style="text-align:right;">
-0.0947
-</td>
-<td style="text-align:right;">
--1.1818
-</td>
-<td style="text-align:right;">
-0.2373
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayFriday
-</td>
-<td style="text-align:right;">
-0.1197
-</td>
-<td style="text-align:right;">
-0.0894
-</td>
-<td style="text-align:right;">
-1.3382
-</td>
-<td style="text-align:right;">
-0.1808
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdaySaturday
-</td>
-<td style="text-align:right;">
-0.5499
-</td>
-<td style="text-align:right;">
-0.0817
-</td>
-<td style="text-align:right;">
-6.7268
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdaySunday
-</td>
-<td style="text-align:right;">
-0.6161
-</td>
-<td style="text-align:right;">
-0.0808
-</td>
-<td style="text-align:right;">
-7.6268
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District2D
-</td>
-<td style="text-align:right;">
-0.7044
-</td>
-<td style="text-align:right;">
-0.0751
-</td>
-<td style="text-align:right;">
-9.3802
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District3D
-</td>
-<td style="text-align:right;">
-0.5982
-</td>
-<td style="text-align:right;">
-0.0765
-</td>
-<td style="text-align:right;">
-7.8225
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 District4D
 </td>
 <td style="text-align:right;">
-0.6268
+0.4187
 </td>
 <td style="text-align:right;">
-0.0761
+0.1487
 </td>
 <td style="text-align:right;">
-8.2382
+2.8162
 </td>
 <td style="text-align:right;">
-0.0000
+0.0049
 </td>
 </tr>
 <tr>
@@ -2395,16 +2404,16 @@ District4D
 District5D
 </td>
 <td style="text-align:right;">
--0.6169
+-0.7066
 </td>
 <td style="text-align:right;">
-0.1038
+0.2009
 </td>
 <td style="text-align:right;">
--5.9452
+-3.5170
 </td>
 <td style="text-align:right;">
-0.0000
+0.0004
 </td>
 </tr>
 <tr>
@@ -2412,13 +2421,13 @@ District5D
 District6D
 </td>
 <td style="text-align:right;">
--1.9162
+-1.8326
 </td>
 <td style="text-align:right;">
-0.1715
+0.3109
 </td>
 <td style="text-align:right;">
--11.1725
+-5.8942
 </td>
 <td style="text-align:right;">
 0.0000
@@ -2429,13 +2438,13 @@ District6D
 District7D
 </td>
 <td style="text-align:right;">
--2.4887
+-2.9312
 </td>
 <td style="text-align:right;">
-0.2219
+0.5131
 </td>
 <td style="text-align:right;">
--11.2167
+-5.7132
 </td>
 <td style="text-align:right;">
 0.0000
@@ -2443,14 +2452,10 @@ District7D
 </tr>
 </tbody>
 </table>
-<p>The coefficients of Tuesday to Friday are not significant, so I will
-try “Weekend” instead of “Weekday”.</p>
-</div>
-<div id="model2-count-month-weekend-district" class="section level5">
-<h5>Model2: Count ~ Month + Weekend + District</h5>
+<strong>2018</strong>
 <table class="table table-striped" style="width: auto !important; ">
 <caption>
-Model: Count ~ Month + Weekend + District
+Model: Count ~ District + Month
 </caption>
 <thead>
 <tr>
@@ -2476,13 +2481,115 @@ Pr(&gt;|z|)
 (Intercept)
 </td>
 <td style="text-align:right;">
--0.4288
+1.3610
 </td>
 <td style="text-align:right;">
-0.0976
+0.2120
 </td>
 <td style="text-align:right;">
--4.3931
+6.4210
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D
+</td>
+<td style="text-align:right;">
+0.8362
+</td>
+<td style="text-align:right;">
+0.1660
+</td>
+<td style="text-align:right;">
+5.0369
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D
+</td>
+<td style="text-align:right;">
+0.9760
+</td>
+<td style="text-align:right;">
+0.1627
+</td>
+<td style="text-align:right;">
+5.9982
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D
+</td>
+<td style="text-align:right;">
+0.8850
+</td>
+<td style="text-align:right;">
+0.1648
+</td>
+<td style="text-align:right;">
+5.3696
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D
+</td>
+<td style="text-align:right;">
+-0.5839
+</td>
+<td style="text-align:right;">
+0.2318
+</td>
+<td style="text-align:right;">
+-2.5196
+</td>
+<td style="text-align:right;">
+0.0117
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D
+</td>
+<td style="text-align:right;">
+-1.8718
+</td>
+<td style="text-align:right;">
+0.3797
+</td>
+<td style="text-align:right;">
+-4.9291
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D
+</td>
+<td style="text-align:right;">
+-2.0053
+</td>
+<td style="text-align:right;">
+0.4026
+</td>
+<td style="text-align:right;">
+-4.9809
 </td>
 <td style="text-align:right;">
 0.0000
@@ -2493,16 +2600,16 @@ Pr(&gt;|z|)
 Month02
 </td>
 <td style="text-align:right;">
--0.2380
+-0.2513
 </td>
 <td style="text-align:right;">
-0.1155
+0.2520
 </td>
 <td style="text-align:right;">
--2.0599
+-0.9974
 </td>
 <td style="text-align:right;">
-0.0394
+0.3186
 </td>
 </tr>
 <tr>
@@ -2510,16 +2617,16 @@ Month02
 Month03
 </td>
 <td style="text-align:right;">
--0.0178
+0.0274
 </td>
 <td style="text-align:right;">
-0.1090
+0.2341
 </td>
 <td style="text-align:right;">
--0.1634
+0.1170
 </td>
 <td style="text-align:right;">
-0.8702
+0.9068
 </td>
 </tr>
 <tr>
@@ -2527,16 +2634,16 @@ Month03
 Month04
 </td>
 <td style="text-align:right;">
--0.1119
+-0.1495
 </td>
 <td style="text-align:right;">
-0.1116
+0.2450
 </td>
 <td style="text-align:right;">
--1.0026
+-0.6103
 </td>
 <td style="text-align:right;">
-0.3161
+0.5417
 </td>
 </tr>
 <tr>
@@ -2544,16 +2651,16 @@ Month04
 Month05
 </td>
 <td style="text-align:right;">
--0.0178
+0.0541
 </td>
 <td style="text-align:right;">
-0.1090
+0.2326
 </td>
 <td style="text-align:right;">
--0.1634
+0.2325
 </td>
 <td style="text-align:right;">
-0.8702
+0.8162
 </td>
 </tr>
 <tr>
@@ -2561,16 +2668,16 @@ Month05
 Month06
 </td>
 <td style="text-align:right;">
-0.0953
+0.2007
 </td>
 <td style="text-align:right;">
-0.1060
+0.2247
 </td>
 <td style="text-align:right;">
-0.8994
+0.8929
 </td>
 <td style="text-align:right;">
-0.3684
+0.3719
 </td>
 </tr>
 <tr>
@@ -2578,16 +2685,16 @@ Month06
 Month07
 </td>
 <td style="text-align:right;">
--0.0732
+0.0000
 </td>
 <td style="text-align:right;">
-0.1105
+0.2357
 </td>
 <td style="text-align:right;">
--0.6624
+0.0000
 </td>
 <td style="text-align:right;">
-0.5077
+1.0000
 </td>
 </tr>
 <tr>
@@ -2595,16 +2702,16 @@ Month07
 Month08
 </td>
 <td style="text-align:right;">
--0.0924
+0.1301
 </td>
 <td style="text-align:right;">
-0.1111
+0.2284
 </td>
 <td style="text-align:right;">
--0.8318
+0.5694
 </td>
 <td style="text-align:right;">
-0.4055
+0.5691
 </td>
 </tr>
 <tr>
@@ -2612,16 +2719,16 @@ Month08
 Month09
 </td>
 <td style="text-align:right;">
--0.0178
+0.3285
 </td>
 <td style="text-align:right;">
-0.1090
+0.2186
 </td>
 <td style="text-align:right;">
--0.1634
+1.5029
 </td>
 <td style="text-align:right;">
-0.8702
+0.1329
 </td>
 </tr>
 <tr>
@@ -2629,16 +2736,16 @@ Month09
 Month10
 </td>
 <td style="text-align:right;">
-0.1625
+0.4418
 </td>
 <td style="text-align:right;">
-0.1043
+0.2136
 </td>
 <td style="text-align:right;">
-1.5579
+2.0683
 </td>
 <td style="text-align:right;">
-0.1193
+0.0386
 </td>
 </tr>
 <tr>
@@ -2646,16 +2753,16 @@ Month10
 Month11
 </td>
 <td style="text-align:right;">
--0.0544
+-0.2162
 </td>
 <td style="text-align:right;">
-0.1100
+0.2495
 </td>
 <td style="text-align:right;">
--0.4946
+-0.8666
 </td>
 <td style="text-align:right;">
-0.6209
+0.3862
 </td>
 </tr>
 <tr>
@@ -2663,557 +2770,21 @@ Month11
 Month12
 </td>
 <td style="text-align:right;">
--0.0299
+0.4055
 </td>
 <td style="text-align:right;">
-0.1093
+0.2152
 </td>
 <td style="text-align:right;">
--0.2732
+1.8844
 </td>
 <td style="text-align:right;">
-0.7847
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Weekend1
-</td>
-<td style="text-align:right;">
-0.6207
-</td>
-<td style="text-align:right;">
-0.0454
-</td>
-<td style="text-align:right;">
-13.6697
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District2D
-</td>
-<td style="text-align:right;">
-0.7044
-</td>
-<td style="text-align:right;">
-0.0751
-</td>
-<td style="text-align:right;">
-9.3802
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District3D
-</td>
-<td style="text-align:right;">
-0.5982
-</td>
-<td style="text-align:right;">
-0.0765
-</td>
-<td style="text-align:right;">
-7.8225
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District4D
-</td>
-<td style="text-align:right;">
-0.6268
-</td>
-<td style="text-align:right;">
-0.0761
-</td>
-<td style="text-align:right;">
-8.2382
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District5D
-</td>
-<td style="text-align:right;">
--0.6169
-</td>
-<td style="text-align:right;">
-0.1038
-</td>
-<td style="text-align:right;">
--5.9452
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District6D
-</td>
-<td style="text-align:right;">
--1.9162
-</td>
-<td style="text-align:right;">
-0.1715
-</td>
-<td style="text-align:right;">
--11.1725
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District7D
-</td>
-<td style="text-align:right;">
--2.4887
-</td>
-<td style="text-align:right;">
-0.2219
-</td>
-<td style="text-align:right;">
--11.2167
-</td>
-<td style="text-align:right;">
-0.0000
+0.0595
 </td>
 </tr>
 </tbody>
 </table>
-<p>Most of months do not have a significant coefficient, so I will drop
-“Month” from variables.</p>
-</div>
-<div id="model3-count-weekday-district" class="section level5">
-<h5>Model3: Count ~ Weekday + District</h5>
-<table class="table table-striped" style="width: auto !important; ">
-<caption>
-Model: Count ~ Weekday + District
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Estimate
-</th>
-<th style="text-align:right;">
-Std. Error
-</th>
-<th style="text-align:right;">
-z value
-</th>
-<th style="text-align:right;">
-Pr(&gt;|z|)
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-(Intercept)
-</td>
-<td style="text-align:right;">
--0.4200
-</td>
-<td style="text-align:right;">
-0.0866
-</td>
-<td style="text-align:right;">
--4.8477
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayTuesday
-</td>
-<td style="text-align:right;">
--0.1655
-</td>
-<td style="text-align:right;">
-0.0961
-</td>
-<td style="text-align:right;">
--1.7221
-</td>
-<td style="text-align:right;">
-0.0850
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayWednesday
-</td>
-<td style="text-align:right;">
--0.0522
-</td>
-<td style="text-align:right;">
-0.0933
-</td>
-<td style="text-align:right;">
--0.5594
-</td>
-<td style="text-align:right;">
-0.5759
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayThursday
-</td>
-<td style="text-align:right;">
--0.1120
-</td>
-<td style="text-align:right;">
-0.0947
-</td>
-<td style="text-align:right;">
--1.1818
-</td>
-<td style="text-align:right;">
-0.2373
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayFriday
-</td>
-<td style="text-align:right;">
-0.1197
-</td>
-<td style="text-align:right;">
-0.0894
-</td>
-<td style="text-align:right;">
-1.3382
-</td>
-<td style="text-align:right;">
-0.1808
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdaySaturday
-</td>
-<td style="text-align:right;">
-0.5499
-</td>
-<td style="text-align:right;">
-0.0817
-</td>
-<td style="text-align:right;">
-6.7268
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdaySunday
-</td>
-<td style="text-align:right;">
-0.6161
-</td>
-<td style="text-align:right;">
-0.0808
-</td>
-<td style="text-align:right;">
-7.6268
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District2D
-</td>
-<td style="text-align:right;">
-0.7044
-</td>
-<td style="text-align:right;">
-0.0751
-</td>
-<td style="text-align:right;">
-9.3802
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District3D
-</td>
-<td style="text-align:right;">
-0.5982
-</td>
-<td style="text-align:right;">
-0.0765
-</td>
-<td style="text-align:right;">
-7.8225
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District4D
-</td>
-<td style="text-align:right;">
-0.6268
-</td>
-<td style="text-align:right;">
-0.0761
-</td>
-<td style="text-align:right;">
-8.2382
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District5D
-</td>
-<td style="text-align:right;">
--0.6169
-</td>
-<td style="text-align:right;">
-0.1038
-</td>
-<td style="text-align:right;">
--5.9452
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District6D
-</td>
-<td style="text-align:right;">
--1.9162
-</td>
-<td style="text-align:right;">
-0.1715
-</td>
-<td style="text-align:right;">
--11.1725
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District7D
-</td>
-<td style="text-align:right;">
--2.4887
-</td>
-<td style="text-align:right;">
-0.2219
-</td>
-<td style="text-align:right;">
--11.2167
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="model4-count-weekend-district" class="section level5">
-<h5>Model4: Count ~ Weekend + District</h5>
-<table class="table table-striped" style="width: auto !important; ">
-<caption>
-Model: Count ~ Weekend + District
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Estimate
-</th>
-<th style="text-align:right;">
-Std. Error
-</th>
-<th style="text-align:right;">
-z value
-</th>
-<th style="text-align:right;">
-Pr(&gt;|z|)
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-(Intercept)
-</td>
-<td style="text-align:right;">
--0.4571
-</td>
-<td style="text-align:right;">
-0.0644
-</td>
-<td style="text-align:right;">
--7.0970
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Weekend1
-</td>
-<td style="text-align:right;">
-0.6207
-</td>
-<td style="text-align:right;">
-0.0454
-</td>
-<td style="text-align:right;">
-13.6697
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District2D
-</td>
-<td style="text-align:right;">
-0.7044
-</td>
-<td style="text-align:right;">
-0.0751
-</td>
-<td style="text-align:right;">
-9.3802
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District3D
-</td>
-<td style="text-align:right;">
-0.5982
-</td>
-<td style="text-align:right;">
-0.0765
-</td>
-<td style="text-align:right;">
-7.8225
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District4D
-</td>
-<td style="text-align:right;">
-0.6268
-</td>
-<td style="text-align:right;">
-0.0761
-</td>
-<td style="text-align:right;">
-8.2382
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District5D
-</td>
-<td style="text-align:right;">
--0.6169
-</td>
-<td style="text-align:right;">
-0.1038
-</td>
-<td style="text-align:right;">
--5.9452
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District6D
-</td>
-<td style="text-align:right;">
--1.9162
-</td>
-<td style="text-align:right;">
-0.1715
-</td>
-<td style="text-align:right;">
--11.1725
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District7D
-</td>
-<td style="text-align:right;">
--2.4887
-</td>
-<td style="text-align:right;">
-0.2219
-</td>
-<td style="text-align:right;">
--11.2167
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="model5-count-district" class="section level5">
-<h5>Model5: Count ~ District</h5>
+<strong>2019</strong>
 <table class="table table-striped" style="width: auto !important; ">
 <caption>
 Model: Count ~ District
@@ -3242,16 +2813,16 @@ Pr(&gt;|z|)
 (Intercept)
 </td>
 <td style="text-align:right;">
--0.2374
+1.5224
 </td>
 <td style="text-align:right;">
-0.0614
+0.1348
 </td>
 <td style="text-align:right;">
--3.8643
+11.2906
 </td>
 <td style="text-align:right;">
-1e-04
+0.0000
 </td>
 </tr>
 <tr>
@@ -3259,16 +2830,16 @@ Pr(&gt;|z|)
 District2D
 </td>
 <td style="text-align:right;">
-0.7044
+1.0165
 </td>
 <td style="text-align:right;">
-0.0751
+0.1574
 </td>
 <td style="text-align:right;">
-9.3802
+6.4602
 </td>
 <td style="text-align:right;">
-0e+00
+0.0000
 </td>
 </tr>
 <tr>
@@ -3276,16 +2847,16 @@ District2D
 District3D
 </td>
 <td style="text-align:right;">
-0.5982
+0.6078
 </td>
 <td style="text-align:right;">
-0.0765
+0.1676
 </td>
 <td style="text-align:right;">
-7.8225
+3.6269
 </td>
 <td style="text-align:right;">
-0e+00
+0.0003
 </td>
 </tr>
 <tr>
@@ -3293,16 +2864,16 @@ District3D
 District4D
 </td>
 <td style="text-align:right;">
-0.6268
+0.7802
 </td>
 <td style="text-align:right;">
-0.0761
+0.1628
 </td>
 <td style="text-align:right;">
-8.2382
+4.7911
 </td>
 <td style="text-align:right;">
-0e+00
+0.0000
 </td>
 </tr>
 <tr>
@@ -3310,16 +2881,16 @@ District4D
 District5D
 </td>
 <td style="text-align:right;">
--0.6169
+-0.7492
 </td>
 <td style="text-align:right;">
-0.1038
+0.2380
 </td>
 <td style="text-align:right;">
--5.9452
+-3.1481
 </td>
 <td style="text-align:right;">
-0e+00
+0.0016
 </td>
 </tr>
 <tr>
@@ -3327,16 +2898,16 @@ District5D
 District6D
 </td>
 <td style="text-align:right;">
--1.9162
+-1.5224
 </td>
 <td style="text-align:right;">
-0.1715
+0.3186
 </td>
 <td style="text-align:right;">
--11.1725
+-4.7783
 </td>
 <td style="text-align:right;">
-0e+00
+0.0000
 </td>
 </tr>
 <tr>
@@ -3344,175 +2915,24 @@ District6D
 District7D
 </td>
 <td style="text-align:right;">
--2.4887
+-2.0614
 </td>
 <td style="text-align:right;">
-0.2219
+0.4013
 </td>
 <td style="text-align:right;">
--11.2167
+-5.1372
 </td>
 <td style="text-align:right;">
-0e+00
+0.0000
 </td>
 </tr>
 </tbody>
 </table>
-</div>
-<div id="model-evaluation" class="section level4">
-<h4>Model Evaluation</h4>
-<div id="deviance" class="section level5">
-<h5>Deviance</h5>
-<p>I will use “residual deviance” to test whether the null hypothesis
-(Poisson regression model provides an adequate fit for the data) is
-true. To test the null hypothesis, I will calculate p-value:</p>
-<table style="width:100%;">
-<colgroup>
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Model</th>
-<th align="center">Model1</th>
-<th align="center">Model2</th>
-<th align="center">Model3</th>
-<th align="center">Model4</th>
-<th align="center">Model5</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>p-value</strong></td>
-<td align="center">0.7136488</td>
-<td align="center">0.6763486</td>
-<td align="center">0.6755461</td>
-<td align="center">0.6365731</td>
-<td align="center">0.0139359</td>
-</tr>
-</tbody>
-</table>
-<p>Null hypothesis is not rejected except for Model 5.</p>
-</div>
-<div id="pseudo-r2" class="section level5">
-<h5>pseudo-R2</h5>
-<p>Check MacFadden’s pseudo r-squared for each model.</p>
-<table style="width:100%;">
-<colgroup>
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Model</th>
-<th align="center">Model1</th>
-<th align="center">Model2</th>
-<th align="center">Model3</th>
-<th align="center">Model4</th>
-<th align="center">Model5</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>pseudo R2</strong></td>
-<td align="center">0.2306397</td>
-<td align="center">0.2287217</td>
-<td align="center">0.2277581</td>
-<td align="center">0.22584</td>
-<td align="center">0.1976703</td>
-</tr>
-</tbody>
-</table>
-<p>About 23% of variance in the response can be explained in Model1 to
-Model4.</p>
-</div>
-<div id="aic" class="section level5">
-<h5>AIC</h5>
-<p>Check AIC for each model.</p>
-<table style="width:100%;">
-<colgroup>
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Model</th>
-<th align="center">Model1</th>
-<th align="center">Model2</th>
-<th align="center">Model3</th>
-<th align="center">Model4</th>
-<th align="center">Model5</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>AIC</strong></td>
-<td align="center">4927.1970662</td>
-<td align="center">4929.3612459</td>
-<td align="center">4923.4723849</td>
-<td align="center">4925.6365646</td>
-<td align="center">5102.2857389</td>
-</tr>
-</tbody>
-</table>
-<p>Model 3 is the best in terms of AIC.</p>
-</div>
-<div id="bic" class="section level5">
-<h5>BIC</h5>
-<p>Check BIC for each model.</p>
-<table style="width:100%;">
-<colgroup>
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-<col width="16%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Model</th>
-<th align="center">Model1</th>
-<th align="center">Model2</th>
-<th align="center">Model3</th>
-<th align="center">Model4</th>
-<th align="center">Model5</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>BIC</strong></td>
-<td align="center">5065.5095776</td>
-<td align="center">5038.8586508</td>
-<td align="center">4998.3916619</td>
-<td align="center">4971.740735</td>
-<td align="center">5102.2857389</td>
-</tr>
-</tbody>
-</table>
-<p>Model 4 is the best in terms of BIC.</p>
-</div>
-</div>
-</div>
-<div id="models-for-post-covid" class="section level3">
-<h3>Models for post-COVID</h3>
-<div id="model1-count-month-weekday-district-1" class="section level4">
-<h4>Model1: Count ~ Month + Weekday + District</h4>
+<strong>2020</strong>
 <table class="table table-striped" style="width: auto !important; ">
 <caption>
-Model: Count ~ Month + Weekday + District
+Model: Count ~ District * Month
 </caption>
 <thead>
 <tr>
@@ -3538,16 +2958,118 @@ Pr(&gt;|z|)
 (Intercept)
 </td>
 <td style="text-align:right;">
--0.6741
+1.9459
 </td>
 <td style="text-align:right;">
-0.1894
+0.3780
 </td>
 <td style="text-align:right;">
--3.5582
+5.1484
 </td>
 <td style="text-align:right;">
-0.0004
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D
+</td>
+<td style="text-align:right;">
+0.3567
+</td>
+<td style="text-align:right;">
+0.4928
+</td>
+<td style="text-align:right;">
+0.7238
+</td>
+<td style="text-align:right;">
+0.4692
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.5345
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D
+</td>
+<td style="text-align:right;">
+0.7621
+</td>
+<td style="text-align:right;">
+0.4577
+</td>
+<td style="text-align:right;">
+1.6650
+</td>
+<td style="text-align:right;">
+0.0959
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D
+</td>
+<td style="text-align:right;">
+-1.9459
+</td>
+<td style="text-align:right;">
+1.0690
+</td>
+<td style="text-align:right;">
+-1.8202
+</td>
+<td style="text-align:right;">
+0.0687
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D
+</td>
+<td style="text-align:right;">
+-1.2528
+</td>
+<td style="text-align:right;">
+0.8018
+</td>
+<td style="text-align:right;">
+-1.5625
+</td>
+<td style="text-align:right;">
+0.1182
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D
+</td>
+<td style="text-align:right;">
+-27.2485
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+-0.0001
+</td>
+<td style="text-align:right;">
+0.9999
 </td>
 </tr>
 <tr>
@@ -3555,822 +3077,33 @@ Pr(&gt;|z|)
 Month02
 </td>
 <td style="text-align:right;">
--0.0140
+-1.9459
 </td>
 <td style="text-align:right;">
-0.1673
+1.0690
 </td>
 <td style="text-align:right;">
--0.0836
+-1.8202
 </td>
 <td style="text-align:right;">
-0.9334
+0.0687
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 Month03
-</td>
-<td style="text-align:right;">
--0.3064
-</td>
-<td style="text-align:right;">
-0.1810
-</td>
-<td style="text-align:right;">
--1.6928
-</td>
-<td style="text-align:right;">
-0.0905
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month04
-</td>
-<td style="text-align:right;">
--0.6391
-</td>
-<td style="text-align:right;">
-0.2005
-</td>
-<td style="text-align:right;">
--3.1873
-</td>
-<td style="text-align:right;">
-0.0014
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month05
-</td>
-<td style="text-align:right;">
--0.1023
-</td>
-<td style="text-align:right;">
-0.1711
-</td>
-<td style="text-align:right;">
--0.5978
-</td>
-<td style="text-align:right;">
-0.5500
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month06
-</td>
-<td style="text-align:right;">
--0.5390
-</td>
-<td style="text-align:right;">
-0.1942
-</td>
-<td style="text-align:right;">
--2.7760
-</td>
-<td style="text-align:right;">
-0.0055
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month07
-</td>
-<td style="text-align:right;">
--0.4480
-</td>
-<td style="text-align:right;">
-0.1888
-</td>
-<td style="text-align:right;">
--2.3736
-</td>
-<td style="text-align:right;">
-0.0176
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month08
-</td>
-<td style="text-align:right;">
--0.1178
-</td>
-<td style="text-align:right;">
-0.1718
-</td>
-<td style="text-align:right;">
--0.6856
-</td>
-<td style="text-align:right;">
-0.4930
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month09
-</td>
-<td style="text-align:right;">
--0.2162
-</td>
-<td style="text-align:right;">
-0.1764
-</td>
-<td style="text-align:right;">
--1.2255
-</td>
-<td style="text-align:right;">
-0.2204
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month10
-</td>
-<td style="text-align:right;">
--0.1991
-</td>
-<td style="text-align:right;">
-0.1756
-</td>
-<td style="text-align:right;">
--1.1339
-</td>
-<td style="text-align:right;">
-0.2568
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month11
-</td>
-<td style="text-align:right;">
--0.1658
-</td>
-<td style="text-align:right;">
-0.1740
-</td>
-<td style="text-align:right;">
--0.9527
-</td>
-<td style="text-align:right;">
-0.3407
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month12
-</td>
-<td style="text-align:right;">
--0.4480
-</td>
-<td style="text-align:right;">
-0.1888
-</td>
-<td style="text-align:right;">
--2.3736
-</td>
-<td style="text-align:right;">
-0.0176
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayTuesday
-</td>
-<td style="text-align:right;">
--0.0355
-</td>
-<td style="text-align:right;">
-0.1539
-</td>
-<td style="text-align:right;">
--0.2308
-</td>
-<td style="text-align:right;">
-0.8175
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayWednesday
-</td>
-<td style="text-align:right;">
--0.0235
-</td>
-<td style="text-align:right;">
-0.1534
-</td>
-<td style="text-align:right;">
--0.1534
-</td>
-<td style="text-align:right;">
-0.8781
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayThursday
-</td>
-<td style="text-align:right;">
--0.1917
-</td>
-<td style="text-align:right;">
-0.1604
-</td>
-<td style="text-align:right;">
--1.1953
-</td>
-<td style="text-align:right;">
-0.2320
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayFriday
-</td>
-<td style="text-align:right;">
-0.0230
-</td>
-<td style="text-align:right;">
-0.1516
-</td>
-<td style="text-align:right;">
-0.1516
-</td>
-<td style="text-align:right;">
-0.8795
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdaySaturday
-</td>
-<td style="text-align:right;">
-0.3578
-</td>
-<td style="text-align:right;">
-0.1406
-</td>
-<td style="text-align:right;">
-2.5457
-</td>
-<td style="text-align:right;">
-0.0109
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdaySunday
-</td>
-<td style="text-align:right;">
-0.4873
-</td>
-<td style="text-align:right;">
-0.1370
-</td>
-<td style="text-align:right;">
-3.5567
-</td>
-<td style="text-align:right;">
-0.0004
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District2D
-</td>
-<td style="text-align:right;">
-0.8643
-</td>
-<td style="text-align:right;">
-0.1377
-</td>
-<td style="text-align:right;">
-6.2783
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District3D
-</td>
-<td style="text-align:right;">
-0.6729
-</td>
-<td style="text-align:right;">
-0.1419
-</td>
-<td style="text-align:right;">
-4.7423
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District4D
-</td>
-<td style="text-align:right;">
-0.8810
-</td>
-<td style="text-align:right;">
-0.1373
-</td>
-<td style="text-align:right;">
-6.4155
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District5D
-</td>
-<td style="text-align:right;">
--0.3285
-</td>
-<td style="text-align:right;">
-0.1785
-</td>
-<td style="text-align:right;">
--1.8407
-</td>
-<td style="text-align:right;">
-0.0657
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District6D
-</td>
-<td style="text-align:right;">
--0.9163
-</td>
-<td style="text-align:right;">
-0.2160
-</td>
-<td style="text-align:right;">
--4.2416
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District7D
-</td>
-<td style="text-align:right;">
--2.0149
-</td>
-<td style="text-align:right;">
-0.3367
-</td>
-<td style="text-align:right;">
--5.9852
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-</tbody>
-</table>
-<p>The coefficients of Tuesday to Friday are not significant, so I will
-try “Weekend” instead of “Weekday”.</p>
-</div>
-<div id="model2-count-month-weekend-district-1" class="section level4">
-<h4>Model2: Count ~ Month + Weekend + District</h4>
-<table class="table table-striped" style="width: auto !important; ">
-<caption>
-Model: Count ~ Month + Weekend + District
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Estimate
-</th>
-<th style="text-align:right;">
-Std. Error
-</th>
-<th style="text-align:right;">
-z value
-</th>
-<th style="text-align:right;">
-Pr(&gt;|z|)
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-(Intercept)
-</td>
-<td style="text-align:right;">
--0.7168
-</td>
-<td style="text-align:right;">
-0.1634
-</td>
-<td style="text-align:right;">
--4.3881
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month02
-</td>
-<td style="text-align:right;">
--0.0140
-</td>
-<td style="text-align:right;">
-0.1673
-</td>
-<td style="text-align:right;">
--0.0836
-</td>
-<td style="text-align:right;">
-0.9334
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month03
-</td>
-<td style="text-align:right;">
--0.3064
-</td>
-<td style="text-align:right;">
-0.1810
-</td>
-<td style="text-align:right;">
--1.6928
-</td>
-<td style="text-align:right;">
-0.0905
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month04
-</td>
-<td style="text-align:right;">
--0.6391
-</td>
-<td style="text-align:right;">
-0.2005
-</td>
-<td style="text-align:right;">
--3.1873
-</td>
-<td style="text-align:right;">
-0.0014
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month05
-</td>
-<td style="text-align:right;">
--0.1023
-</td>
-<td style="text-align:right;">
-0.1711
-</td>
-<td style="text-align:right;">
--0.5978
-</td>
-<td style="text-align:right;">
-0.5500
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month06
-</td>
-<td style="text-align:right;">
--0.5390
-</td>
-<td style="text-align:right;">
-0.1942
-</td>
-<td style="text-align:right;">
--2.7760
-</td>
-<td style="text-align:right;">
-0.0055
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month07
-</td>
-<td style="text-align:right;">
--0.4480
-</td>
-<td style="text-align:right;">
-0.1888
-</td>
-<td style="text-align:right;">
--2.3736
-</td>
-<td style="text-align:right;">
-0.0176
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month08
-</td>
-<td style="text-align:right;">
--0.1178
-</td>
-<td style="text-align:right;">
-0.1718
-</td>
-<td style="text-align:right;">
--0.6856
-</td>
-<td style="text-align:right;">
-0.4930
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month09
-</td>
-<td style="text-align:right;">
--0.2162
-</td>
-<td style="text-align:right;">
-0.1764
-</td>
-<td style="text-align:right;">
--1.2255
-</td>
-<td style="text-align:right;">
-0.2204
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month10
-</td>
-<td style="text-align:right;">
--0.1991
-</td>
-<td style="text-align:right;">
-0.1756
-</td>
-<td style="text-align:right;">
--1.1339
-</td>
-<td style="text-align:right;">
-0.2568
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month11
-</td>
-<td style="text-align:right;">
--0.1658
-</td>
-<td style="text-align:right;">
-0.1740
-</td>
-<td style="text-align:right;">
--0.9527
-</td>
-<td style="text-align:right;">
-0.3407
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month12
-</td>
-<td style="text-align:right;">
--0.4480
-</td>
-<td style="text-align:right;">
-0.1888
-</td>
-<td style="text-align:right;">
--2.3736
-</td>
-<td style="text-align:right;">
-0.0176
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Weekend1
-</td>
-<td style="text-align:right;">
-0.4674
-</td>
-<td style="text-align:right;">
-0.0789
-</td>
-<td style="text-align:right;">
-5.9222
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District2D
-</td>
-<td style="text-align:right;">
-0.8643
-</td>
-<td style="text-align:right;">
-0.1377
-</td>
-<td style="text-align:right;">
-6.2783
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District3D
-</td>
-<td style="text-align:right;">
-0.6729
-</td>
-<td style="text-align:right;">
-0.1419
-</td>
-<td style="text-align:right;">
-4.7423
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District4D
-</td>
-<td style="text-align:right;">
-0.8810
-</td>
-<td style="text-align:right;">
-0.1373
-</td>
-<td style="text-align:right;">
-6.4155
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District5D
-</td>
-<td style="text-align:right;">
--0.3285
-</td>
-<td style="text-align:right;">
-0.1785
-</td>
-<td style="text-align:right;">
--1.8407
-</td>
-<td style="text-align:right;">
-0.0657
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District6D
-</td>
-<td style="text-align:right;">
--0.9163
-</td>
-<td style="text-align:right;">
-0.2160
-</td>
-<td style="text-align:right;">
--4.2416
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District7D
-</td>
-<td style="text-align:right;">
--2.0149
-</td>
-<td style="text-align:right;">
-0.3367
-</td>
-<td style="text-align:right;">
--5.9852
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="model3-count-month-district" class="section level4">
-<h4>Model3: Count ~ Month + District</h4>
-<table class="table table-striped" style="width: auto !important; ">
-<caption>
-Model: Count ~ Month + District
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Estimate
-</th>
-<th style="text-align:right;">
-Std. Error
-</th>
-<th style="text-align:right;">
-z value
-</th>
-<th style="text-align:right;">
-Pr(&gt;|z|)
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-(Intercept)
 </td>
 <td style="text-align:right;">
 -0.5596
 </td>
 <td style="text-align:right;">
-0.1604
+0.6268
 </td>
 <td style="text-align:right;">
--3.4880
+-0.8928
 </td>
 <td style="text-align:right;">
-0.0005
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month02
-</td>
-<td style="text-align:right;">
--0.0140
-</td>
-<td style="text-align:right;">
-0.1673
-</td>
-<td style="text-align:right;">
--0.0836
-</td>
-<td style="text-align:right;">
-0.9334
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Month03
-</td>
-<td style="text-align:right;">
--0.3064
-</td>
-<td style="text-align:right;">
-0.1810
-</td>
-<td style="text-align:right;">
--1.6928
-</td>
-<td style="text-align:right;">
-0.0905
+0.3719
 </td>
 </tr>
 <tr>
@@ -4378,16 +3111,16 @@ Month03
 Month04
 </td>
 <td style="text-align:right;">
--0.6391
+-27.2485
 </td>
 <td style="text-align:right;">
-0.2005
+189338.6608
 </td>
 <td style="text-align:right;">
--3.1873
+-0.0001
 </td>
 <td style="text-align:right;">
-0.0014
+0.9999
 </td>
 </tr>
 <tr>
@@ -4395,16 +3128,16 @@ Month04
 Month05
 </td>
 <td style="text-align:right;">
--0.1023
+-1.9459
 </td>
 <td style="text-align:right;">
-0.1711
+1.0690
 </td>
 <td style="text-align:right;">
--0.5978
+-1.8202
 </td>
 <td style="text-align:right;">
-0.5500
+0.0687
 </td>
 </tr>
 <tr>
@@ -4412,16 +3145,16 @@ Month05
 Month06
 </td>
 <td style="text-align:right;">
--0.5390
+-1.9459
 </td>
 <td style="text-align:right;">
-0.1942
+1.0690
 </td>
 <td style="text-align:right;">
--2.7760
+-1.8202
 </td>
 <td style="text-align:right;">
-0.0055
+0.0687
 </td>
 </tr>
 <tr>
@@ -4429,16 +3162,16 @@ Month06
 Month07
 </td>
 <td style="text-align:right;">
--0.4480
+-0.3365
 </td>
 <td style="text-align:right;">
-0.1888
+0.5855
 </td>
 <td style="text-align:right;">
--2.3736
+-0.5746
 </td>
 <td style="text-align:right;">
-0.0176
+0.5655
 </td>
 </tr>
 <tr>
@@ -4446,16 +3179,16 @@ Month07
 Month08
 </td>
 <td style="text-align:right;">
--0.1178
+-0.5596
 </td>
 <td style="text-align:right;">
-0.1718
+0.6268
 </td>
 <td style="text-align:right;">
--0.6856
+-0.8928
 </td>
 <td style="text-align:right;">
-0.4930
+0.3719
 </td>
 </tr>
 <tr>
@@ -4463,16 +3196,16 @@ Month08
 Month09
 </td>
 <td style="text-align:right;">
--0.2162
+-0.3365
 </td>
 <td style="text-align:right;">
-0.1764
+0.5855
 </td>
 <td style="text-align:right;">
--1.2255
+-0.5746
 </td>
 <td style="text-align:right;">
-0.2204
+0.5655
 </td>
 </tr>
 <tr>
@@ -4480,16 +3213,16 @@ Month09
 Month10
 </td>
 <td style="text-align:right;">
--0.1991
+-0.5596
 </td>
 <td style="text-align:right;">
-0.1756
+0.6268
 </td>
 <td style="text-align:right;">
--1.1339
+-0.8928
 </td>
 <td style="text-align:right;">
-0.2568
+0.3719
 </td>
 </tr>
 <tr>
@@ -4497,16 +3230,16 @@ Month10
 Month11
 </td>
 <td style="text-align:right;">
--0.1658
+-1.9459
 </td>
 <td style="text-align:right;">
-0.1740
+1.0690
 </td>
 <td style="text-align:right;">
--0.9527
+-1.8202
 </td>
 <td style="text-align:right;">
-0.3407
+0.0687
 </td>
 </tr>
 <tr>
@@ -4514,128 +3247,1146 @@ Month11
 Month12
 </td>
 <td style="text-align:right;">
--0.4480
+-1.2528
 </td>
 <td style="text-align:right;">
-0.1888
+0.8018
 </td>
 <td style="text-align:right;">
--2.3736
+-1.5625
 </td>
 <td style="text-align:right;">
-0.0176
+0.1182
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-District2D
+District2D:Month02
 </td>
 <td style="text-align:right;">
-0.8643
+1.7228
 </td>
 <td style="text-align:right;">
-0.1377
+1.1696
 </td>
 <td style="text-align:right;">
-6.2783
+1.4730
+</td>
+<td style="text-align:right;">
+0.1407
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month02
+</td>
+<td style="text-align:right;">
+2.0794
+</td>
+<td style="text-align:right;">
+1.1877
+</td>
+<td style="text-align:right;">
+1.7508
+</td>
+<td style="text-align:right;">
+0.0800
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month02
+</td>
+<td style="text-align:right;">
+2.0711
+</td>
+<td style="text-align:right;">
+1.1262
+</td>
+<td style="text-align:right;">
+1.8390
+</td>
+<td style="text-align:right;">
+0.0659
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month02
+</td>
+<td style="text-align:right;">
+3.5553
+</td>
+<td style="text-align:right;">
+1.5306
+</td>
+<td style="text-align:right;">
+2.3228
+</td>
+<td style="text-align:right;">
+0.0202
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month02
+</td>
+<td style="text-align:right;">
+2.6391
+</td>
+<td style="text-align:right;">
+1.3758
+</td>
+<td style="text-align:right;">
+1.9182
+</td>
+<td style="text-align:right;">
+0.0551
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month02
+</td>
+<td style="text-align:right;">
+1.9459
+</td>
+<td style="text-align:right;">
+267765.3019
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
+<td style="text-align:right;">
+1.0000
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
-District3D
+District2D:Month03
 </td>
 <td style="text-align:right;">
-0.6729
+0.4543
 </td>
 <td style="text-align:right;">
-0.1419
+0.7772
 </td>
 <td style="text-align:right;">
-4.7423
+0.5845
+</td>
+<td style="text-align:right;">
+0.5589
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month03
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District4D
-</td>
 <td style="text-align:right;">
-0.8810
-</td>
-<td style="text-align:right;">
-0.1373
-</td>
-<td style="text-align:right;">
-6.4155
+0.8864
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District5D
-</td>
 <td style="text-align:right;">
--0.3285
-</td>
-<td style="text-align:right;">
-0.1785
-</td>
-<td style="text-align:right;">
--1.8407
-</td>
-<td style="text-align:right;">
-0.0657
+1.0000
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-District6D
+District4D:Month03
 </td>
 <td style="text-align:right;">
--0.9163
+-0.5390
 </td>
 <td style="text-align:right;">
-0.2160
+0.8121
 </td>
 <td style="text-align:right;">
--4.2416
+-0.6637
+</td>
+<td style="text-align:right;">
+0.5069
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month03
+</td>
+<td style="text-align:right;">
+2.1691
+</td>
+<td style="text-align:right;">
+1.2621
+</td>
+<td style="text-align:right;">
+1.7186
+</td>
+<td style="text-align:right;">
+0.0857
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month03
+</td>
+<td style="text-align:right;">
+-0.1335
+</td>
+<td style="text-align:right;">
+1.3758
+</td>
+<td style="text-align:right;">
+-0.0971
+</td>
+<td style="text-align:right;">
+0.9227
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month03
+</td>
+<td style="text-align:right;">
+25.8622
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month04
+</td>
+<td style="text-align:right;">
+26.8918
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month04
+</td>
+<td style="text-align:right;">
+27.4998
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month04
+</td>
+<td style="text-align:right;">
+26.1499
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month04
+</td>
+<td style="text-align:right;">
+27.2485
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month04
+</td>
+<td style="text-align:right;">
+1.2528
+</td>
+<td style="text-align:right;">
+267765.3019
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
+<td style="text-align:right;">
+1.0000
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
-District7D
+District7D:Month04
 </td>
 <td style="text-align:right;">
--2.0149
+52.5511
 </td>
 <td style="text-align:right;">
-0.3367
+267765.3020
 </td>
 <td style="text-align:right;">
--5.9852
+0.0002
+</td>
+<td style="text-align:right;">
+0.9998
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month05
+</td>
+<td style="text-align:right;">
+2.0412
+</td>
+<td style="text-align:right;">
+1.1549
+</td>
+<td style="text-align:right;">
+1.7675
+</td>
+<td style="text-align:right;">
+0.0772
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month05
+</td>
+<td style="text-align:right;">
+2.3026
+</td>
+<td style="text-align:right;">
+1.1772
+</td>
+<td style="text-align:right;">
+1.9560
+</td>
+<td style="text-align:right;">
+0.0505
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month05
+</td>
+<td style="text-align:right;">
+1.0296
+</td>
+<td style="text-align:right;">
+1.1731
+</td>
+<td style="text-align:right;">
+0.8777
+</td>
+<td style="text-align:right;">
+0.3801
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month05
+</td>
+<td style="text-align:right;">
+3.5553
+</td>
+<td style="text-align:right;">
+1.5306
+</td>
+<td style="text-align:right;">
+2.3228
+</td>
+<td style="text-align:right;">
+0.0202
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month05
+</td>
+<td style="text-align:right;">
+1.9459
+</td>
+<td style="text-align:right;">
+1.4639
+</td>
+<td style="text-align:right;">
+1.3293
+</td>
+<td style="text-align:right;">
+0.1837
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month05
+</td>
+<td style="text-align:right;">
+27.9416
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month06
+</td>
+<td style="text-align:right;">
+1.0296
+</td>
+<td style="text-align:right;">
+1.2218
+</td>
+<td style="text-align:right;">
+0.8427
+</td>
+<td style="text-align:right;">
+0.3994
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month06
+</td>
+<td style="text-align:right;">
+1.7918
+</td>
+<td style="text-align:right;">
+1.2051
+</td>
+<td style="text-align:right;">
+1.4868
+</td>
+<td style="text-align:right;">
+0.1371
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month06
+</td>
+<td style="text-align:right;">
+0.8473
+</td>
+<td style="text-align:right;">
+1.1872
+</td>
+<td style="text-align:right;">
+0.7137
+</td>
+<td style="text-align:right;">
+0.4754
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month06
+</td>
+<td style="text-align:right;">
+1.9459
+</td>
+<td style="text-align:right;">
+1.7728
+</td>
+<td style="text-align:right;">
+1.0976
+</td>
+<td style="text-align:right;">
+0.2724
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month06
+</td>
+<td style="text-align:right;">
+1.2528
+</td>
+<td style="text-align:right;">
+1.6257
+</td>
+<td style="text-align:right;">
+0.7706
+</td>
+<td style="text-align:right;">
+0.4409
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month06
+</td>
+<td style="text-align:right;">
+1.9459
+</td>
+<td style="text-align:right;">
+267765.3019
 </td>
 <td style="text-align:right;">
 0.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month07
+</td>
+<td style="text-align:right;">
+-0.3567
+</td>
+<td style="text-align:right;">
+0.8018
+</td>
+<td style="text-align:right;">
+-0.4449
+</td>
+<td style="text-align:right;">
+0.6564
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month07
+</td>
+<td style="text-align:right;">
+-0.2231
+</td>
+<td style="text-align:right;">
+0.8577
+</td>
+<td style="text-align:right;">
+-0.2602
+</td>
+<td style="text-align:right;">
+0.7947
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month07
+</td>
+<td style="text-align:right;">
+-0.5798
+</td>
+<td style="text-align:right;">
+0.7591
+</td>
+<td style="text-align:right;">
+-0.7639
+</td>
+<td style="text-align:right;">
+0.4450
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month07
+</td>
+<td style="text-align:right;">
+0.3365
+</td>
+<td style="text-align:right;">
+1.5306
+</td>
+<td style="text-align:right;">
+0.2198
+</td>
+<td style="text-align:right;">
+0.8260
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month07
+</td>
+<td style="text-align:right;">
+1.0296
+</td>
+<td style="text-align:right;">
+1.0454
+</td>
+<td style="text-align:right;">
+0.9849
+</td>
+<td style="text-align:right;">
+0.3247
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month07
+</td>
+<td style="text-align:right;">
+0.3365
+</td>
+<td style="text-align:right;">
+267765.3019
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month08
+</td>
+<td style="text-align:right;">
+0.0488
+</td>
+<td style="text-align:right;">
+0.8121
+</td>
+<td style="text-align:right;">
+0.0601
+</td>
+<td style="text-align:right;">
+0.9521
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month08
+</td>
+<td style="text-align:right;">
+0.4055
+</td>
+<td style="text-align:right;">
+0.8381
+</td>
+<td style="text-align:right;">
+0.4838
+</td>
+<td style="text-align:right;">
+0.6285
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month08
+</td>
+<td style="text-align:right;">
+-0.5390
+</td>
+<td style="text-align:right;">
+0.8121
+</td>
+<td style="text-align:right;">
+-0.6637
+</td>
+<td style="text-align:right;">
+0.5069
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month08
+</td>
+<td style="text-align:right;">
+0.5596
+</td>
+<td style="text-align:right;">
+1.5469
+</td>
+<td style="text-align:right;">
+0.3618
+</td>
+<td style="text-align:right;">
+0.7175
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month08
+</td>
+<td style="text-align:right;">
+-25.4361
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+-0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month08
+</td>
+<td style="text-align:right;">
+0.5596
+</td>
+<td style="text-align:right;">
+267765.3019
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month09
+</td>
+<td style="text-align:right;">
+0.2311
+</td>
+<td style="text-align:right;">
+0.7443
+</td>
+<td style="text-align:right;">
+0.3105
+</td>
+<td style="text-align:right;">
+0.7562
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month09
+</td>
+<td style="text-align:right;">
+0.1823
+</td>
+<td style="text-align:right;">
+0.8077
+</td>
+<td style="text-align:right;">
+0.2257
+</td>
+<td style="text-align:right;">
+0.8214
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month09
+</td>
+<td style="text-align:right;">
+-0.4257
+</td>
+<td style="text-align:right;">
+0.7432
+</td>
+<td style="text-align:right;">
+-0.5727
+</td>
+<td style="text-align:right;">
+0.5668
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month09
+</td>
+<td style="text-align:right;">
+1.4351
+</td>
+<td style="text-align:right;">
+1.2947
+</td>
+<td style="text-align:right;">
+1.1084
+</td>
+<td style="text-align:right;">
+0.2677
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month09
+</td>
+<td style="text-align:right;">
+-0.3567
+</td>
+<td style="text-align:right;">
+1.3575
+</td>
+<td style="text-align:right;">
+-0.2627
+</td>
+<td style="text-align:right;">
+0.7928
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month09
+</td>
+<td style="text-align:right;">
+0.3365
+</td>
+<td style="text-align:right;">
+267765.3019
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month10
+</td>
+<td style="text-align:right;">
+-0.1335
+</td>
+<td style="text-align:right;">
+0.8324
+</td>
+<td style="text-align:right;">
+-0.1604
+</td>
+<td style="text-align:right;">
+0.8725
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month10
+</td>
+<td style="text-align:right;">
+0.5596
+</td>
+<td style="text-align:right;">
+0.8238
+</td>
+<td style="text-align:right;">
+0.6793
+</td>
+<td style="text-align:right;">
+0.4969
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month10
+</td>
+<td style="text-align:right;">
+0.1542
+</td>
+<td style="text-align:right;">
+0.7480
+</td>
+<td style="text-align:right;">
+0.2061
+</td>
+<td style="text-align:right;">
+0.8367
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month10
+</td>
+<td style="text-align:right;">
+-24.7430
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+-0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month10
+</td>
+<td style="text-align:right;">
+-25.4361
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+-0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month10
+</td>
+<td style="text-align:right;">
+25.8622
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month11
+</td>
+<td style="text-align:right;">
+1.4351
+</td>
+<td style="text-align:right;">
+1.1872
+</td>
+<td style="text-align:right;">
+1.2088
+</td>
+<td style="text-align:right;">
+0.2268
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month11
+</td>
+<td style="text-align:right;">
+0.6931
+</td>
+<td style="text-align:right;">
+1.3363
+</td>
+<td style="text-align:right;">
+0.5187
+</td>
+<td style="text-align:right;">
+0.6040
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month11
+</td>
+<td style="text-align:right;">
+1.8028
+</td>
+<td style="text-align:right;">
+1.1342
+</td>
+<td style="text-align:right;">
+1.5895
+</td>
+<td style="text-align:right;">
+0.1120
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month11
+</td>
+<td style="text-align:right;">
+3.0445
+</td>
+<td style="text-align:right;">
+1.5736
+</td>
+<td style="text-align:right;">
+1.9348
+</td>
+<td style="text-align:right;">
+0.0530
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month11
+</td>
+<td style="text-align:right;">
+1.2528
+</td>
+<td style="text-align:right;">
+1.6257
+</td>
+<td style="text-align:right;">
+0.7706
+</td>
+<td style="text-align:right;">
+0.4409
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month11
+</td>
+<td style="text-align:right;">
+1.9459
+</td>
+<td style="text-align:right;">
+267765.3019
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:Month12
+</td>
+<td style="text-align:right;">
+1.3481
+</td>
+<td style="text-align:right;">
+0.9131
+</td>
+<td style="text-align:right;">
+1.4764
+</td>
+<td style="text-align:right;">
+0.1398
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:Month12
+</td>
+<td style="text-align:right;">
+0.9163
+</td>
+<td style="text-align:right;">
+0.9928
+</td>
+<td style="text-align:right;">
+0.9229
+</td>
+<td style="text-align:right;">
+0.3561
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:Month12
+</td>
+<td style="text-align:right;">
+-0.3567
+</td>
+<td style="text-align:right;">
+1.0212
+</td>
+<td style="text-align:right;">
+-0.3493
+</td>
+<td style="text-align:right;">
+0.7269
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:Month12
+</td>
+<td style="text-align:right;">
+2.6391
+</td>
+<td style="text-align:right;">
+1.3758
+</td>
+<td style="text-align:right;">
+1.9182
+</td>
+<td style="text-align:right;">
+0.0551
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:Month12
+</td>
+<td style="text-align:right;">
+-24.7430
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+-0.0001
+</td>
+<td style="text-align:right;">
+0.9999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:Month12
+</td>
+<td style="text-align:right;">
+26.5553
+</td>
+<td style="text-align:right;">
+189338.6608
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+<td style="text-align:right;">
+0.9999
 </td>
 </tr>
 </tbody>
 </table>
-</div>
-<div id="model4-count-weekday-district" class="section level4">
-<h4>Model4: Count ~ Weekday + District</h4>
+<strong>2021</strong>
 <table class="table table-striped" style="width: auto !important; ">
 <caption>
-Model: Count ~ Weekday + District
+Model: Count ~ District + Month
 </caption>
 <thead>
 <tr>
@@ -4661,279 +4412,13 @@ Pr(&gt;|z|)
 (Intercept)
 </td>
 <td style="text-align:right;">
--0.9209
+1.3032
 </td>
 <td style="text-align:right;">
-0.1532
+0.2351
 </td>
 <td style="text-align:right;">
--6.0101
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayTuesday
-</td>
-<td style="text-align:right;">
--0.0355
-</td>
-<td style="text-align:right;">
-0.1539
-</td>
-<td style="text-align:right;">
--0.2308
-</td>
-<td style="text-align:right;">
-0.8175
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayWednesday
-</td>
-<td style="text-align:right;">
--0.0235
-</td>
-<td style="text-align:right;">
-0.1534
-</td>
-<td style="text-align:right;">
--0.1534
-</td>
-<td style="text-align:right;">
-0.8781
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayThursday
-</td>
-<td style="text-align:right;">
--0.1917
-</td>
-<td style="text-align:right;">
-0.1604
-</td>
-<td style="text-align:right;">
--1.1953
-</td>
-<td style="text-align:right;">
-0.2320
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdayFriday
-</td>
-<td style="text-align:right;">
-0.0230
-</td>
-<td style="text-align:right;">
-0.1516
-</td>
-<td style="text-align:right;">
-0.1516
-</td>
-<td style="text-align:right;">
-0.8795
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdaySaturday
-</td>
-<td style="text-align:right;">
-0.3578
-</td>
-<td style="text-align:right;">
-0.1406
-</td>
-<td style="text-align:right;">
-2.5457
-</td>
-<td style="text-align:right;">
-0.0109
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-WeekdaySunday
-</td>
-<td style="text-align:right;">
-0.4873
-</td>
-<td style="text-align:right;">
-0.1370
-</td>
-<td style="text-align:right;">
-3.5567
-</td>
-<td style="text-align:right;">
-0.0004
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District2D
-</td>
-<td style="text-align:right;">
-0.8643
-</td>
-<td style="text-align:right;">
-0.1377
-</td>
-<td style="text-align:right;">
-6.2783
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District3D
-</td>
-<td style="text-align:right;">
-0.6729
-</td>
-<td style="text-align:right;">
-0.1419
-</td>
-<td style="text-align:right;">
-4.7423
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District4D
-</td>
-<td style="text-align:right;">
-0.8810
-</td>
-<td style="text-align:right;">
-0.1373
-</td>
-<td style="text-align:right;">
-6.4155
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District5D
-</td>
-<td style="text-align:right;">
--0.3285
-</td>
-<td style="text-align:right;">
-0.1785
-</td>
-<td style="text-align:right;">
--1.8407
-</td>
-<td style="text-align:right;">
-0.0657
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District6D
-</td>
-<td style="text-align:right;">
--0.9163
-</td>
-<td style="text-align:right;">
-0.2160
-</td>
-<td style="text-align:right;">
--4.2416
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District7D
-</td>
-<td style="text-align:right;">
--2.0149
-</td>
-<td style="text-align:right;">
-0.3367
-</td>
-<td style="text-align:right;">
--5.9852
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="model5-count-weekend-district" class="section level4">
-<h4>Model5: Count ~ Weekend + District</h4>
-<table class="table table-striped" style="width: auto !important; ">
-<caption>
-Model: Count ~ Weekend + District
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Estimate
-</th>
-<th style="text-align:right;">
-Std. Error
-</th>
-<th style="text-align:right;">
-z value
-</th>
-<th style="text-align:right;">
-Pr(&gt;|z|)
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-(Intercept)
-</td>
-<td style="text-align:right;">
--0.9637
-</td>
-<td style="text-align:right;">
-0.1195
-</td>
-<td style="text-align:right;">
--8.0647
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Weekend1
-</td>
-<td style="text-align:right;">
-0.4674
-</td>
-<td style="text-align:right;">
-0.0789
-</td>
-<td style="text-align:right;">
-5.9222
+5.5434
 </td>
 <td style="text-align:right;">
 0.0000
@@ -4944,160 +4429,13 @@ Weekend1
 District2D
 </td>
 <td style="text-align:right;">
-0.8643
+0.7770
 </td>
 <td style="text-align:right;">
-0.1377
+0.1910
 </td>
 <td style="text-align:right;">
-6.2783
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District3D
-</td>
-<td style="text-align:right;">
-0.6729
-</td>
-<td style="text-align:right;">
-0.1419
-</td>
-<td style="text-align:right;">
-4.7423
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District4D
-</td>
-<td style="text-align:right;">
-0.8810
-</td>
-<td style="text-align:right;">
-0.1373
-</td>
-<td style="text-align:right;">
-6.4155
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District5D
-</td>
-<td style="text-align:right;">
--0.3285
-</td>
-<td style="text-align:right;">
-0.1785
-</td>
-<td style="text-align:right;">
--1.8407
-</td>
-<td style="text-align:right;">
-0.0657
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District6D
-</td>
-<td style="text-align:right;">
--0.9163
-</td>
-<td style="text-align:right;">
-0.2160
-</td>
-<td style="text-align:right;">
--4.2416
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District7D
-</td>
-<td style="text-align:right;">
--2.0149
-</td>
-<td style="text-align:right;">
-0.3367
-</td>
-<td style="text-align:right;">
--5.9852
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="model6-count-district" class="section level4">
-<h4>Model6: Count ~ District</h4>
-<table class="table table-striped" style="width: auto !important; ">
-<caption>
-Model: Count ~ District
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Estimate
-</th>
-<th style="text-align:right;">
-Std. Error
-</th>
-<th style="text-align:right;">
-z value
-</th>
-<th style="text-align:right;">
-Pr(&gt;|z|)
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-(Intercept)
-</td>
-<td style="text-align:right;">
--0.8065
-</td>
-<td style="text-align:right;">
-0.1155
-</td>
-<td style="text-align:right;">
--6.9843
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-District2D
-</td>
-<td style="text-align:right;">
-0.8643
-</td>
-<td style="text-align:right;">
-0.1377
-</td>
-<td style="text-align:right;">
-6.2783
+4.0675
 </td>
 <td style="text-align:right;">
 0.0000
@@ -5108,16 +4446,16 @@ District2D
 District3D
 </td>
 <td style="text-align:right;">
-0.6729
+0.6016
 </td>
 <td style="text-align:right;">
-0.1419
+0.1967
 </td>
 <td style="text-align:right;">
-4.7423
+3.0581
 </td>
 <td style="text-align:right;">
-0.0000
+0.0022
 </td>
 </tr>
 <tr>
@@ -5125,16 +4463,16 @@ District3D
 District4D
 </td>
 <td style="text-align:right;">
-0.8810
+0.7419
 </td>
 <td style="text-align:right;">
-0.1373
+0.1921
 </td>
 <td style="text-align:right;">
-6.4155
+3.8621
 </td>
 <td style="text-align:right;">
-0.0000
+0.0001
 </td>
 </tr>
 <tr>
@@ -5142,16 +4480,16 @@ District4D
 District5D
 </td>
 <td style="text-align:right;">
--0.3285
+-0.5108
 </td>
 <td style="text-align:right;">
-0.1785
+0.2582
 </td>
 <td style="text-align:right;">
--1.8407
+-1.9784
 </td>
 <td style="text-align:right;">
-0.0657
+0.0479
 </td>
 </tr>
 <tr>
@@ -5159,16 +4497,16 @@ District5D
 District6D
 </td>
 <td style="text-align:right;">
--0.9163
+-1.0498
 </td>
 <td style="text-align:right;">
-0.2160
+0.3105
 </td>
 <td style="text-align:right;">
--4.2416
+-3.3807
 </td>
 <td style="text-align:right;">
-0.0000
+0.0007
 </td>
 </tr>
 <tr>
@@ -5176,178 +4514,207 @@ District6D
 District7D
 </td>
 <td style="text-align:right;">
--2.0149
+-2.3026
 </td>
 <td style="text-align:right;">
-0.3367
+0.5244
 </td>
 <td style="text-align:right;">
--5.9852
+-4.3909
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
 </tr>
+<tr>
+<td style="text-align:left;">
+Month02
+</td>
+<td style="text-align:right;">
+-0.0690
+</td>
+<td style="text-align:right;">
+0.2628
+</td>
+<td style="text-align:right;">
+-0.2626
+</td>
+<td style="text-align:right;">
+0.7929
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month03
+</td>
+<td style="text-align:right;">
+-0.2231
+</td>
+<td style="text-align:right;">
+0.2739
+</td>
+<td style="text-align:right;">
+-0.8148
+</td>
+<td style="text-align:right;">
+0.4152
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month04
+</td>
+<td style="text-align:right;">
+-0.6931
+</td>
+<td style="text-align:right;">
+0.3162
+</td>
+<td style="text-align:right;">
+-2.1919
+</td>
+<td style="text-align:right;">
+0.0284
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month05
+</td>
+<td style="text-align:right;">
+-0.0690
+</td>
+<td style="text-align:right;">
+0.2628
+</td>
+<td style="text-align:right;">
+-0.2626
+</td>
+<td style="text-align:right;">
+0.7929
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month06
+</td>
+<td style="text-align:right;">
+-0.2231
+</td>
+<td style="text-align:right;">
+0.2739
+</td>
+<td style="text-align:right;">
+-0.8148
+</td>
+<td style="text-align:right;">
+0.4152
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month07
+</td>
+<td style="text-align:right;">
+-0.3567
+</td>
+<td style="text-align:right;">
+0.2845
+</td>
+<td style="text-align:right;">
+-1.2536
+</td>
+<td style="text-align:right;">
+0.2100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month08
+</td>
+<td style="text-align:right;">
+0.3365
+</td>
+<td style="text-align:right;">
+0.2390
+</td>
+<td style="text-align:right;">
+1.4076
+</td>
+<td style="text-align:right;">
+0.1593
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month09
+</td>
+<td style="text-align:right;">
+-0.1054
+</td>
+<td style="text-align:right;">
+0.2653
+</td>
+<td style="text-align:right;">
+-0.3972
+</td>
+<td style="text-align:right;">
+0.6912
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month10
+</td>
+<td style="text-align:right;">
+0.0645
+</td>
+<td style="text-align:right;">
+0.2541
+</td>
+<td style="text-align:right;">
+0.2540
+</td>
+<td style="text-align:right;">
+0.7995
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month11
+</td>
+<td style="text-align:right;">
+0.1542
+</td>
+<td style="text-align:right;">
+0.2488
+</td>
+<td style="text-align:right;">
+0.6196
+</td>
+<td style="text-align:right;">
+0.5355
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month12
+</td>
+<td style="text-align:right;">
+-0.4055
+</td>
+<td style="text-align:right;">
+0.2887
+</td>
+<td style="text-align:right;">
+-1.4046
+</td>
+<td style="text-align:right;">
+0.1601
+</td>
+</tr>
 </tbody>
 </table>
-</div>
-<div id="model-evaluation-1" class="section level4">
-<h4>Model Evaluation</h4>
-<div id="deviance-1" class="section level5">
-<h5>Deviance</h5>
-<p>I will use “residual deviance” to test whether the null hypothesis
-(Poisson regression model provides an adequate fit for the data) is
-true. To test the null hypothesis, I will calculate p-value:</p>
-<table style="width:100%;">
-<colgroup>
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Model</th>
-<th align="center">Model1</th>
-<th align="center">Model2</th>
-<th align="center">Model3</th>
-<th align="center">Model4</th>
-<th align="center">Model5</th>
-<th align="center">Model6</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>p-value</strong></td>
-<td align="center">0.9993238</td>
-<td align="center">0.9993926</td>
-<td align="center">0.9937597</td>
-<td align="center">0.9979077</td>
-<td align="center">0.9981043</td>
-<td align="center">0.9849543</td>
-</tr>
-</tbody>
-</table>
-<p>Null hypothesis is not rejected except.</p>
-</div>
-<div id="pseudo-r2-1" class="section level5">
-<h5>pseudo-R2</h5>
-<p>Check MacFadden’s pseudo r-squared for each model.</p>
-<table style="width:100%;">
-<colgroup>
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Model</th>
-<th align="center">Model1</th>
-<th align="center">Model2</th>
-<th align="center">Model3</th>
-<th align="center">Model4</th>
-<th align="center">Model5</th>
-<th align="center">Model6</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>pseudo R2</strong></td>
-<td align="center">0.1696528</td>
-<td align="center">0.1683021</td>
-<td align="center">0.1546143</td>
-<td align="center">0.1593367</td>
-<td align="center">0.157986</td>
-<td align="center">0.1442982</td>
-</tr>
-</tbody>
-</table>
-<p>About 15 ~ 17% of variance in the response can be explained in Model1
-to Model5.</p>
-</div>
-<div id="aic-1" class="section level5">
-<h5>AIC</h5>
-<p>Check AIC for each model.</p>
-<table style="width:100%;">
-<colgroup>
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Model</th>
-<th align="center">Model1</th>
-<th align="center">Model2</th>
-<th align="center">Model3</th>
-<th align="center">Model4</th>
-<th align="center">Model5</th>
-<th align="center">Model</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>AIC</strong></td>
-<td align="center">2087.535307</td>
-<td align="center">2080.8528527</td>
-<td align="center">2112.4734252</td>
-<td align="center">2090.8741698</td>
-<td align="center">2084.1917155</td>
-<td align="center">2115.8122881</td>
-</tr>
-</tbody>
-</table>
-<p>Model 2 is the best in terms of AIC.</p>
-</div>
-<div id="bic-1" class="section level5">
-<h5>BIC</h5>
-<p>Check BIC for each model.</p>
-<table style="width:100%;">
-<colgroup>
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Model</th>
-<th align="center">Model1</th>
-<th align="center">Model2</th>
-<th align="center">Model3</th>
-<th align="center">Model4</th>
-<th align="center">Model5</th>
-<th align="center">Model6</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>BIC</strong></td>
-<td align="center">2209.212286</td>
-<td align="center">2177.1804611</td>
-<td align="center">2203.7311595</td>
-<td align="center">2156.7825335</td>
-<td align="center">2124.7507086</td>
-<td align="center">2151.301407</td>
-</tr>
-</tbody>
-</table>
-<p>Model 5 is the best in terms of BIC.</p>
-</div>
 </div>
 </div>
 </div>
