@@ -141,6 +141,7 @@ where $\lambda$ is a ground effect, $\lambda^A_i$ is the main effect of categori
   
 
 ## Simple Assault  
+### Modeled on a yearly basis
 ### Models  
 I will model the relationship between the counts of "Simple Assault" and categorical variables ("District" and "Month") using independence models:
 $${\rm{Model \ 1:}} \ \log(\mu_{ij})=\lambda.$$
@@ -397,5 +398,113 @@ xkabledply(model5.sa.2020)
 **2021**
 ```{r}
 xkabledply(model4.sa.2021)
+```
+
+### Modeled before and after COVID-19
+### Weekday, District
+```{r}
+# create dataframe with "Category", "District", "Weekend"
+DF_WM3 <- DF_WM
+DF_WM3$Count <- c(rep(1,nrow(DF_WM3)))
+
+# split the data into pre-COVID and post-COVID
+DF_preCOVID = subset(DF_WM3, Arrest_Year %in% c(2016,2017,2018,2019))
+DF_postCOVID = subset(DF_WM3, Arrest_Year %in% c(2020,2021))
+
+# create dataframe with "Category", "District", "Weekend"
+DF_preCOVID = aggregate(x=DF_preCOVID[c("Count")],
+                           by=list(DF_preCOVID$Arrest_Category,
+                                   DF_preCOVID$Offense_Location_District,
+                                   DF_preCOVID$Weekday),
+                           sum)
+DF_postCOVID = aggregate(x=DF_postCOVID[c("Count")],
+                            by=list(DF_postCOVID$Arrest_Category,
+                                    DF_postCOVID$Offense_Location_District,
+                                    DF_postCOVID$Weekday),
+                            sum)
+colnames(DF_preCOVID)[1:3] = c("Category", "District", "Weekday")
+colnames(DF_postCOVID)[1:3] = c("Category", "District", "Weekday")
+
+DF_preCOVID %>% subset(., District != '#N/A') %>% subset(., District != 'Unk') %>% subset(., District != 'UNKNOWN') -> DF_preCOVID
+
+DF_postCOVID %>% subset(., District != '#N/A') %>% subset(., District != 'Unk') %>% subset(., District != 'UNKNOWN') -> DF_postCOVID
+
+```
+
+
+```{r}
+DF_preCOVID_SA = subset(DF_preCOVID, Category == 'Simple Assault')
+DF_postCOVID_SA = subset(DF_postCOVID, Category == 'Simple Assault')
+```
+
+
+### Models
+
+```{r, include=FALSE}
+# pre-COVID
+
+model1.pre.sa <- glm(Count ~ 1, data = DF_preCOVID_SA, family = poisson)
+model2.pre.sa <- glm(Count ~ District, data = DF_preCOVID_SA, family = poisson)
+model3.pre.sa <- glm(Count ~ Weekday, data = DF_preCOVID_SA, family = poisson)
+model4.pre.sa <- glm(Count ~ District + Weekday, data = DF_preCOVID_SA, family = poisson)
+model5.pre.sa <- glm(Count ~ District * Weekday, data = DF_preCOVID_SA, family = poisson)
+summary(model1.pre.sa)
+summary(model2.pre.sa)
+summary(model3.pre.sa)
+summary(model4.pre.sa)
+summary(model5.pre.sa)
+```
+
+```{r, include=FALSE}
+# post-COVID
+
+model1.post.sa <- glm(Count ~ 1, data = DF_postCOVID_SA, family = poisson)
+model2.post.sa <- glm(Count ~ District, data = DF_postCOVID_SA, family = poisson)
+model3.post.sa <- glm(Count ~ Weekday, data = DF_postCOVID_SA, family = poisson)
+model4.post.sa <- glm(Count ~ District + Weekday, data = DF_postCOVID_SA, family = poisson)
+model5.post.sa <- glm(Count ~ District * Weekday, data = DF_postCOVID_SA, family = poisson)
+summary(model1.post.sa)
+summary(model2.post.sa)
+summary(model3.post.sa)
+summary(model4.post.sa)
+summary(model5.post.sa)
+```
+
+### Model selection  
+#### Deviance  
+**pre-COVID**  
+
+| Model | Deviance | df | p-value |
+|:-:|:-:|:-:|:-:|
+| Model 1 | `r summary(model1.pre.sa)$deviance` | `r summary(model1.pre.sa)$df.residual` | `r pchisq(summary(model1.pre.sa)$deviance, summary(model1.pre.sa)$df.residual, lower.tail=FALSE)` | 
+| Model 2 | `r summary(model2.pre.sa)$deviance` | `r summary(model2.pre.sa)$df.residual` | `r pchisq(summary(model2.pre.sa)$deviance, summary(model2.pre.sa)$df.residual, lower.tail=FALSE)` |
+| Model 3 | `r summary(model3.pre.sa)$deviance` | `r summary(model3.pre.sa)$df.residual` | `r pchisq(summary(model3.pre.sa)$deviance, summary(model3.pre.sa)$df.residual, lower.tail=FALSE)` |
+| Model 4 | `r summary(model4.pre.sa)$deviance` | `r summary(model4.pre.sa)$df.residual` | `r pchisq(summary(model4.pre.sa)$deviance, summary(model4.pre.sa)$df.residual, lower.tail=FALSE)` |
+  
+$H_0$ is rejected for all models.
+
+  
+**post-COVID**  
+
+| Model | Deviance | df | p-value |
+|:-:|:-:|:-:|:-:|
+| Model 1 | `r summary(model1.post.sa)$deviance` | `r summary(model1.post.sa)$df.residual` | `r pchisq(summary(model1.post.sa)$deviance, summary(model1.post.sa)$df.residual, lower.tail=FALSE)` | 
+| Model 2 | `r summary(model2.post.sa)$deviance` | `r summary(model2.post.sa)$df.residual` | `r pchisq(summary(model2.post.sa)$deviance, summary(model2.post.sa)$df.residual, lower.tail=FALSE)` |
+| Model 3 | `r summary(model3.post.sa)$deviance` | `r summary(model3.post.sa)$df.residual` | `r pchisq(summary(model3.post.sa)$deviance, summary(model3.post.sa)$df.residual, lower.tail=FALSE)` |
+| Model 4 | `r summary(model4.post.sa)$deviance` | `r summary(model4.post.sa)$df.residual` | `r pchisq(summary(model4.post.sa)$deviance, summary(model4.post.sa)$df.residual, lower.tail=FALSE)` |
+  
+For Model 4, $H_0$ is not rejected.
+
+### Best Models
+#### Parameters  
+**pre-COVID**
+```{r}
+xkabledply(model5.pre.sa)
+```
+
+
+**post-COVID**
+```{r}
+xkabledply(model4.post.sa)
 ```
 

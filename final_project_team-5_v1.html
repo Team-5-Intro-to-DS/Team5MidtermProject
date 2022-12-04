@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2022-11-29" />
+<meta name="date" content="2022-12-03" />
 
 <title>final project team 5</title>
 
@@ -1803,7 +1803,7 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">final project team 5</h1>
-<h4 class="date">2022-11-29</h4>
+<h4 class="date">2022-12-03</h4>
 
 </div>
 
@@ -1822,6 +1822,9 @@ categorical variable A, and <span class="math inline">\(\lambda^{AB}_{ij}\)</spa
 effect of A and B (if any).</p>
 <div id="simple-assault" class="section level2">
 <h2>Simple Assault</h2>
+<div id="modeled-on-a-yearly-basis" class="section level3">
+<h3>Modeled on a yearly basis</h3>
+</div>
 <div id="models" class="section level3">
 <h3>Models</h3>
 <p>I will model the relationship between the counts of “Simple Assault”
@@ -4711,6 +4714,1211 @@ Month12
 </td>
 <td style="text-align:right;">
 0.1601
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="modeled-before-and-after-covid-19" class="section level3">
+<h3>Modeled before and after COVID-19</h3>
+</div>
+<div id="weekday-district" class="section level3">
+<h3>Weekday, District</h3>
+</div>
+<div id="models-1" class="section level3">
+<h3>Models</h3>
+</div>
+<div id="model-selection-1" class="section level3">
+<h3>Model selection</h3>
+<div id="deviance-1" class="section level4">
+<h4>Deviance</h4>
+<p><strong>pre-COVID</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Model</th>
+<th align="center">Deviance</th>
+<th align="center">df</th>
+<th align="center">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model 1</td>
+<td align="center">1507.0408226</td>
+<td align="center">48</td>
+<td align="center">3.3448636^{-284}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 2</td>
+<td align="center">253.4379229</td>
+<td align="center">42</td>
+<td align="center">5.1429955^{-32}</td>
+</tr>
+<tr class="odd">
+<td align="center">Model 3</td>
+<td align="center">1316.2274686</td>
+<td align="center">42</td>
+<td align="center">1.5069984^{-248}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 4</td>
+<td align="center">62.6245689</td>
+<td align="center">36</td>
+<td align="center">0.0038852</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math inline">\(H_0\)</span> is rejected for all
+models.</p>
+<p><strong>post-COVID</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Model</th>
+<th align="center">Deviance</th>
+<th align="center">df</th>
+<th align="center">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model 1</td>
+<td align="center">323.3690873</td>
+<td align="center">44</td>
+<td align="center">3.273094^{-44}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 2</td>
+<td align="center">63.4591149</td>
+<td align="center">38</td>
+<td align="center">0.0059206</td>
+</tr>
+<tr class="odd">
+<td align="center">Model 3</td>
+<td align="center">289.1723154</td>
+<td align="center">38</td>
+<td align="center">2.1889251^{-40}</td>
+</tr>
+<tr class="even">
+<td align="center">Model 4</td>
+<td align="center">27.9595984</td>
+<td align="center">32</td>
+<td align="center">0.6713568</td>
+</tr>
+</tbody>
+</table>
+<p>For Model 4, <span class="math inline">\(H_0\)</span> is not
+rejected.</p>
+</div>
+</div>
+<div id="best-models-1" class="section level3">
+<h3>Best Models</h3>
+<div id="parameters-1" class="section level4">
+<h4>Parameters</h4>
+<strong>pre-COVID</strong>
+<table class="table table-striped" style="width: auto !important; ">
+<caption>
+Model: Count ~ District * Weekday
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+Std. Error
+</th>
+<th style="text-align:right;">
+z value
+</th>
+<th style="text-align:right;">
+Pr(&gt;|z|)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+3.5835
+</td>
+<td style="text-align:right;">
+0.1667
+</td>
+<td style="text-align:right;">
+21.5011
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D
+</td>
+<td style="text-align:right;">
+0.4940
+</td>
+<td style="text-align:right;">
+0.2115
+</td>
+<td style="text-align:right;">
+2.3359
+</td>
+<td style="text-align:right;">
+0.0195
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D
+</td>
+<td style="text-align:right;">
+0.2451
+</td>
+<td style="text-align:right;">
+0.2225
+</td>
+<td style="text-align:right;">
+1.1016
+</td>
+<td style="text-align:right;">
+0.2707
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D
+</td>
+<td style="text-align:right;">
+0.6360
+</td>
+<td style="text-align:right;">
+0.2061
+</td>
+<td style="text-align:right;">
+3.0856
+</td>
+<td style="text-align:right;">
+0.0020
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D
+</td>
+<td style="text-align:right;">
+-0.5390
+</td>
+<td style="text-align:right;">
+0.2746
+</td>
+<td style="text-align:right;">
+-1.9630
+</td>
+<td style="text-align:right;">
+0.0497
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D
+</td>
+<td style="text-align:right;">
+-2.8904
+</td>
+<td style="text-align:right;">
+0.7265
+</td>
+<td style="text-align:right;">
+-3.9786
+</td>
+<td style="text-align:right;">
+0.0001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D
+</td>
+<td style="text-align:right;">
+-2.1972
+</td>
+<td style="text-align:right;">
+0.5270
+</td>
+<td style="text-align:right;">
+-4.1689
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdayTuesday
+</td>
+<td style="text-align:right;">
+-0.7503
+</td>
+<td style="text-align:right;">
+0.2943
+</td>
+<td style="text-align:right;">
+-2.5496
+</td>
+<td style="text-align:right;">
+0.0108
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdayWednesday
+</td>
+<td style="text-align:right;">
+-0.1178
+</td>
+<td style="text-align:right;">
+0.2430
+</td>
+<td style="text-align:right;">
+-0.4848
+</td>
+<td style="text-align:right;">
+0.6278
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdayThursday
+</td>
+<td style="text-align:right;">
+-0.0870
+</td>
+<td style="text-align:right;">
+0.2410
+</td>
+<td style="text-align:right;">
+-0.3610
+</td>
+<td style="text-align:right;">
+0.7181
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdayFriday
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.2357
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdaySaturday
+</td>
+<td style="text-align:right;">
+0.4238
+</td>
+<td style="text-align:right;">
+0.2144
+</td>
+<td style="text-align:right;">
+1.9769
+</td>
+<td style="text-align:right;">
+0.0481
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdaySunday
+</td>
+<td style="text-align:right;">
+0.4418
+</td>
+<td style="text-align:right;">
+0.2136
+</td>
+<td style="text-align:right;">
+2.0683
+</td>
+<td style="text-align:right;">
+0.0386
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:WeekdayTuesday
+</td>
+<td style="text-align:right;">
+0.6240
+</td>
+<td style="text-align:right;">
+0.3504
+</td>
+<td style="text-align:right;">
+1.7808
+</td>
+<td style="text-align:right;">
+0.0749
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:WeekdayTuesday
+</td>
+<td style="text-align:right;">
+0.8920
+</td>
+<td style="text-align:right;">
+0.3567
+</td>
+<td style="text-align:right;">
+2.5008
+</td>
+<td style="text-align:right;">
+0.0124
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:WeekdayTuesday
+</td>
+<td style="text-align:right;">
+0.3594
+</td>
+<td style="text-align:right;">
+0.3508
+</td>
+<td style="text-align:right;">
+1.0247
+</td>
+<td style="text-align:right;">
+0.3055
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:WeekdayTuesday
+</td>
+<td style="text-align:right;">
+0.9247
+</td>
+<td style="text-align:right;">
+0.4174
+</td>
+<td style="text-align:right;">
+2.2153
+</td>
+<td style="text-align:right;">
+0.0267
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:WeekdayTuesday
+</td>
+<td style="text-align:right;">
+1.4435
+</td>
+<td style="text-align:right;">
+0.9147
+</td>
+<td style="text-align:right;">
+1.5781
+</td>
+<td style="text-align:right;">
+0.1145
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:WeekdayTuesday
+</td>
+<td style="text-align:right;">
+0.4626
+</td>
+<td style="text-align:right;">
+0.8185
+</td>
+<td style="text-align:right;">
+0.5652
+</td>
+<td style="text-align:right;">
+0.5719
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:WeekdayWednesday
+</td>
+<td style="text-align:right;">
+-0.0085
+</td>
+<td style="text-align:right;">
+0.3086
+</td>
+<td style="text-align:right;">
+-0.0276
+</td>
+<td style="text-align:right;">
+0.9780
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:WeekdayWednesday
+</td>
+<td style="text-align:right;">
+0.0958
+</td>
+<td style="text-align:right;">
+0.3209
+</td>
+<td style="text-align:right;">
+0.2985
+</td>
+<td style="text-align:right;">
+0.7653
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:WeekdayWednesday
+</td>
+<td style="text-align:right;">
+-0.0413
+</td>
+<td style="text-align:right;">
+0.3016
+</td>
+<td style="text-align:right;">
+-0.1369
+</td>
+<td style="text-align:right;">
+0.8911
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:WeekdayWednesday
+</td>
+<td style="text-align:right;">
+0.3691
+</td>
+<td style="text-align:right;">
+0.3791
+</td>
+<td style="text-align:right;">
+0.9737
+</td>
+<td style="text-align:right;">
+0.3302
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:WeekdayWednesday
+</td>
+<td style="text-align:right;">
+1.6219
+</td>
+<td style="text-align:right;">
+0.8186
+</td>
+<td style="text-align:right;">
+1.9812
+</td>
+<td style="text-align:right;">
+0.0476
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:WeekdayWednesday
+</td>
+<td style="text-align:right;">
+-1.2685
+</td>
+<td style="text-align:right;">
+1.1441
+</td>
+<td style="text-align:right;">
+-1.1087
+</td>
+<td style="text-align:right;">
+0.2676
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:WeekdayThursday
+</td>
+<td style="text-align:right;">
+-0.0202
+</td>
+<td style="text-align:right;">
+0.3064
+</td>
+<td style="text-align:right;">
+-0.0660
+</td>
+<td style="text-align:right;">
+0.9474
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:WeekdayThursday
+</td>
+<td style="text-align:right;">
+0.1502
+</td>
+<td style="text-align:right;">
+0.3166
+</td>
+<td style="text-align:right;">
+0.4744
+</td>
+<td style="text-align:right;">
+0.6352
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:WeekdayThursday
+</td>
+<td style="text-align:right;">
+-0.1071
+</td>
+<td style="text-align:right;">
+0.3011
+</td>
+<td style="text-align:right;">
+-0.3559
+</td>
+<td style="text-align:right;">
+0.7219
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:WeekdayThursday
+</td>
+<td style="text-align:right;">
+-0.8781
+</td>
+<td style="text-align:right;">
+0.4803
+</td>
+<td style="text-align:right;">
+-1.8281
+</td>
+<td style="text-align:right;">
+0.0675
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:WeekdayThursday
+</td>
+<td style="text-align:right;">
+1.1856
+</td>
+<td style="text-align:right;">
+0.8513
+</td>
+<td style="text-align:right;">
+1.3927
+</td>
+<td style="text-align:right;">
+0.1637
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:WeekdayThursday
+</td>
+<td style="text-align:right;">
+0.4925
+</td>
+<td style="text-align:right;">
+0.6890
+</td>
+<td style="text-align:right;">
+0.7148
+</td>
+<td style="text-align:right;">
+0.4748
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:WeekdayFriday
+</td>
+<td style="text-align:right;">
+0.1710
+</td>
+<td style="text-align:right;">
+0.2946
+</td>
+<td style="text-align:right;">
+0.5803
+</td>
+<td style="text-align:right;">
+0.5617
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:WeekdayFriday
+</td>
+<td style="text-align:right;">
+0.2985
+</td>
+<td style="text-align:right;">
+0.3057
+</td>
+<td style="text-align:right;">
+0.9766
+</td>
+<td style="text-align:right;">
+0.3288
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:WeekdayFriday
+</td>
+<td style="text-align:right;">
+0.0710
+</td>
+<td style="text-align:right;">
+0.2898
+</td>
+<td style="text-align:right;">
+0.2449
+</td>
+<td style="text-align:right;">
+0.8066
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:WeekdayFriday
+</td>
+<td style="text-align:right;">
+-0.1001
+</td>
+<td style="text-align:right;">
+0.3947
+</td>
+<td style="text-align:right;">
+-0.2536
+</td>
+<td style="text-align:right;">
+0.7998
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:WeekdayFriday
+</td>
+<td style="text-align:right;">
+0.4055
+</td>
+<td style="text-align:right;">
+0.9428
+</td>
+<td style="text-align:right;">
+0.4301
+</td>
+<td style="text-align:right;">
+0.6672
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:WeekdayFriday
+</td>
+<td style="text-align:right;">
+-0.2877
+</td>
+<td style="text-align:right;">
+0.7993
+</td>
+<td style="text-align:right;">
+-0.3599
+</td>
+<td style="text-align:right;">
+0.7189
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:WeekdaySaturday
+</td>
+<td style="text-align:right;">
+0.3189
+</td>
+<td style="text-align:right;">
+0.2664
+</td>
+<td style="text-align:right;">
+1.1971
+</td>
+<td style="text-align:right;">
+0.2312
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:WeekdaySaturday
+</td>
+<td style="text-align:right;">
+0.4749
+</td>
+<td style="text-align:right;">
+0.2767
+</td>
+<td style="text-align:right;">
+1.7166
+</td>
+<td style="text-align:right;">
+0.0861
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:WeekdaySaturday
+</td>
+<td style="text-align:right;">
+-0.1890
+</td>
+<td style="text-align:right;">
+0.2689
+</td>
+<td style="text-align:right;">
+-0.7028
+</td>
+<td style="text-align:right;">
+0.4822
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:WeekdaySaturday
+</td>
+<td style="text-align:right;">
+-0.4726
+</td>
+<td style="text-align:right;">
+0.3789
+</td>
+<td style="text-align:right;">
+-1.2472
+</td>
+<td style="text-align:right;">
+0.2123
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:WeekdaySaturday
+</td>
+<td style="text-align:right;">
+1.0803
+</td>
+<td style="text-align:right;">
+0.8106
+</td>
+<td style="text-align:right;">
+1.3327
+</td>
+<td style="text-align:right;">
+0.1826
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:WeekdaySaturday
+</td>
+<td style="text-align:right;">
+-1.1170
+</td>
+<td style="text-align:right;">
+0.8922
+</td>
+<td style="text-align:right;">
+-1.2520
+</td>
+<td style="text-align:right;">
+0.2106
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D:WeekdaySunday
+</td>
+<td style="text-align:right;">
+0.3169
+</td>
+<td style="text-align:right;">
+0.2656
+</td>
+<td style="text-align:right;">
+1.1934
+</td>
+<td style="text-align:right;">
+0.2327
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D:WeekdaySunday
+</td>
+<td style="text-align:right;">
+0.4657
+</td>
+<td style="text-align:right;">
+0.2759
+</td>
+<td style="text-align:right;">
+1.6877
+</td>
+<td style="text-align:right;">
+0.0915
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D:WeekdaySunday
+</td>
+<td style="text-align:right;">
+0.0300
+</td>
+<td style="text-align:right;">
+0.2637
+</td>
+<td style="text-align:right;">
+0.1138
+</td>
+<td style="text-align:right;">
+0.9094
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D:WeekdaySunday
+</td>
+<td style="text-align:right;">
+-0.3509
+</td>
+<td style="text-align:right;">
+0.3698
+</td>
+<td style="text-align:right;">
+-0.9489
+</td>
+<td style="text-align:right;">
+0.3427
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D:WeekdaySunday
+</td>
+<td style="text-align:right;">
+0.6568
+</td>
+<td style="text-align:right;">
+0.8440
+</td>
+<td style="text-align:right;">
+0.7782
+</td>
+<td style="text-align:right;">
+0.4365
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D:WeekdaySunday
+</td>
+<td style="text-align:right;">
+-0.7295
+</td>
+<td style="text-align:right;">
+0.7931
+</td>
+<td style="text-align:right;">
+-0.9199
+</td>
+<td style="text-align:right;">
+0.3576
+</td>
+</tr>
+</tbody>
+</table>
+<strong>post-COVID</strong>
+<table class="table table-striped" style="width: auto !important; ">
+<caption>
+Model: Count ~ District + Weekday
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+Std. Error
+</th>
+<th style="text-align:right;">
+z value
+</th>
+<th style="text-align:right;">
+Pr(&gt;|z|)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+2.2916
+</td>
+<td style="text-align:right;">
+0.1532
+</td>
+<td style="text-align:right;">
+14.9627
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District2D
+</td>
+<td style="text-align:right;">
+0.8643
+</td>
+<td style="text-align:right;">
+0.1377
+</td>
+<td style="text-align:right;">
+6.2783
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District3D
+</td>
+<td style="text-align:right;">
+0.6729
+</td>
+<td style="text-align:right;">
+0.1419
+</td>
+<td style="text-align:right;">
+4.7423
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District4D
+</td>
+<td style="text-align:right;">
+0.8810
+</td>
+<td style="text-align:right;">
+0.1373
+</td>
+<td style="text-align:right;">
+6.4155
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District5D
+</td>
+<td style="text-align:right;">
+-0.3285
+</td>
+<td style="text-align:right;">
+0.1785
+</td>
+<td style="text-align:right;">
+-1.8407
+</td>
+<td style="text-align:right;">
+0.0657
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District6D
+</td>
+<td style="text-align:right;">
+-0.7749
+</td>
+<td style="text-align:right;">
+0.2166
+</td>
+<td style="text-align:right;">
+-3.5780
+</td>
+<td style="text-align:right;">
+0.0003
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+District7D
+</td>
+<td style="text-align:right;">
+-1.4784
+</td>
+<td style="text-align:right;">
+0.3382
+</td>
+<td style="text-align:right;">
+-4.3710
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdayTuesday
+</td>
+<td style="text-align:right;">
+-0.0871
+</td>
+<td style="text-align:right;">
+0.1542
+</td>
+<td style="text-align:right;">
+-0.5653
+</td>
+<td style="text-align:right;">
+0.5719
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdayWednesday
+</td>
+<td style="text-align:right;">
+-0.0499
+</td>
+<td style="text-align:right;">
+0.1539
+</td>
+<td style="text-align:right;">
+-0.3245
+</td>
+<td style="text-align:right;">
+0.7456
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdayThursday
+</td>
+<td style="text-align:right;">
+-0.2181
+</td>
+<td style="text-align:right;">
+0.1609
+</td>
+<td style="text-align:right;">
+-1.3558
+</td>
+<td style="text-align:right;">
+0.1752
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdayFriday
+</td>
+<td style="text-align:right;">
+-0.0286
+</td>
+<td style="text-align:right;">
+0.1519
+</td>
+<td style="text-align:right;">
+-0.1886
+</td>
+<td style="text-align:right;">
+0.8504
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdaySaturday
+</td>
+<td style="text-align:right;">
+0.3314
+</td>
+<td style="text-align:right;">
+0.1411
+</td>
+<td style="text-align:right;">
+2.3483
+</td>
+<td style="text-align:right;">
+0.0189
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WeekdaySunday
+</td>
+<td style="text-align:right;">
+0.4357
+</td>
+<td style="text-align:right;">
+0.1373
+</td>
+<td style="text-align:right;">
+3.1723
+</td>
+<td style="text-align:right;">
+0.0015
 </td>
 </tr>
 </tbody>
