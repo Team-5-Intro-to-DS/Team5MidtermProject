@@ -106,7 +106,7 @@ DF_WM2 = aggregate(x=DF_WM2[c("Count")],
                    sum)
 
 colnames(DF_WM2)[1:4] = c("Category", "Month", "District", "Year")
-DF_WM2 = subset(DF_WM2, DF_WM2$District != '#N/A')
+DF_WM2 %>% subset(., District != '#N/A') %>% subset(., District != 'Unk') %>% subset(., District != 'UNKNOWN') -> DF_WM2
 ```
 
 ```{r}
@@ -141,8 +141,7 @@ where $\lambda$ is a ground effect, $\lambda^A_i$ is the main effect of categori
   
 
 ## Simple Assault  
-### Modeled on a yearly basis
-### Models  
+### Models: variable: "District" and "Month"  
 I will model the relationship between the counts of "Simple Assault" and categorical variables ("District" and "Month") using independence models:
 $${\rm{Model \ 1:}} \ \log(\mu_{ij})=\lambda.$$
 $${\rm{Model \ 2:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i.$$
@@ -150,7 +149,6 @@ $${\rm{Model \ 3:}} \ \log(\mu_{ij})=\lambda + \lambda^{Month}_j.$$
 $${\rm{Model \ 4:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i + \lambda^{Month}_j.$$
 I also create a saturated model:
 $${\rm{Model \ 5:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i + \lambda^{Month}_j + \lambda^{District,Month}_{ij}.$$
-
 
 ```{r, , include=FALSE}
 # 2016
@@ -400,6 +398,273 @@ xkabledply(model5.sa.2020)
 xkabledply(model4.sa.2021)
 ```
 
+### Models variable: "District" and "Weekday"
+
+```{r}
+# create dataframe having "Category", "Weekday", "District", "Year", and "Count" as its column
+DF_WM3 <- DF_WM
+DF_WM3$Count <- c(rep(1,nrow(DF_WM3)))
+
+DF_WM3 = aggregate(x=DF_WM3[c("Count")], 
+                   by=list(DF_WM3$Arrest_Category, DF_WM3$Weekday,
+                           DF_WM3$Offense_Location_District, DF_WM3$Arrest_Year),
+                   sum)
+
+colnames(DF_WM3)[1:4] = c("Category", "Weekday", "District", "Year")
+DF_WM3 %>% subset(., District != '#N/A') %>% subset(., District != 'Unk') %>% subset(., District != 'UNKNOWN') -> DF_WM3
+```
+
+```{r}
+# create a data frame with "District", "Month", and "Count" as columns for the specified crime.
+
+createDF <- function(df, cat, y){
+  df_temp = subset(df, Category==cat & Year==y, select=c(District, Weekday, Count))
+  D <- c('1D','2D','3D','4D','5D','6D','7D' )
+  W <- c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+  for(d in D){
+    for(w in W){
+      if(nrow(df_temp[df_temp$District==d & df_temp$Weekday==w,])==0){
+        add_data = c(d, w, 0)
+        df_temp = rbind(df_temp, add_data)
+      }
+    }
+  }
+  df_temp$Count = as.integer(df_temp$Count)
+  
+  return(df_temp)
+}
+```
+
+```{r, , include=FALSE}
+# 2016
+
+DF_SA_2016 = createDF(DF_WM3, 'Simple Assault', '2016')
+model1.sa.2016 <- glm(Count ~ 1, data = DF_SA_2016, family = poisson)
+model2.sa.2016 <- glm(Count ~ District, data = DF_SA_2016, family = poisson)
+model3.sa.2016 <- glm(Count ~ Weekday, data = DF_SA_2016, family = poisson)
+model4.sa.2016 <- glm(Count ~ District + Weekday, data = DF_SA_2016, family = poisson)
+model5.sa.2016 <- glm(Count ~ District * Weekday, data = DF_SA_2016, family = poisson)
+summary(model1.sa.2016)
+summary(model2.sa.2016)
+summary(model3.sa.2016)
+summary(model4.sa.2016)
+summary(model5.sa.2016)
+```
+
+```{r, , include=FALSE}
+# 2017
+
+DF_SA_2017 = createDF(DF_WM3, 'Simple Assault', '2017')
+model1.sa.2017 <- glm(Count ~ 1, data = DF_SA_2017, family = poisson)
+model2.sa.2017 <- glm(Count ~ District, data = DF_SA_2017, family = poisson)
+model3.sa.2017 <- glm(Count ~ Weekday, data = DF_SA_2017, family = poisson)
+model4.sa.2017 <- glm(Count ~ District + Weekday, data = DF_SA_2017, family = poisson)
+model5.sa.2017 <- glm(Count ~ District * Weekday, data = DF_SA_2017, family = poisson)
+summary(model1.sa.2017)
+summary(model2.sa.2017)
+summary(model3.sa.2017)
+summary(model4.sa.2017)
+summary(model5.sa.2017)
+```
+
+```{r, , include=FALSE}
+# 2018
+
+DF_SA_2018 = createDF(DF_WM3, 'Simple Assault', '2018')
+model1.sa.2018 <- glm(Count ~ 1, data = DF_SA_2018, family = poisson)
+model2.sa.2018 <- glm(Count ~ District, data = DF_SA_2018, family = poisson)
+model3.sa.2018 <- glm(Count ~ Weekday, data = DF_SA_2018, family = poisson)
+model4.sa.2018 <- glm(Count ~ District + Weekday, data = DF_SA_2018, family = poisson)
+model5.sa.2018 <- glm(Count ~ District * Weekday, data = DF_SA_2018, family = poisson)
+summary(model1.sa.2018)
+summary(model2.sa.2018)
+summary(model3.sa.2018)
+summary(model4.sa.2018)
+summary(model5.sa.2018)
+```
+
+```{r, , include=FALSE}
+# 2019
+
+DF_SA_2019 = createDF(DF_WM3, 'Simple Assault', '2019')
+model1.sa.2019 <- glm(Count ~ 1, data = DF_SA_2019, family = poisson)
+model2.sa.2019 <- glm(Count ~ District, data = DF_SA_2019, family = poisson)
+model3.sa.2019 <- glm(Count ~ Weekday, data = DF_SA_2019, family = poisson)
+model4.sa.2019 <- glm(Count ~ District + Weekday, data = DF_SA_2019, family = poisson)
+model5.sa.2019 <- glm(Count ~ District * Weekday, data = DF_SA_2019, family = poisson)
+summary(model1.sa.2019)
+summary(model2.sa.2019)
+summary(model3.sa.2019)
+summary(model4.sa.2019)
+summary(model5.sa.2019)
+```
+
+```{r, , include=FALSE}
+# 2020
+
+DF_SA_2020 = createDF(DF_WM3, 'Simple Assault', '2020')
+model1.sa.2020 <- glm(Count ~ 1, data = DF_SA_2020, family = poisson)
+model2.sa.2020 <- glm(Count ~ District, data = DF_SA_2020, family = poisson)
+model3.sa.2020 <- glm(Count ~ Weekday, data = DF_SA_2020, family = poisson)
+model4.sa.2020 <- glm(Count ~ District + Weekday, data = DF_SA_2020, family = poisson)
+model5.sa.2020 <- glm(Count ~ District * Weekday, data = DF_SA_2020, family = poisson)
+summary(model1.sa.2020)
+summary(model2.sa.2020)
+summary(model3.sa.2020)
+summary(model4.sa.2020)
+summary(model5.sa.2020)
+```
+
+```{r, include=FALSE}
+# 2021
+
+DF_SA_2021 = createDF(DF_WM3, 'Simple Assault', '2021')
+model1.sa.2021 <- glm(Count ~ 1, data = DF_SA_2021, family = poisson)
+model2.sa.2021 <- glm(Count ~ District, data = DF_SA_2021, family = poisson)
+model3.sa.2021 <- glm(Count ~ Weekday, data = DF_SA_2021, family = poisson)
+model4.sa.2021 <- glm(Count ~ District + Weekday, data = DF_SA_2021, family = poisson)
+model5.sa.2021 <- glm(Count ~ District * Weekday, data = DF_SA_2021, family = poisson)
+summary(model1.sa.2021)
+summary(model2.sa.2021)
+summary(model3.sa.2021)
+summary(model4.sa.2021)
+summary(model5.sa.2021)
+```
+
+### Model selection  
+#### Deviance
+I will use "residual deviance" to test the below hypothesis at a siginificance level $\alpha=0.05$:
+$$H_0: \ \rm{Reduced \ model \ is \ true.}$$
+$$H_1: \ \rm{Satureated \ model \ (Model \ 5) \ is \ true}$$
+To test the hypothesis, I will calculate p-value:  
+  
+  
+**2016**  
+
+| Model | Deviance | df | p-value |
+|:-:|:-:|:-:|:-:|
+| Model 1 | `r summary(model1.sa.2016)$deviance` | `r summary(model1.sa.2016)$df.residual` | `r pchisq(summary(model1.sa.2016)$deviance, summary(model1.sa.2016)$df.residual, lower.tail=FALSE)` | 
+| Model 2 | `r summary(model2.sa.2016)$deviance` | `r summary(model2.sa.2016)$df.residual` | `r pchisq(summary(model2.sa.2016)$deviance, summary(model2.sa.2016)$df.residual, lower.tail=FALSE)` |
+| Model 3 | `r summary(model3.sa.2016)$deviance` | `r summary(model3.sa.2016)$df.residual` | `r pchisq(summary(model3.sa.2016)$deviance, summary(model3.sa.2016)$df.residual, lower.tail=FALSE)` |
+| Model 4 | `r summary(model4.sa.2016)$deviance` | `r summary(model4.sa.2016)$df.residual` | `r pchisq(summary(model4.sa.2016)$deviance, summary(model4.sa.2016)$df.residual, lower.tail=FALSE)` |
+  
+For Model 4, $H_0$ is not rejected.
+
+  
+**2017**  
+
+| Model | Deviance | df | p-value |
+|:-:|:-:|:-:|:-:|
+| Model 1 | `r summary(model1.sa.2017)$deviance` | `r summary(model1.sa.2017)$df.residual` | `r pchisq(summary(model1.sa.2017)$deviance, summary(model1.sa.2017)$df.residual, lower.tail=FALSE)` | 
+| Model 2 | `r summary(model2.sa.2017)$deviance` | `r summary(model2.sa.2017)$df.residual` | `r pchisq(summary(model2.sa.2017)$deviance, summary(model2.sa.2017)$df.residual, lower.tail=FALSE)` |
+| Model 3 | `r summary(model3.sa.2017)$deviance` | `r summary(model3.sa.2017)$df.residual` | `r pchisq(summary(model3.sa.2017)$deviance, summary(model3.sa.2017)$df.residual, lower.tail=FALSE)` |
+| Model 4 | `r summary(model4.sa.2017)$deviance` | `r summary(model4.sa.2017)$df.residual` | `r pchisq(summary(model4.sa.2017)$deviance, summary(model4.sa.2017)$df.residual, lower.tail=FALSE)` |
+  
+$H_0$ is rejected.
+  
+**2018**  
+
+| Model | Deviance | df | p-value |
+|:-:|:-:|:-:|:-:|
+| Model 1 | `r summary(model1.sa.2018)$deviance` | `r summary(model1.sa.2018)$df.residual` | `r pchisq(summary(model1.sa.2018)$deviance, summary(model1.sa.2018)$df.residual, lower.tail=FALSE)` | 
+| Model 2 | `r summary(model2.sa.2018)$deviance` | `r summary(model2.sa.2018)$df.residual` | `r pchisq(summary(model2.sa.2018)$deviance, summary(model2.sa.2018)$df.residual, lower.tail=FALSE)` |
+| Model 3 | `r summary(model3.sa.2018)$deviance` | `r summary(model3.sa.2018)$df.residual` | `r pchisq(summary(model3.sa.2018)$deviance, summary(model3.sa.2018)$df.residual, lower.tail=FALSE)` |
+| Model 4 | `r summary(model4.sa.2018)$deviance` | `r summary(model4.sa.2018)$df.residual` | `r pchisq(summary(model4.sa.2018)$deviance, summary(model4.sa.2018)$df.residual, lower.tail=FALSE)` |
+  
+For Model 4, $H_0$ is not rejected.
+  
+**2019**  
+
+| Model | Deviance | df | p-value |
+|:-:|:-:|:-:|:-:|
+| Model 1 | `r summary(model1.sa.2019)$deviance` | `r summary(model1.sa.2019)$df.residual` | `r pchisq(summary(model1.sa.2019)$deviance, summary(model1.sa.2019)$df.residual, lower.tail=FALSE)` | 
+| Model 2 | `r summary(model2.sa.2019)$deviance` | `r summary(model2.sa.2019)$df.residual` | `r pchisq(summary(model2.sa.2019)$deviance, summary(model2.sa.2019)$df.residual, lower.tail=FALSE)` |
+| Model 3 | `r summary(model3.sa.2019)$deviance` | `r summary(model3.sa.2019)$df.residual` | `r pchisq(summary(model3.sa.2019)$deviance, summary(model3.sa.2019)$df.residual, lower.tail=FALSE)` |
+| Model 4 | `r summary(model4.sa.2019)$deviance` | `r summary(model4.sa.2019)$df.residual` | `r pchisq(summary(model4.sa.2019)$deviance, summary(model4.sa.2019)$df.residual, lower.tail=FALSE)` |
+
+For Model 4, $H_0$ is not rejected.
+  
+**2020**  
+
+| Model | Deviance | df | p-value |
+|:-:|:-:|:-:|:-:|
+| Model 1 | `r summary(model1.sa.2020)$deviance` | `r summary(model1.sa.2020)$df.residual` | `r pchisq(summary(model1.sa.2020)$deviance, summary(model1.sa.2020)$df.residual, lower.tail=FALSE)` | 
+| Model 2 | `r summary(model2.sa.2020)$deviance` | `r summary(model2.sa.2020)$df.residual` | `r pchisq(summary(model2.sa.2020)$deviance, summary(model2.sa.2020)$df.residual, lower.tail=FALSE)` |
+| Model 3 | `r summary(model3.sa.2020)$deviance` | `r summary(model3.sa.2020)$df.residual` | `r pchisq(summary(model3.sa.2020)$deviance, summary(model3.sa.2020)$df.residual, lower.tail=FALSE)` |
+| Model 4 | `r summary(model4.sa.2020)$deviance` | `r summary(model4.sa.2020)$df.residual` | `r pchisq(summary(model4.sa.2020)$deviance, summary(model4.sa.2020)$df.residual, lower.tail=FALSE)` |
+  
+For Model 4, $H_0$ is not rejected.
+  
+**2021**  
+
+| Model | Deviance | df | p-value |
+|:-:|:-:|:-:|:-:|
+| Model 1 | `r summary(model1.sa.2021)$deviance` | `r summary(model1.sa.2021)$df.residual` | `r pchisq(summary(model1.sa.2021)$deviance, summary(model1.sa.2021)$df.residual, lower.tail=FALSE)` | 
+| Model 2 | `r summary(model2.sa.2021)$deviance` | `r summary(model2.sa.2021)$df.residual` | `r pchisq(summary(model2.sa.2021)$deviance, summary(model2.sa.2021)$df.residual, lower.tail=FALSE)` |
+| Model 3 | `r summary(model3.sa.2021)$deviance` | `r summary(model3.sa.2021)$df.residual` | `r pchisq(summary(model3.sa.2021)$deviance, summary(model3.sa.2021)$df.residual, lower.tail=FALSE)` |
+| Model 4 | `r summary(model4.sa.2021)$deviance` | `r summary(model4.sa.2021)$df.residual` | `r pchisq(summary(model4.sa.2021)$deviance, summary(model4.sa.2021)$df.residual, lower.tail=FALSE)` |
+  
+For Model 2 and Model 4, $H_0$ is not rejected.
+
+
+#### Likelihood Ratio Tests  
+For the 2016, 2017 and 2021 data, Model 2 and Model 4 remained as candidates. If there is no significant difference between Model 2 and Model 4, then Model 2, the simpler model, is preferred. Therefore, I will perform likelihood ratio tests on the following hypotheses to select the model.  
+$$H_0: \ \rm{Model \ 2 \ and \ Model \ 4 \ fit \ the \ data \ equally \ well.}$$
+$$H_1: \ \rm{Model \ 4 \ fits \ the \ data \ better \ than \ Model \ 2.}$$
+
+**2021**  
+```{r, warning=FALSE, message=FALSE}
+library("lmtest")
+lrtest(model2.sa.2021, model4.sa.2021)
+```
+
+$H_0$ is not rejected.
+
+### Best Models  
+
+| Year | Best Model |
+|:-:|:-:|
+|2016|Model 4|
+|2017|Model 5|
+|2018|Model 4|
+|2019|Model 4|
+|2020|Model 4|
+|2021|Model 2| 
+  
+#### Parameters  
+**2016**
+```{r}
+xkabledply(model4.sa.2016)
+```
+
+**2017**
+```{r}
+xkabledply(model5.sa.2017)
+```
+
+**2018**
+```{r}
+xkabledply(model4.sa.2018)
+```
+
+**2019**
+```{r}
+xkabledply(model4.sa.2019)
+```
+
+**2020**
+```{r}
+xkabledply(model4.sa.2020)
+```
+
+**2021**
+```{r}
+xkabledply(model2.sa.2021)
+```
+
+
+
+
 ### Modeled before and after COVID-19
 ### Weekday, District
 ```{r}
@@ -435,6 +700,18 @@ DF_postCOVID %>% subset(., District != '#N/A') %>% subset(., District != 'Unk') 
 ```{r}
 DF_preCOVID_SA = subset(DF_preCOVID, Category == 'Simple Assault')
 DF_postCOVID_SA = subset(DF_postCOVID, Category == 'Simple Assault')
+
+D <- c('1D','2D','3D','4D','5D','6D','7D' )
+W <- c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+for(d in D){
+  for(w in W){
+    if(nrow(DF_postCOVID_SA[DF_postCOVID_SA$District==d & DF_postCOVID_SA$Weekday==w,])==0){
+      add_data = c('Simple Assault', d, w, 0)
+      DF_postCOVID_SA = rbind(DF_postCOVID_SA, add_data)
+    }
+  }
+}
+DF_postCOVID_SA$Count = as.integer(DF_postCOVID_SA$Count)
 ```
 
 
@@ -495,9 +772,11 @@ $H_0$ is rejected for all models.
   
 For Model 4, $H_0$ is not rejected.
 
-### Best Models
+### Best Models  
+Saturated model is the best for pre-COVID model. 
+  
 #### Parameters  
-**pre-COVID**
+**pre-COVID**  
 ```{r}
 xkabledply(model5.pre.sa)
 ```
@@ -507,4 +786,5 @@ xkabledply(model5.pre.sa)
 ```{r}
 xkabledply(model4.post.sa)
 ```
+
 
