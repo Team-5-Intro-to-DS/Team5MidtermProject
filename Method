@@ -1,0 +1,6 @@
+Final Project Method (Team 5)
+
+The data source: https://mpdc.dc.gov/node/1379551 (same as midterm project)
+
+Model:
+For the midterm project, we observed a significant difference in the number of major crimes between Pre-Covid (2016-2019) and Post-Covid (2020-2021). However, we did not consider the effects of “District” or “Month” on the number of crimes. We will model the relationship between the count of major crimes committed by white males and categorical variables like “District” or “Month” using a Log-linear model.
