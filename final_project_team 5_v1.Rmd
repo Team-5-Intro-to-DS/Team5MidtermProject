@@ -14,7 +14,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(ggplot2)
 library(ezids)
 library(dplyr)
@@ -533,7 +533,7 @@ summary(model5.sa.2021)
 
 ### Model selection  
 #### Deviance
-I will use "residual deviance" to test the below hypothesis at a siginificance level $\alpha=0.05$:
+I will use "residual deviance" to test the below hypothesis at a significance level $\alpha=0.05$:
 $$H_0: \ \rm{Reduced \ model \ is \ true.}$$
 $$H_1: \ \rm{Satureated \ model \ (Model \ 5) \ is \ true}$$
 To test the hypothesis, I will calculate p-value:  
@@ -773,7 +773,7 @@ $H_0$ is rejected for all models.
 For Model 4, $H_0$ is not rejected.
 
 ### Best Models  
-Saturated model is the best for pre-COVID model. 
+Saturated model is the best for pre-COVID model. On the other hand, Independence model is the best for post-COVID model. 
   
 #### Parameters  
 **pre-COVID**  
@@ -782,9 +782,46 @@ xkabledply(model5.pre.sa)
 ```
 
 
+```{r}
+createCIgraph <- function(model, cl, title_str){
+  ci <- confint(model, level = cl)
+  lb <- vector()
+  ub <- vector()
+  for(i in 1:(length(ci)/2)){
+    lb = append(lb, ci[i,1])
+    ub = append(ub, ci[i,2])
+  }
+  
+  coef_label <- labels(coef(model))
+  est <- data.frame(coeff_v = coef(model),
+                    LB = lb,
+                    UB = ub, 
+                    var_name = coef_label)
+  
+  ggplot(est, aes(x = var_name, y = coeff_v)) +
+    geom_point() +
+    geom_errorbar(aes(ymin = lb, ymax = ub), width = 0.1) +
+    geom_hline(yintercept = 0, lty = 1, color = "red") +
+    theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+    scale_x_discrete(limits=coef_label) + 
+    xlab("") +
+    ylab("Estimated Parameter Value") + 
+    ggtitle(title_str)
+}
+```
+
+```{r}
+createCIgraph(model5.pre.sa, 0.95, "95% Confidence Intervals of each parameter")
+```
+
 **post-COVID**
 ```{r}
 xkabledply(model4.post.sa)
 ```
 
 
+
+
+```{r}
+createCIgraph(model4.post.sa, 0.95, "95% Confidence Intervals of each parameter")
+```
