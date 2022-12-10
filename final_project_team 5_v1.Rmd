@@ -596,6 +596,16 @@ xkabledply(model4.post.th)
 createCIgraph(model4.post.th, 0.95, "95% Confidence Intervals of each parameter")
 ```
 
+# Interpretation  
+  
+* "Weekend = 1" has a negative parameter in all models. However, this does not mean that there are fewer crimes on weekends than on other weekdays. This is because only Saturdays and Sundays are classified as "Weekend = 1", and the number of days classified as "Weekend = 0" is 2.5 times greater.
+* Through pre-COVID and post-COVID, the fact that a district is 2D, 3D, or 4D tends to drive up the number of crimes. This is not surprising since these districts are in the Northwest area, which has a large population.  
+* The combination of 5D and "Weekend = 1" has the effect of pushing down the number of "Simple Assault" during post-COVID period. This may be due to the fact that the main tourist areas are in the Northwest District, which attracts more people to this area on weekends than to 5D. The interaction between 5D and "Weekend" may have disappeared because outings were suppressed in all districts after COVID-19 outbreak.  
+* Prior to 2019, 5D had the effect of pushing down the number of thefts relative to other districts, but after 2020, 5D has the effect of pushing up the number of thefts relative to other districts.  
+  
+# Conclusion  
+
+COVID-19 appears to not only reduce the number of crimes, but also change crime trends. In particular, 5D seems to have changed crime trends compared to other districts.
 
 # Refereance  
 Chakrabarti, A., & Ghosh, J. K. (2011). AIC, BIC and recent advances in model selection. Philosophy of statistics, 583-605.
