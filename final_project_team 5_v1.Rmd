@@ -13,6 +13,14 @@ editor_options:
     wrap: 72
 ---
 
+# Investigation in DC crime trend 2016-2021
+
+Professor: Dr. Farhana Faruqe
+
+DATS-6101: Introduction to Data Science
+
+Member: Xuanyu Chen, Yuchuan Feng, Ore Asaba, Kentaro Osawa, Adewale Maye  
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(ggplot2)
@@ -22,6 +30,8 @@ library(readr)
 library(tidyr)
 library(knitr)
 library(magrittr)
+
+# This chunk is for data cleaning, the same as was done in the midterm project.
 
 df_2016<-data.frame(read.csv("Arrests 2016 Public.csv"))
 df_2017<-data.frame(read.csv("Arrests 2017 Public.csv"))
@@ -95,80 +105,50 @@ DF_WM <- subset(DF, subset = Defendant_Race=='WHITE' & Defendant_Sex=='MALE')
 ```
 
 
-```{r}
-# create dataframe having "Category", "Month", "District", "Year", and "Count" as its column
-DF_WM2 <- DF_WM
-DF_WM2$Count <- c(rep(1,nrow(DF_WM2)))
-
-DF_WM2 = aggregate(x=DF_WM2[c("Count")], 
-                   by=list(DF_WM2$Arrest_Category, DF_WM2$Month,
-                           DF_WM2$Offense_Location_District, DF_WM2$Arrest_Year),
-                   sum)
-
-colnames(DF_WM2)[1:4] = c("Category", "Month", "District", "Year")
-DF_WM2 %>% subset(., District != '#N/A') %>% subset(., District != 'Unk') %>% subset(., District != 'UNKNOWN') -> DF_WM2
-```
-
-```{r}
-# create a data frame with "District", "Weekend", and "Count" as columns for the specified crime.
-
-createDF <- function(df, cat, y){
-  df_temp = subset(df, Category==cat & Year==y, select=c(District, Month, Count))
-  M <- c('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12')
-  D <- c('1D','2D','3D','4D','5D','6D','7D' )
-  for(m in M){
-    for(d in D){
-      if(nrow(df_temp[df_temp$Month==m & df_temp$District==d,])==0){
-        add_data = c(d, m, 0)
-        df_temp = rbind(df_temp, add_data)
-      }
-    }
-  }
-  df_temp$Count = as.integer(df_temp$Count)
-  
-  return(df_temp)
-}
-```
-
-
 # Model
 ## Log-linear model 
-I calculated $\lambda$ without considering the effects of "Month", "Weekday" and "District" in the midterm project. For final project, I will check these effects on the counts of each major crime  using a Log-linear model.
+We calculated $\lambda$ without considering the effects of "Month", "Weekday" and "District" in the midterm project. For final project, We will check these effects on the counts of each major crime  using a Log-linear model.
 
 In a Log-linear model, response variable is a count of some occurrence that follows a Poisson distribution, and explanatory variables are categorical variables. The expected counts $\mu_{ij}$ is modeled as follows:
 $$ \log(\mu_{ij})=\lambda + \lambda^A_i + \lambda^B_j + \lambda^{AB}_{ij}, $$
-where $\lambda$ is a ground effect, $\lambda^A_i$ is the main effect of $i$ th level of A, and $\lambda^{AB}_{ij}$ is the interaction effect of $i$ th level of A and $j$ th level of B (if any).
+where $\lambda$ is a ground effect, $\lambda^A_i$ is the main effect of $i$ th level of A, and $\lambda^{AB}_{ij}$ is the interaction effect of $i$ th level of A and $j$ th level of B (if any) ([https://online.stat.psu.edu/stat504/lesson/10](https://online.stat.psu.edu/stat504/lesson/10)).
   
 # Method 
-First, I divided the data into two prats: pre-COVID (2016-2019) and post-COVID (2020-2021). Then, each major crime case was classified by "District" and "Weekend". "District" has five levels (1D, 2D, 3D, 4D, 5D), and "Weekend" has two levels (0 (stands for weekday), 1 (stands for weekend)).
-DC area are divided by seven police districts, but I excluded sixth and seventh districts because these districts have a very low crime rate, which makes the analysis difficult.  
+First, We divided the data into two prats: pre-COVID (2016-2019) and post-COVID (2020-2021). Then, each major crime case was classified by "District" and "Weekend". "District" has five levels (1D, 2D, 3D, 4D, 5D), and "Weekend" has two levels (0 (stands for weekday), 1 (stands for weekend)).
+DC area are divided by seven police districts, but We excluded sixth and seventh districts because these districts have a very low crime rate, which makes the analysis difficult.  
   
-I modeled the relationship between the counts of each major crime and categorical variables ("District" and "Weekend") using four independence models and the saturated model:
+We modeled the relationship between the counts of each major crime and categorical variables ("District" and "Weekend") using four independence models and the saturated model:  
 $${\rm{Model \ 1:}} \ \log(\mu_{ij})=\lambda.$$
 $${\rm{Model \ 2:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i.$$
 $${\rm{Model \ 3:}} \ \log(\mu_{ij})=\lambda + \lambda^{Weekend}_j.$$
 $${\rm{Model \ 4:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i + \lambda^{Weekend}_j.$$
 $${\rm{Model \ 5:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i + \lambda^{Weekend}_j + \lambda^{District,Weekend}_{ij}.$$
 
-```{r}
-# create dataframe with "Category", "District", "Weekend"
-DF_WM3 <- subset(DF_WM, Offense_Location_District %in% c('1D', '2D', '3D', '4D', '5D'))
-DF_WM3$Offense_Location_District <- factor(DF_WM3$Offense_Location_District)
-DF_WM3$Count <- c(rep(1,nrow(DF_WM3)))
 
-DF_WM3$Weekend <- c(rep(0,nrow(DF_WM3)))
-for(i in 1:nrow(DF_WM3)){
-  if(DF_WM3$Weekday[i] %in% c('Saturday', 'Sunday')){
-    DF_WM3$Weekend[i] = 1
+```{r}
+# This chunk is for creating new dataframe used to conduct log-linear analysis
+
+# drop the rows in which "Offense_Location_District" is '6D' or '7D'
+DF_WM2 <- subset(DF_WM, Offense_Location_District %in% c('1D', '2D', '3D', '4D', '5D'))
+DF_WM2$Offense_Location_District <- factor(DF_WM2$Offense_Location_District)
+
+# create a new row named "Count"
+DF_WM2$Count <- c(rep(1,nrow(DF_WM2)))
+
+# create a new row named "Weekend" that takes 0 for Mon - Fri and 1 for Sat and Sun
+DF_WM2$Weekend <- c(rep(0,nrow(DF_WM2)))
+for(i in 1:nrow(DF_WM2)){
+  if(DF_WM2$Weekday[i] %in% c('Saturday', 'Sunday')){
+    DF_WM2$Weekend[i] = 1
   }
 }
-DF_WM3$Weekend <- as.factor(DF_WM3$Weekend)
+DF_WM2$Weekend <- as.factor(DF_WM2$Weekend)
 
 # split the data into pre-COVID and post-COVID
-DF_preCOVID = subset(DF_WM3, Arrest_Year %in% c(2016,2017,2018,2019))
-DF_postCOVID = subset(DF_WM3, Arrest_Year %in% c(2020,2021))
+DF_preCOVID = subset(DF_WM2, Arrest_Year %in% c(2016,2017,2018,2019))
+DF_postCOVID = subset(DF_WM2, Arrest_Year %in% c(2020,2021))
 
-# create dataframe with "Category", "District", "Weekend"
+# create dataframe with "Category", "District", "Weekend", and "Count"
 DF_preCOVID = aggregate(x=DF_preCOVID[c("Count")],
                            by=list(DF_preCOVID$Arrest_Category,
                                    DF_preCOVID$Offense_Location_District,
@@ -179,13 +159,10 @@ DF_postCOVID = aggregate(x=DF_postCOVID[c("Count")],
                                     DF_postCOVID$Offense_Location_District,
                                     DF_postCOVID$Weekend),
                             sum)
+
+# rename some columns
 colnames(DF_preCOVID)[1:3] = c("Category", "District", "Weekend")
 colnames(DF_postCOVID)[1:3] = c("Category", "District", "Weekend")
-
-#DF_preCOVID %>% subset(., District != '#N/A') %>% subset(., District != 'Unk') %>% subset(., District != 'UNKNOWN') %>% subset(., District != '6D') %>%  subset(., District != '7D') -> DF_preCOVID
-
-#DF_postCOVID %>% subset(., District != '#N/A') %>% subset(., District != 'Unk') %>% subset(., District != 'UNKNOWN') %>% subset(., District != '6D') %>%  subset(., District != '7D') -> DF_postCOVID
-
 ```
 
 # Model Evaluation
@@ -198,6 +175,8 @@ DF_postCOVID_SA = subset(DF_postCOVID, Category == 'Simple Assault')
 The two-way tables for "Simple Assault" are as follows.
   
 ```{r}
+#This chunk is for creating two-way tables
+
 library("kableExtra")
 
 d1 <- xtabs(Count ~ District + Weekend, data = DF_preCOVID_SA)
@@ -211,41 +190,31 @@ kable(d2, format = "html", align = 'c', caption = 'Two-way table by "District" a
 
 
 ```{r, include=FALSE}
-# pre-COVID
+# models for pre-COVID
 
 model1.pre.sa <- glm(Count ~ 1, data = DF_preCOVID_SA, family = poisson)
 model2.pre.sa <- glm(Count ~ District, data = DF_preCOVID_SA, family = poisson)
 model3.pre.sa <- glm(Count ~ Weekend, data = DF_preCOVID_SA, family = poisson)
 model4.pre.sa <- glm(Count ~ District + Weekend, data = DF_preCOVID_SA, family = poisson)
 model5.pre.sa <- glm(Count ~ District * Weekend, data = DF_preCOVID_SA, family = poisson)
-summary(model1.pre.sa)
-summary(model2.pre.sa)
-summary(model3.pre.sa)
-summary(model4.pre.sa)
-summary(model5.pre.sa)
 ```
 
 ```{r, include=FALSE}
-# post-COVID
+# models for post-COVID
 
 model1.post.sa <- glm(Count ~ 1, data = DF_postCOVID_SA, family = poisson)
 model2.post.sa <- glm(Count ~ District, data = DF_postCOVID_SA, family = poisson)
 model3.post.sa <- glm(Count ~ Weekend, data = DF_postCOVID_SA, family = poisson)
 model4.post.sa <- glm(Count ~ District + Weekend, data = DF_postCOVID_SA, family = poisson)
 model5.post.sa <- glm(Count ~ District * Weekend, data = DF_postCOVID_SA, family = poisson)
-summary(model1.post.sa)
-summary(model2.post.sa)
-summary(model3.post.sa)
-summary(model4.post.sa)
-summary(model5.post.sa)
 ```
 
 ### Deviance  
 
-I used "residual deviance" to test the below hypothesis at a significance level $\alpha=0.05$:
+We used "residual deviance" to test the below hypothesis at a significance level $\alpha=0.05$:
 $$H_0: \ \rm{Reduced \ model \ is \ true.}$$
 $$H_1: \ \rm{Satureated \ model \ (Model \ 5) \ is \ true.}$$  
-"residual deviance" is the difference between the deviance of the model and that of the saturated model. According to [The Pennsylvania State University website](https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4), "residual deviance" follows a chi-square distribution with the model's degrees of freedom. Therefore, to test the hypothesis, I calculated p-values.  
+"residual deviance" is the difference between the deviance of the model and that of the saturated model. According to The Pennsylvania State University website ([https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4](https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4 )), "residual deviance" follows a chi-square distribution with the model's degrees of freedom. Therefore, to test the hypothesis, I calculated p-values.  
 
 **pre-COVID**  
 
@@ -306,11 +275,15 @@ Saturated model is the best for pre-COVID model. On the other hand, Independence
 Although the best model is the saturated model, almost all interaction terms are not significant. The interaction between "5D" and "weekend" is significant and has a negative value. This means the count of "Simple Assault" in 5D on weekend is fewer than the other districts.
 
 ```{r}
+# Showing the parameters and p-values of the best model for pre-COVID
 xkabledply(model5.pre.sa)
 ```
 
 
 ```{r}
+# This function is for creating graphs showing estimated parameters and their CIs
+# The funcitons takes 3 arguments: model - fitted model, cl - confidence level, title_str - the string for the title
+
 createCIgraph <- function(model, cl, title_str){
   ci <- confint(model, level = cl)
   lb <- vector()
@@ -339,17 +312,20 @@ createCIgraph <- function(model, cl, title_str){
 ```
 
 ```{r}
+# Showing the parameters and CIs of the best model of pre-COVID
 createCIgraph(model5.pre.sa, 0.95, "95% Confidence Intervals of each parameter")
 ```
 
 **post-COVID**  
 
 ```{r}
+# Showing the parameters and p-values of the best model of post-COVID
 xkabledply(model4.post.sa)
 ```
 
 
 ```{r}
+# Showing the parameters and CIs of the best model of post-COVID
 createCIgraph(model4.post.sa, 0.95, "95% Confidence Intervals of each parameter")
 ```
 
@@ -361,6 +337,8 @@ DF_postCOVID_TV = subset(DF_postCOVID, Category == 'Traffic Violations')
 ```
 
 ```{r}
+#This chunk is for creating two-way tables
+
 d1 <- xtabs(Count ~ District + Weekend, data = DF_preCOVID_TV)
 d2 <- xtabs(Count ~ District + Weekend, data = DF_postCOVID_TV)
 
@@ -371,33 +349,23 @@ kable(d2, format = "html", align = 'c', caption = 'Two-way table by "District" a
 ```
 
 ```{r, include=FALSE}
-# pre-COVID
+# models for pre-COVID
 
 model1.pre.tv <- glm(Count ~ 1, data = DF_preCOVID_TV, family = poisson)
 model2.pre.tv <- glm(Count ~ District, data = DF_preCOVID_TV, family = poisson)
 model3.pre.tv <- glm(Count ~ Weekend, data = DF_preCOVID_TV, family = poisson)
 model4.pre.tv <- glm(Count ~ District + Weekend, data = DF_preCOVID_TV, family = poisson)
 model5.pre.tv <- glm(Count ~ District * Weekend, data = DF_preCOVID_TV, family = poisson)
-summary(model1.pre.tv)
-summary(model2.pre.tv)
-summary(model3.pre.tv)
-summary(model4.pre.tv)
-summary(model5.pre.tv)
 ```
 
 ```{r, include=FALSE}
-# post-COVID
+# models for post-COVID
 
 model1.post.tv <- glm(Count ~ 1, data = DF_postCOVID_TV, family = poisson)
 model2.post.tv <- glm(Count ~ District, data = DF_postCOVID_TV, family = poisson)
 model3.post.tv <- glm(Count ~ Weekend, data = DF_postCOVID_TV, family = poisson)
 model4.post.tv <- glm(Count ~ District + Weekend, data = DF_postCOVID_TV, family = poisson)
 model5.post.tv <- glm(Count ~ District * Weekend, data = DF_postCOVID_TV, family = poisson)
-summary(model1.post.tv)
-summary(model2.post.tv)
-summary(model3.post.tv)
-summary(model4.post.tv)
-summary(model5.post.tv)
 ```
 
 ### Deviance  
@@ -464,6 +432,7 @@ Independence model is the best for pre-COVID and post-COVID.
 **pre-COVID**  
 
 ```{r}
+# Showing the parameters, p-values, and CIs of the best model for pre-COVID
 xkabledply(model4.pre.tv)
 createCIgraph(model4.pre.tv, 0.95, "95% Confidence Intervals of each parameter")
 ```
@@ -472,6 +441,7 @@ createCIgraph(model4.pre.tv, 0.95, "95% Confidence Intervals of each parameter")
 **post-COVID**  
 
 ```{r}
+# Showing the parameters, p-values, and CIs of the best model for post-COVID
 xkabledply(model4.post.tv)
 createCIgraph(model4.post.tv, 0.95, "95% Confidence Intervals of each parameter")
 ```
@@ -484,6 +454,8 @@ DF_postCOVID_Th = subset(DF_postCOVID, Category == 'Theft')
 ```
 
 ```{r}
+# This chunk is for creating two-way tables
+
 d1 <- xtabs(Count ~ District + Weekend, data = DF_preCOVID_Th)
 d2 <- xtabs(Count ~ District + Weekend, data = DF_postCOVID_Th)
 
@@ -495,33 +467,23 @@ kable(d2, format = "html", align = 'c', caption = 'Two-way table by "District" a
 
 
 ```{r, include=FALSE}
-# pre-COVID
+# models for pre-COVID
 
 model1.pre.th <- glm(Count ~ 1, data = DF_preCOVID_Th, family = poisson)
 model2.pre.th <- glm(Count ~ District, data = DF_preCOVID_Th, family = poisson)
 model3.pre.th <- glm(Count ~ Weekend, data = DF_preCOVID_Th, family = poisson)
 model4.pre.th <- glm(Count ~ District + Weekend, data = DF_preCOVID_Th, family = poisson)
 model5.pre.th <- glm(Count ~ District * Weekend, data = DF_preCOVID_Th, family = poisson)
-summary(model1.pre.th)
-summary(model2.pre.th)
-summary(model3.pre.th)
-summary(model4.pre.th)
-summary(model5.pre.th)
 ```
 
 ```{r, include=FALSE}
-# post-COVID
+# models for post-COVID
 
 model1.post.th <- glm(Count ~ 1, data = DF_postCOVID_Th, family = poisson)
 model2.post.th <- glm(Count ~ District, data = DF_postCOVID_Th, family = poisson)
 model3.post.th <- glm(Count ~ Weekend, data = DF_postCOVID_Th, family = poisson)
 model4.post.th <- glm(Count ~ District + Weekend, data = DF_postCOVID_Th, family = poisson)
 model5.post.th <- glm(Count ~ District * Weekend, data = DF_postCOVID_Th, family = poisson)
-summary(model1.post.th)
-summary(model2.post.th)
-summary(model3.post.th)
-summary(model4.post.th)
-summary(model5.post.th)
 ```
 
 ### Deviance  
@@ -585,6 +547,7 @@ Model 4 is the best in terms of AIC and BIC.
 **pre-COVID**  
 
 ```{r}
+# Showing the parameters, p-values, and CIs of the best model for pre-COVID
 xkabledply(model4.pre.th)
 createCIgraph(model4.pre.th, 0.95, "95% Confidence Intervals of each parameter")
 ```
@@ -592,6 +555,7 @@ createCIgraph(model4.pre.th, 0.95, "95% Confidence Intervals of each parameter")
 **post-COVID**
   
 ```{r}
+# Showing the parameters, p-values, and CIs of the best model for post-COVID
 xkabledply(model4.post.th)
 createCIgraph(model4.post.th, 0.95, "95% Confidence Intervals of each parameter")
 ```
@@ -607,5 +571,8 @@ createCIgraph(model4.post.th, 0.95, "95% Confidence Intervals of each parameter"
 
 COVID-19 appears to not only reduce the number of crimes, but also change crime trends. In particular, 5D seems to have changed crime trends compared to other districts.
 
-# Refereance  
-Chakrabarti, A., & Ghosh, J. K. (2011). AIC, BIC and recent advances in model selection. Philosophy of statistics, 583-605.
+# Refereances  
+
+* 6.3.4 - analysis of deviance and Model Selection: Stat 504. PennState: Statistics Online Courses. (n.d.). Retrieved December 11, 2022, from https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4  
+* 10: Log-Linear Models: Stat 504. PennState: Statistics Online Courses. (n.d.). Retrieved December 10, 2022, from https://online.stat.psu.edu/stat504/lesson/10  
+* Chakrabarti, A., & Ghosh, J. K. (2011). AIC, BIC and recent advances in model selection. Philosophy of statistics, 583-605.

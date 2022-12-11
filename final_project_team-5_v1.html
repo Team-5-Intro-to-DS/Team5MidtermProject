@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2022-12-10" />
+<meta name="date" content="2022-12-11" />
 
 <title>final project team 5</title>
 
@@ -1803,44 +1803,53 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">final project team 5</h1>
-<h4 class="date">2022-12-10</h4>
+<h4 class="date">2022-12-11</h4>
 
 </div>
 
 
+<div id="investigation-in-dc-crime-trend-2016-2021" class="section level1">
+<h1>Investigation in DC crime trend 2016-2021</h1>
+<p>Professor: Dr. Farhana Faruqe</p>
+<p>DATS-6101: Introduction to Data Science</p>
+<p>Member: Xuanyu Chen, Yuchuan Feng, Ore Asaba, Kentaro Osawa, Adewale
+Maye</p>
+</div>
 <div id="model" class="section level1">
 <h1>Model</h1>
 <div id="log-linear-model" class="section level2">
 <h2>Log-linear model</h2>
-<p>I calculated <span class="math inline">\(\lambda\)</span> without
+<p>We calculated <span class="math inline">\(\lambda\)</span> without
 considering the effects of “Month”, “Weekday” and “District” in the
-midterm project. For final project, I will check these effects on the
+midterm project. For final project, We will check these effects on the
 counts of each major crime using a Log-linear model.</p>
 <p>In a Log-linear model, response variable is a count of some
 occurrence that follows a Poisson distribution, and explanatory
 variables are categorical variables. The expected counts <span class="math inline">\(\mu_{ij}\)</span> is modeled as follows: <span class="math display">\[ \log(\mu_{ij})=\lambda + \lambda^A_i +
 \lambda^B_j + \lambda^{AB}_{ij}, \]</span> where <span class="math inline">\(\lambda\)</span> is a ground effect, <span class="math inline">\(\lambda^A_i\)</span> is the main effect of <span class="math inline">\(i\)</span> th level of A, and <span class="math inline">\(\lambda^{AB}_{ij}\)</span> is the interaction
-effect of <span class="math inline">\(i\)</span> th level of A and <span class="math inline">\(j\)</span> th level of B (if any).</p>
+effect of <span class="math inline">\(i\)</span> th level of A and <span class="math inline">\(j\)</span> th level of B (if any) (<a href="https://online.stat.psu.edu/stat504/lesson/10">https://online.stat.psu.edu/stat504/lesson/10</a>).</p>
 </div>
 </div>
 <div id="method" class="section level1">
 <h1>Method</h1>
-<p>First, I divided the data into two prats: pre-COVID (2016-2019) and
+<p>First, We divided the data into two prats: pre-COVID (2016-2019) and
 post-COVID (2020-2021). Then, each major crime case was classified by
 “District” and “Weekend”. “District” has five levels (1D, 2D, 3D, 4D,
 5D), and “Weekend” has two levels (0 (stands for weekday), 1 (stands for
-weekend)). DC area are divided by seven police districts, but I excluded
-sixth and seventh districts because these districts have a very low
-crime rate, which makes the analysis difficult.</p>
-<p>I modeled the relationship between the counts of each major crime and
-categorical variables (“District” and “Weekend”) using four independence
-models and the saturated model: <span class="math display">\[{\rm{Model
-\ 1:}} \ \log(\mu_{ij})=\lambda.\]</span> <span class="math display">\[{\rm{Model \ 2:}} \ \log(\mu_{ij})=\lambda +
-\lambda^{District}_i.\]</span> <span class="math display">\[{\rm{Model \
-3:}} \ \log(\mu_{ij})=\lambda + \lambda^{Weekend}_j.\]</span> <span class="math display">\[{\rm{Model \ 4:}} \ \log(\mu_{ij})=\lambda +
-\lambda^{District}_i + \lambda^{Weekend}_j.\]</span> <span class="math display">\[{\rm{Model \ 5:}} \ \log(\mu_{ij})=\lambda +
-\lambda^{District}_i + \lambda^{Weekend}_j +
-\lambda^{District,Weekend}_{ij}.\]</span></p>
+weekend)). DC area are divided by seven police districts, but We
+excluded sixth and seventh districts because these districts have a very
+low crime rate, which makes the analysis difficult.</p>
+<p>We modeled the relationship between the counts of each major crime
+and categorical variables (“District” and “Weekend”) using four
+independence models and the saturated model:<br />
+<span class="math display">\[{\rm{Model \ 1:}} \
+\log(\mu_{ij})=\lambda.\]</span> <span class="math display">\[{\rm{Model
+\ 2:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i.\]</span> <span class="math display">\[{\rm{Model \ 3:}} \ \log(\mu_{ij})=\lambda +
+\lambda^{Weekend}_j.\]</span> <span class="math display">\[{\rm{Model \
+4:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i +
+\lambda^{Weekend}_j.\]</span> <span class="math display">\[{\rm{Model \
+5:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i +
+\lambda^{Weekend}_j + \lambda^{District,Weekend}_{ij}.\]</span></p>
 </div>
 <div id="model-evaluation" class="section level1">
 <h1>Model Evaluation</h1>
@@ -1997,16 +2006,17 @@ Two-way table by “District” and “Weekend” (post-COVID)
 </table>
 <div id="deviance" class="section level3">
 <h3>Deviance</h3>
-<p>I used “residual deviance” to test the below hypothesis at a
+<p>We used “residual deviance” to test the below hypothesis at a
 significance level <span class="math inline">\(\alpha=0.05\)</span>:
 <span class="math display">\[H_0: \ \rm{Reduced \ model \ is \
 true.}\]</span> <span class="math display">\[H_1: \ \rm{Satureated \
 model \ (Model \ 5) \ is \ true.}\]</span><br />
 “residual deviance” is the difference between the deviance of the model
-and that of the saturated model. According to <a href="https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4">The
-Pennsylvania State University website</a>, “residual deviance” follows a
-chi-square distribution with the model’s degrees of freedom. Therefore,
-to test the hypothesis, I calculated p-values.</p>
+and that of the saturated model. According to The Pennsylvania State
+University website (<a href="https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4">https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4</a>),
+“residual deviance” follows a chi-square distribution with the model’s
+degrees of freedom. Therefore, to test the hypothesis, I calculated
+p-values.</p>
 <p><strong>pre-COVID</strong></p>
 <table>
 <thead>
@@ -3701,10 +3711,19 @@ pushing up the number of thefts relative to other districts.</li>
 change crime trends. In particular, 5D seems to have changed crime
 trends compared to other districts.</p>
 </div>
-<div id="refereance" class="section level1">
-<h1>Refereance</h1>
-<p>Chakrabarti, A., &amp; Ghosh, J. K. (2011). AIC, BIC and recent
-advances in model selection. Philosophy of statistics, 583-605.</p>
+<div id="refereances" class="section level1">
+<h1>Refereances</h1>
+<ul>
+<li>6.3.4 - analysis of deviance and Model Selection: Stat 504.
+PennState: Statistics Online Courses. (n.d.). Retrieved December 11,
+2022, from <a href="https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4" class="uri">https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4</a><br />
+</li>
+<li>10: Log-Linear Models: Stat 504. PennState: Statistics Online
+Courses. (n.d.). Retrieved December 10, 2022, from <a href="https://online.stat.psu.edu/stat504/lesson/10" class="uri">https://online.stat.psu.edu/stat504/lesson/10</a><br />
+</li>
+<li>Chakrabarti, A., &amp; Ghosh, J. K. (2011). AIC, BIC and recent
+advances in model selection. Philosophy of statistics, 583-605.</li>
+</ul>
 </div>
 
 
