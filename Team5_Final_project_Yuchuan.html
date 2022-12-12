@@ -2381,7 +2381,9 @@ glm_ATWA_Theft_post &lt;- glm(Theft_counts~(Dist * weekday)+ generation*weekday+
 #BIC(glm_ATWA_SA_post)
 #BIC(glm_ATWA_TV_post)
 #BIC(glm_ATWA_Theft_post)</code></pre>
-<p>####Saturated model ~A<em>B</em>C</p>
+</div>
+<div id="saturated-model-abc" class="section level4">
+<h4>Saturated model ~A<em>B</em>C</h4>
 <p>Pre-Covid</p>
 <pre class="r"><code>loglm_sat_SA &lt;- loglm(Simple_Assult_counts~Dist * weekday*generation , data=crime_dist_weekday_age)
 loglm_sat_TV &lt;- loglm(Traffic_Violations_counts~Dist * weekday*generation , data=crime_dist_weekday_age)
@@ -2423,28 +2425,164 @@ glm_sat_Theft_post  &lt;- glm(Theft_counts~Dist * weekday*generation , data=crim
 </div>
 <div id="table-of-aic-and-bic-of-different-models" class="section level4">
 <h4>Table of AIC and BIC of different models</h4>
-<p><strong>Pre-Covid</strong> | | Simple Assault | Simple Assault |
-Traffic Violations | Traffic Violations | Theft | Theft | | Model | AIC
-| BIC | AIC | BIC | AIC | BIC | |:-:|:-:|:-:|:-:|:-:|:-:|:-:| |
-Independent Model | 716.8395989 | 756.8769726 | 640.6409949 |
-680.3489416 | 459.7797654 | 497.7131882 | | Condition Model |
-733.8949454 | 859.7266912 | 661.7483417 | | 786.5447456 | 503.4541797 |
-622.6735086 | | Joint Model | 708.2201564 | 816.8930277 | 647.0720171 |
-754.8507295 | 484.7259864 | 587.688134 | | All two-way assciations Model
-| 722.8342748 | 917.3015183 | 665.025908 | 857.8930776 | 526.2029383 |
-710.4509919 | | Saturated Model | 786.3358625 | 1155.2516626 |
-723.5080349 | 1080.8795552 | 591.2977297 | 892.055582 |</p>
-<p><strong>Post-Covid</strong> | | Simple Assault | Simple Assault |
-Traffic Violations | Traffic Violations | Theft | Theft | | Model | AIC
-| BIC | AIC | BIC | AIC | BIC | |:-:|:-:|:-:|:-:|:-:|:-:|:-:| |
-Independent Model | 485.7094256 | 524.0162039 | 263.8401949 |
-296.8341185 | 164.5221206 | 192.8770442 | | Condition Model |
-509.8203007 | 630.2130325 | 301.065468 | | 392.9771122 | 197.368241 |
-262.1794951 | | Joint Model | 519.4166407 | 623.3921817 | 295.3037098 |
-382.5019364 | 201.7575928 | 272.644902 | | All two-way assciations Model
-| 544.9989153 | 731.0604098 | 331.8202565 | 477.9362037 | 230.6167484 |
-333.9096846 | | Saturated Model | 600.5883568 | 912.5149799 |
-358.0042155 | 541.827504 | 238.9594312 | 352.3791259 |</p>
+<p><strong>Pre-Covid</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Crimes</th>
+<th align="center">Simple Assault</th>
+<th align="center">Simple Assault</th>
+<th align="center">Traffic Violations</th>
+<th align="center">Traffic Violations</th>
+<th align="center">Theft</th>
+<th align="center">Theft</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model</td>
+<td align="center">AIC</td>
+<td align="center">BIC</td>
+<td align="center">AIC</td>
+<td align="center">BIC</td>
+<td align="center">AIC</td>
+<td align="center">BIC</td>
+</tr>
+<tr class="even">
+<td align="center">Independent Model</td>
+<td align="center">716.8395989</td>
+<td align="center">756.8769726</td>
+<td align="center">640.6409949</td>
+<td align="center">680.3489416</td>
+<td align="center">459.7797654</td>
+<td align="center">497.7131882</td>
+</tr>
+<tr class="odd">
+<td align="center">Condition Model</td>
+<td align="center">733.8949454</td>
+<td align="center">859.7266912</td>
+<td align="center">661.7483417</td>
+<td align="center"></td>
+<td align="center">786.5447456</td>
+<td align="center">503.4541797</td>
+</tr>
+<tr class="even">
+<td align="center">Joint Model</td>
+<td align="center">708.2201564</td>
+<td align="center">816.8930277</td>
+<td align="center">647.0720171</td>
+<td align="center">754.8507295</td>
+<td align="center">484.7259864</td>
+<td align="center">587.688134</td>
+</tr>
+<tr class="odd">
+<td align="center">All two-way assciations Model</td>
+<td align="center">722.8342748</td>
+<td align="center">917.3015183</td>
+<td align="center">665.025908</td>
+<td align="center">857.8930776</td>
+<td align="center">526.2029383</td>
+<td align="center">710.4509919</td>
+</tr>
+<tr class="even">
+<td align="center">Saturated Model</td>
+<td align="center">786.3358625</td>
+<td align="center">1155.2516626</td>
+<td align="center">723.5080349</td>
+<td align="center">1080.8795552</td>
+<td align="center">591.2977297</td>
+<td align="center">892.055582</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Post-Covid</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Crimes</th>
+<th align="center">Simple Assault</th>
+<th align="center">Simple Assault</th>
+<th align="center">Traffic Violations</th>
+<th align="center">Traffic Violations</th>
+<th align="center">Theft</th>
+<th align="center">Theft</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Model</td>
+<td align="center">AIC</td>
+<td align="center">BIC</td>
+<td align="center">AIC</td>
+<td align="center">BIC</td>
+<td align="center">AIC</td>
+<td align="center">BIC</td>
+</tr>
+<tr class="even">
+<td align="center">Independent Model</td>
+<td align="center">485.7094256</td>
+<td align="center">524.0162039</td>
+<td align="center">263.8401949</td>
+<td align="center">296.8341185</td>
+<td align="center">164.5221206</td>
+<td align="center">192.8770442</td>
+</tr>
+<tr class="odd">
+<td align="center">Condition Model</td>
+<td align="center">509.8203007</td>
+<td align="center">630.2130325</td>
+<td align="center">301.065468</td>
+<td align="center">392.9771122</td>
+<td align="center">197.368241</td>
+<td align="center">262.1794951</td>
+</tr>
+<tr class="even">
+<td align="center">Joint Model</td>
+<td align="center">519.4166407</td>
+<td align="center">623.3921817</td>
+<td align="center">295.3037098</td>
+<td align="center">382.5019364</td>
+<td align="center">201.7575928</td>
+<td align="center">272.644902</td>
+</tr>
+<tr class="odd">
+<td align="center">All two-way assciations Model</td>
+<td align="center">544.9989153</td>
+<td align="center">731.0604098</td>
+<td align="center">331.8202565</td>
+<td align="center">477.9362037</td>
+<td align="center">230.6167484</td>
+<td align="center">333.9096846</td>
+</tr>
+<tr class="even">
+<td align="center">Saturated Model</td>
+<td align="center">600.5883568</td>
+<td align="center">912.5149799</td>
+<td align="center">358.0042155</td>
+<td align="center">541.827504</td>
+<td align="center">238.9594312</td>
+<td align="center">352.3791259</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="model-comparing-with-saturated-model-abc" class="section level3">

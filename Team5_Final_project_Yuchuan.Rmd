@@ -616,7 +616,7 @@ glm_ATWA_Theft_post <- glm(Theft_counts~(Dist * weekday)+ generation*weekday+Dis
  
 ```
 
-####Saturated model 	~A*B*C
+#### Saturated model 	~A*B*C
 
 Pre-Covid
 ```{r,echo=TRUE}
@@ -666,9 +666,10 @@ glm_sat_Theft_post  <- glm(Theft_counts~Dist * weekday*generation , data=crime_d
 #### Table of AIC and BIC of different models
 
 **Pre-Covid**
-|       | Simple Assault | Simple Assault | Traffic Violations | Traffic Violations | Theft | Theft |
-| Model | AIC | BIC | AIC | BIC | AIC | BIC |
+
+| Crimes  | Simple Assault | Simple Assault | Traffic Violations | Traffic Violations | Theft | Theft |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:| 
+| Model | AIC | BIC | AIC | BIC | AIC | BIC |
 | Independent Model | `r AIC(glm_independent_SA )` | `r BIC(glm_independent_SA )` |  `r AIC(glm_independent_TV )` | `r BIC(glm_independent_TV )` | `r AIC(glm_independent_Theft )` |  `r BIC(glm_independent_Theft )` |
 | Condition Model | `r AIC(glm_condition_SA)` | `r BIC(glm_condition_SA)` | `r AIC(glm_condition_TV)` | | `r BIC(glm_condition_TV)` | `r AIC(glm_condition_Theft)` | `r BIC(glm_condition_Theft)` |
 | Joint Model | `r AIC(glm_joint_SA)` | `r BIC(glm_joint_SA)` | `r AIC(glm_joint_TV)` | `r BIC(glm_joint_TV)` | `r AIC(glm_joint_Theft)` | `r BIC(glm_joint_Theft)` |
@@ -676,11 +677,12 @@ glm_sat_Theft_post  <- glm(Theft_counts~Dist * weekday*generation , data=crime_d
 | Saturated Model | `r AIC(glm_sat_SA)` |  `r BIC(glm_sat_SA)` | `r AIC(glm_sat_TV)` | `r BIC(glm_sat_TV)` | `r AIC(glm_sat_Theft)` | `r BIC(glm_sat_Theft)` | 
 
 **Post-Covid**
-|       | Simple Assault | Simple Assault | Traffic Violations | Traffic Violations | Theft | Theft |
-| Model | AIC | BIC | AIC | BIC | AIC | BIC |
+
+| Crimes | Simple Assault | Simple Assault | Traffic Violations | Traffic Violations | Theft | Theft |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:| 
+| Model | AIC | BIC | AIC | BIC | AIC | BIC |
 | Independent Model | `r AIC(glm_independent_SA_post )` | `r BIC(glm_independent_SA_post )` |  `r AIC(glm_independent_TV_post )` | `r BIC(glm_independent_TV_post )` | `r AIC(glm_independent_Theft_post )` |  `r BIC(glm_independent_Theft_post )` |
-| Condition Model | `r AIC(glm_condition_SA_post)` | `r BIC(glm_condition_SA_post)` | `r AIC(glm_condition_TV_post)` | | `r BIC(glm_condition_TV_post)` | `r AIC(glm_condition_Theft_post)` | `r BIC(glm_condition_Theft_post)` |
+| Condition Model | `r AIC(glm_condition_SA_post)` | `r BIC(glm_condition_SA_post)` | `r AIC(glm_condition_TV_post)` | `r BIC(glm_condition_TV_post)` | `r AIC(glm_condition_Theft_post)` | `r BIC(glm_condition_Theft_post)` |
 | Joint Model | `r AIC(glm_joint_SA_post)` | `r BIC(glm_joint_SA_post)` | `r AIC(glm_joint_TV_post)` | `r BIC(glm_joint_TV_post)` | `r AIC(glm_joint_Theft_post)` | `r BIC(glm_joint_Theft_post)` |
 | All two-way assciations Model | `r AIC(glm_ATWA_SA_post)` |  `r BIC(glm_ATWA_SA_post)` | `r AIC(glm_ATWA_TV_post)` | `r BIC(glm_ATWA_TV_post)` | `r AIC(glm_ATWA_Theft_post)` | `r BIC(glm_ATWA_Theft_post)` |
 | Saturated Model | `r AIC(glm_sat_SA_post)` |  `r BIC(glm_sat_SA_post)` | `r AIC(glm_sat_TV_post)` | `r BIC(glm_sat_TV_post)` | `r AIC(glm_sat_Theft_post)` | `r BIC(glm_sat_Theft_post)` | 
