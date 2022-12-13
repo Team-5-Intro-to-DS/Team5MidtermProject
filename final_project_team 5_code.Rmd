@@ -1,0 +1,1353 @@
+---
+title: "final project team 5"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+date: "`r Sys.Date()`"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Investigation in DC crime trend 2016-2021
+
+Professor: Dr. Farhana Faruqe
+
+DATS-6101: Introduction to Data Science
+
+Member: Xuanyu Chen, Yuchuan Feng, Ore Asaba, Kentaro Osawa, Adewale Maye  
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(ggplot2)
+library(ezids)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(knitr)
+library(magrittr)
+
+# This chunk is for data cleaning, the same as was done in the midterm project.
+
+df_2016<-data.frame(read.csv("Arrests 2016 Public.csv"))
+df_2017<-data.frame(read.csv("Arrests 2017 Public.csv"))
+df_2018<-data.frame(read.csv("Arrests by Year, 2018.csv"))
+df_2019<-data.frame(read.csv("Arrests by Year, 2019.csv"))
+df_2020<-data.frame(read.csv("Arrests by Year 2020.csv"))
+df_2021<-data.frame(read.csv("2021 Adult Arrests.csv"))
+
+# convert format
+df_2018$Arrest.Date <- as.Date(df_2018$Arrest.Date, format = "%m/%d/%Y") %>% format()
+df_2019$Arrest.Date <- as.Date(df_2019$Arrest.Date, format = "%m/%d/%Y") %>% format()
+df_2020$Arrest.Date <- as.Date(df_2020$Arrest.Date, format = "%m/%d/%Y") %>% format()
+df_2021$Arrest.Date <- as.Date(df_2021$Arrest.Date, format = "%Y/%m/%d") %>% format()
+
+#bind df_2016 and df_2017, and delete some columns
+df_16_17 <- rbind(df_2016, df_2017)[,-c(5,6,15,17:21,23:26)]
+names(df_16_17)[c(13,14)] <- c('Arrest.Location.District','Offense.Location.District')   #rename columns
+
+#bind df_2018 - df_2021, and delete some columns
+df_18_21 <- rbind(df_2018, df_2019, df_2020, df_2021)[,-c(5,6,15,17:21,23:26)] 
+
+DF<-rbind(df_16_17,df_18_21)
+
+# remove abnormalities
+DF <- DF[!DF$Age>=100,]
+
+# replace dots with underscore for clarity sake, i think..
+names(DF) = gsub("[.]", "_", names(DF))
+
+# most likely "UNK" is the same as "Unknown", so we can change this
+DF$Defendant_Race[DF$Defendant_Race == 'UNK'] <- 'UNKNOWN'
+#unique(DF$Defendant_Race) - check that it changed
+
+#same issue, "unk" is very likely "unknown", so change it.
+DF$Defendant_Sex[DF$Defendant_Sex == 'UNK'] <- 'UNKNOWN'
+#unique(DF$Defendant_Sex) - check that it changed
+
+# Arrest category -  4 different types of Fraud & Financial crimes , 3 types of Release Violations/Fugitive -- group them into one.
+
+DF$Arrest_Category = gsub("Fraud and Financial Crimes.*","Fraud and Financial Crimes", DF$Arrest_Category)
+
+DF$Arrest_Category = gsub("Release Violations/Fugitive.*","Release Violations/Fugitive",DF$Arrest_Category)
+
+#get month and day variables.. might be interesting, who knows?
+DF <- separate(DF, col = Arrest_Date, into = c("Year","Month","Day"), sep = "-", remove = FALSE, fill="left")
+#remove the new year column formed, it is redundant.. we already have Year column
+DF = DF[,-4]
+
+library(lubridate)
+# Factorize some variables
+DF$Arrest_Year = as.factor(DF$Arrest_Year)
+DF$Month = as.factor(DF$Month)
+DF$Day = as.factor(DF$Day)
+DF$Defendant_Race = as.factor(DF$Defendant_Race)
+DF$Defendant_Sex = as.factor(DF$Defendant_Sex)
+DF$Arrest_Location_District = as.factor(DF$Arrest_Location_District)
+DF$Offense_Location_District = as.factor(DF$Offense_Location_District)
+# convert to date format
+DF$Arrest_Date = as.Date(DF$Arrest_Date)
+# Day format
+DF$Day = day(DF$Arrest_Date)
+# i want to create a week-day variable
+DF$Weekday = weekdays(DF$Arrest_Date)
+DF$Weekday = factor(DF$Weekday, levels = as.character(wday(c(2:7,1), label=TRUE, abbr=FALSE)))
+
+# convert crime types to factors
+DF$Arrest_Category = as.factor(DF$Arrest_Category)
+
+DF_WM <- subset(DF, subset = Defendant_Race=='WHITE' & Defendant_Sex=='MALE')
+
+```
+
+# Some EDA
+## Heat map
+
+There are two fields in the data which provide the description of the crime incident. The first, primary description provides a broad category of the crime type and the second provides more detailed information about the first. We use the primary description to categorize different crime types.
+
+
+The data contains 30 crime types; not all of which are mutually exclusive. We can combine two or more similar categories into one to reduce this number and make the analysis a bit more manageable.
+
+
+
+```{r include=FALSE}
+
+
+library(forcats)
+
+DF<-DF %>%
+  mutate(
+    crime=fct_recode(Arrest_Category ,
+                     "ASSAULT"="Simple Assault",
+                     "ASSAULT"="Assault on a Police Officer",
+                     "ASSAULT"="Assault with a Dangerous Weapon",
+                     "ASSAULT"="Aggravated Assault",
+                     "TRAFFIC"="Traffic Violations",
+                     "THEFT"="Theft",
+                     "THEFT"="Theft from Auto",
+                     "THEFT"="Motor Vehicle Theft",
+                     "FRAUD"="Fraud and Financial Crimes",
+                     "SEX"="Sex Offenses",
+                     "SEX"="Sex Abuse",
+                     "VIOLENT"="Weapon Violations",
+                     "VIOLENT"="Kidnapping",
+                     "VIOLENT"="Release Violations/Fugitive",
+                     "VIOLENT"="Damage to Property",
+                     "DRUG"="Narcotics",
+                     "NONVIOLENT"="Driving/Boating While Intoxicated",
+                     "NONVIOLENT"="Disorderly Conduct",
+                     "NONVIOLENT"="Liquor Law Violations",
+                     "OTHERS"="Other Crimes",
+                     "ASSAULT"="Offenses Against Family & Children",
+                     "OTHERS"="NA",
+                     "OTHERS"="Property Crimes",
+                     "VIOLENT"="Vending Violations",
+                     "VIOLENT"="Robbery",
+                     "THEFT"="Burglary",
+                     "SEX"="Prostitution",
+                     "VIOLENT"="Homicide",
+                     "NONVIOLENT"="Gambling",
+
+                     "OTHERS"="Arson"
+                     
+                     ),
+    crime_type=fct_recode(crime,
+                          "VIOLENT"="SEX",
+                          "VIOLENT"="ASSAULT",
+                          "VIOLENT"="VIOLENT",
+                          "NONVIOLENT"="TRAFFIC",
+                          "NONVIOLENT"="FRAUD",
+                          "NONVIOLENT"="THEFT",
+                          "NONVIOLENT"="NONVIOLENT",
+                          "NONVIOLENT"="DRUG",
+                          "OTHERS"="OTHERS"
+
+                          ) # Further combination into violent and non-violent crime types
+  )
+```
+
+
+```{r echo=FALSE}
+DF %>%
+  group_by(crime) %>%
+  summarize(count=n()) %>%
+  arrange(desc(count))
+```
+
+```{r echo=FALSE}
+library(scales)
+DF %>%
+  group_by(crime,Month) %>%
+  summarise(count=n()) %>%
+  ggplot(aes(x=crime, y=Month)) +
+  geom_tile(aes(fill=count)) +
+  labs(x="Crime", y = "Month of year", title="Spring and Summer is popular for crimes") +
+  scale_fill_viridis_c("Number of Crimes",label=comma) +
+  coord_flip()
+```
+
+
+A quick look at the heat map shows that most of crime happens at the spring and summer.
+
+
+```{r echo=FALSE}
+(crime_agg <- group_by(DF, crime, Arrest_Date) %>%
+  summarise(count = n())) %>%
+  arrange(desc(count))
+```
+
+
+
+By ordering this, we can see from all the data, assault happens a lot times at 2020-06-01 and also nonviolent happens much higher at 2017-01-20 than the other dates.
+
+
+
+
+
+```{r echo=FALSE}
+(dates <- crime_agg %>%
+    ungroup() %>%
+    distinct(Arrest_Date) %>%
+    arrange(Arrest_Date))
+```
+
+
+
+
+
+```{r echo=FALSE}
+DF %>%
+  group_by(crime_type) %>%
+  summarize(count=n()) %>%
+  arrange(count)
+
+```
+
+
+Violent crime is far more than nonviolent crime. 
+
+
+
+
+#### Class by seasons
+
+
+Our visualization exercise showed that there is considerable variation in crime incidents with respect to the time of the year. To use the month variable effectively, we can combine the similar months to form a new variable that reflects the changes in crime incidents with seasons.
+
+
+
+
+```{r include=FALSE}
+(model_data <- DF %>%
+   mutate(season=fct_recode(Month,
+                     "spring"="03",
+                     "spring"="04",
+                     "spring"="05",
+                     "summer"="06",
+                     "summer"="07",
+                     "summer"="08",
+                     "fall"="09",
+                     "fall"="10",
+                     "fall"="11",
+                     "winter"="12",
+                     "winter"="01",
+                     "winter"="02"
+                     ),
+          season=as_factor(season)
+          )
+  )
+
+```
+
+
+```{r}
+model_data %>%
+  group_by(crime,season) %>%
+  summarise(count=n()) %>%
+  ggplot(aes(x=crime, y=season)) +
+  geom_tile(aes(fill=count)) +
+  labs(x="Crime", y = "Season", title="Which season is popular for crimes") +
+  scale_fill_viridis_c("Number of Crimes",label=comma) +
+  coord_flip()
+```
+
+
+
+This chart is more clear than the month chart that summer has the most crime.
+
+
+
+# Model
+## Log-linear model 
+We calculated $\lambda$ without considering the effects of "Month", "Weekday" and "District" in the midterm project. For final project, We will check these effects on the counts of each major crime  using a Log-linear model.
+
+In a Log-linear model, response variable is a count of some occurrence that follows a Poisson distribution, and explanatory variables are categorical variables. The expected counts $\mu_{ij}$ is modeled as follows:
+$$ \log(\mu_{ij})=\lambda + \lambda^A_i + \lambda^B_j + \lambda^{AB}_{ij}, $$
+where $\lambda$ is a ground effect, $\lambda^A_i$ is the main effect of $i$ th level of A, and $\lambda^{AB}_{ij}$ is the interaction effect of $i$ th level of A and $j$ th level of B (if any) ([https://online.stat.psu.edu/stat504/lesson/10](https://online.stat.psu.edu/stat504/lesson/10)).
+  
+# Method 
+First, We divided the data into two prats: pre-COVID (2016-2019) and post-COVID (2020-2021). Then, each major crime case was classified by "District" and "Weekend". "District" has five levels (1D, 2D, 3D, 4D, 5D), and "Weekend" has two levels (0 (stands for weekday), 1 (stands for weekend)).
+DC area are divided by seven police districts, but We excluded sixth and seventh districts because these districts have a very low crime rate, which makes the analysis difficult.  
+  
+We modeled the relationship between the counts of each major crime and categorical variables ("District" and "Weekend") using four independence models and the saturated model:  
+$${\rm{Model \ 1:}} \ \log(\mu_{ij})=\lambda.$$
+$${\rm{Model \ 2:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i.$$
+$${\rm{Model \ 3:}} \ \log(\mu_{ij})=\lambda + \lambda^{Weekend}_j.$$
+$${\rm{Model \ 4:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i + \lambda^{Weekend}_j.$$
+$${\rm{Model \ 5:}} \ \log(\mu_{ij})=\lambda + \lambda^{District}_i + \lambda^{Weekend}_j + \lambda^{District,Weekend}_{ij}.$$
+
+
+```{r}
+# This chunk is for creating new dataframe used to conduct log-linear analysis
+
+# drop the rows in which "Offense_Location_District" is '6D' or '7D'
+DF_WM2 <- subset(DF_WM, Offense_Location_District %in% c('1D', '2D', '3D', '4D', '5D'))
+DF_WM2$Offense_Location_District <- factor(DF_WM2$Offense_Location_District)
+
+# create a new row named "Count"
+DF_WM2$Count <- c(rep(1,nrow(DF_WM2)))
+
+# create a new row named "Weekend" that takes 0 for Mon - Fri and 1 for Sat and Sun
+DF_WM2$Weekend <- c(rep(0,nrow(DF_WM2)))
+for(i in 1:nrow(DF_WM2)){
+  if(DF_WM2$Weekday[i] %in% c('Saturday', 'Sunday')){
+    DF_WM2$Weekend[i] = 1
+  }
+}
+DF_WM2$Weekend <- as.factor(DF_WM2$Weekend)
+
+# split the data into pre-COVID and post-COVID
+DF_preCOVID = subset(DF_WM2, Arrest_Year %in% c(2016,2017,2018,2019))
+DF_postCOVID = subset(DF_WM2, Arrest_Year %in% c(2020,2021))
+
+# create dataframe with "Category", "District", "Weekend", and "Count"
+DF_preCOVID = aggregate(x=DF_preCOVID[c("Count")],
+                           by=list(DF_preCOVID$Arrest_Category,
+                                   DF_preCOVID$Offense_Location_District,
+                                   DF_preCOVID$Weekend),
+                           sum)
+DF_postCOVID = aggregate(x=DF_postCOVID[c("Count")],
+                            by=list(DF_postCOVID$Arrest_Category,
+                                    DF_postCOVID$Offense_Location_District,
+                                    DF_postCOVID$Weekend),
+                            sum)
+
+# rename some columns
+colnames(DF_preCOVID)[1:3] = c("Category", "District", "Weekend")
+colnames(DF_postCOVID)[1:3] = c("Category", "District", "Weekend")
+```
+
+# Model Evaluation
+## Simple Assault
+```{r}
+DF_preCOVID_SA = subset(DF_preCOVID, Category == 'Simple Assault')
+DF_postCOVID_SA = subset(DF_postCOVID, Category == 'Simple Assault')
+```
+  
+The two-way tables for "Simple Assault" are as follows.
+  
+```{r}
+#show the two-way tables for pre-COVID and post-COVID
+
+xtabs(Count ~ District + Weekend, data = DF_preCOVID_SA)
+xtabs(Count ~ District + Weekend, data = DF_postCOVID_SA)
+```
+
+
+```{r, include=FALSE}
+# models for pre-COVID
+
+model1.pre.sa <- glm(Count ~ 1, data = DF_preCOVID_SA, family = poisson)
+model2.pre.sa <- glm(Count ~ District, data = DF_preCOVID_SA, family = poisson)
+model3.pre.sa <- glm(Count ~ Weekend, data = DF_preCOVID_SA, family = poisson)
+model4.pre.sa <- glm(Count ~ District + Weekend, data = DF_preCOVID_SA, family = poisson)
+model5.pre.sa <- glm(Count ~ District * Weekend, data = DF_preCOVID_SA, family = poisson)
+```
+
+```{r, include=FALSE}
+# models for post-COVID
+
+model1.post.sa <- glm(Count ~ 1, data = DF_postCOVID_SA, family = poisson)
+model2.post.sa <- glm(Count ~ District, data = DF_postCOVID_SA, family = poisson)
+model3.post.sa <- glm(Count ~ Weekend, data = DF_postCOVID_SA, family = poisson)
+model4.post.sa <- glm(Count ~ District + Weekend, data = DF_postCOVID_SA, family = poisson)
+model5.post.sa <- glm(Count ~ District * Weekend, data = DF_postCOVID_SA, family = poisson)
+```
+
+### Summary of the models  
+#### pre-COVID models  
+```{r}
+# check the summary of the pre-COVID models
+summary(model1.pre.sa)
+summary(model2.pre.sa)
+summary(model3.pre.sa)
+summary(model4.pre.sa)
+summary(model5.pre.sa)
+```
+  
+#### post-COVID models  
+```{r}
+# check the summary of the post-COVID models
+summary(model1.post.sa)
+summary(model2.post.sa)
+summary(model3.post.sa)
+summary(model4.post.sa)
+summary(model5.post.sa)
+```
+
+### Deviance  
+
+We used "residual deviance" to test the below hypothesis at a significance level $\alpha=0.05$:
+$$H_0: \ \rm{Reduced \ model \ is \ true.}$$
+$$H_1: \ \rm{Satureated \ model \ (Model \ 5) \ is \ true.}$$  
+"residual deviance" is the difference between the deviance of the model and that of the saturated model. According to The Pennsylvania State University website ([https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4](https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4 )), "residual deviance" follows a chi-square distribution with the model's degrees of freedom. Therefore, to test the hypothesis, I calculated p-values.  
+  
+  
+**pre-COVID**  
+The null hypothesis is rejected for all models.  
+```{r}
+# test the hypothesis for pre-COVID models to check the goodness of fit
+pchisq(summary(model1.pre.sa)$deviance, summary(model1.pre.sa)$df.residual, lower.tail=FALSE)
+pchisq(summary(model2.pre.sa)$deviance, summary(model2.pre.sa)$df.residual, lower.tail=FALSE)
+pchisq(summary(model3.pre.sa)$deviance, summary(model3.pre.sa)$df.residual, lower.tail=FALSE)
+pchisq(summary(model4.pre.sa)$deviance, summary(model4.pre.sa)$df.residual, lower.tail=FALSE)
+```
+  
+**post-COVID**  
+The null hypothesis is not rejected for Model 4.  
+```{r}
+# test the hypothesis for post-COVID models to check the goodness of fit
+pchisq(summary(model1.post.sa)$deviance, summary(model1.post.sa)$df.residual, lower.tail=FALSE)
+pchisq(summary(model2.post.sa)$deviance, summary(model2.post.sa)$df.residual, lower.tail=FALSE)
+pchisq(summary(model3.post.sa)$deviance, summary(model3.post.sa)$df.residual, lower.tail=FALSE)
+pchisq(summary(model4.post.sa)$deviance, summary(model4.post.sa)$df.residual, lower.tail=FALSE)
+```
+
+### AIC and BIC
+Each model's AIC and BIC was as follows.  
+
+**pre-COVID**  
+
+Model 5 is the best in terms of both AIC and BIC  
+```{r}
+# AIC and BIC for pre-COVID models
+print("AIC")
+AIC(model1.pre.sa)
+AIC(model2.pre.sa)
+AIC(model3.pre.sa)
+AIC(model4.pre.sa)
+AIC(model5.pre.sa)
+
+print("BIC")
+BIC(model1.pre.sa)
+BIC(model2.pre.sa)
+BIC(model3.pre.sa)
+BIC(model4.pre.sa)
+BIC(model5.pre.sa)
+```
+
+
+**post-COVID**  
+  
+Model 4 is the best in terms of both AIC and BIC. 
+
+```{r}
+# AIC and BIC for post-COVID models
+print("AIC")
+AIC(model1.post.sa)
+AIC(model2.post.sa)
+AIC(model3.post.sa)
+AIC(model4.post.sa)
+AIC(model5.post.sa)
+
+print("BIC")
+BIC(model1.post.sa)
+BIC(model2.post.sa)
+BIC(model3.post.sa)
+BIC(model4.post.sa)
+BIC(model5.post.sa)
+```
+  
+
+### Best Model  
+Saturated model is the best for pre-COVID model. On the other hand, Independence model is the best for post-COVID model. 
+  
+#### Parameters  
+**pre-COVID**  
+
+```{r}
+# This function is for creating graphs showing estimated parameters and their CIs
+# The funcitons takes 3 arguments: model - fitted model, cl - confidence level, title_str - the string for the title
+
+createCIgraph <- function(model, cl, title_str){
+  ci <- confint(model, level = cl)
+  lb <- vector()
+  ub <- vector()
+  for(i in 1:(length(ci)/2)){
+    lb = append(lb, ci[i,1])
+    ub = append(ub, ci[i,2])
+  }
+  
+  coef_label <- labels(coef(model))
+  est <- data.frame(coeff_v = coef(model),
+                    LB = lb,
+                    UB = ub, 
+                    var_name = coef_label)
+  
+  ggplot(est, aes(x = var_name, y = coeff_v)) +
+    geom_point() +
+    geom_errorbar(aes(ymin = lb, ymax = ub), width = 0.1) +
+    geom_hline(yintercept = 0, lty = 1, color = "red") +
+    theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+    scale_x_discrete(limits=coef_label) + 
+    xlab("") +
+    ylab("Estimated Parameter Value") + 
+    ggtitle(title_str)
+}
+```
+  
+Although the best model is the saturated model, almost all interaction terms are not significant at a significance level $\alpha = 0.05$. The interaction between "5D" and "weekend" is significant and has a negative value. This means that the combination of "5D" and "weekend" has the effect of pushing down the count of "Simple Assault".  
+
+```{r}
+# Showing the parameters and CIs of the best model of pre-COVID
+xkabledply(model5.pre.sa)
+createCIgraph(model5.pre.sa, 0.95, "95% Confidence Intervals of each parameter")
+```
+
+**post-COVID**  
+
+There are no interaction terms. Only 5th district parameter is insignificant at a significance level $\alpha = 0.05$. The base lien levels are "1D" and "Weekend0". Therefore, for example, the relationship between the population parameter in 2D on weekend0 ($\mu_{2D,0}$) and the population parameter in 1D on weekend0 ($\mu_{1D,0}$) is like this: $\log(\mu_{2D,0}/\mu_{1D,0}) = 0.8643 \ (\rm{the \ estimated \ 2D \ parameter})$.
+
+```{r}
+# Showing the parameters and CIs of the best model of post-COVID
+xkabledply(model4.post.sa)
+createCIgraph(model4.post.sa, 0.95, "95% Confidence Intervals of each parameter")
+```
+
+
+## Traffic Violations
+```{r}
+DF_preCOVID_TV = subset(DF_preCOVID, Category == 'Traffic Violations')
+DF_postCOVID_TV = subset(DF_postCOVID, Category == 'Traffic Violations')
+```
+
+```{r}
+#This chunk is for creating two-way tables
+
+xtabs(Count ~ District + Weekend, data = DF_preCOVID_TV)
+xtabs(Count ~ District + Weekend, data = DF_postCOVID_TV)
+
+```
+
+```{r, include=FALSE}
+# models for pre-COVID
+
+model1.pre.tv <- glm(Count ~ 1, data = DF_preCOVID_TV, family = poisson)
+model2.pre.tv <- glm(Count ~ District, data = DF_preCOVID_TV, family = poisson)
+model3.pre.tv <- glm(Count ~ Weekend, data = DF_preCOVID_TV, family = poisson)
+model4.pre.tv <- glm(Count ~ District + Weekend, data = DF_preCOVID_TV, family = poisson)
+model5.pre.tv <- glm(Count ~ District * Weekend, data = DF_preCOVID_TV, family = poisson)
+```
+
+```{r, include=FALSE}
+# models for post-COVID
+
+model1.post.tv <- glm(Count ~ 1, data = DF_postCOVID_TV, family = poisson)
+model2.post.tv <- glm(Count ~ District, data = DF_postCOVID_TV, family = poisson)
+model3.post.tv <- glm(Count ~ Weekend, data = DF_postCOVID_TV, family = poisson)
+model4.post.tv <- glm(Count ~ District + Weekend, data = DF_postCOVID_TV, family = poisson)
+model5.post.tv <- glm(Count ~ District * Weekend, data = DF_postCOVID_TV, family = poisson)
+```
+  
+  
+### Summary of the models  
+#### pre-COVID models  
+```{r}
+# check the summary of the pre-COVID models
+summary(model1.pre.tv)
+summary(model2.pre.tv)
+summary(model3.pre.tv)
+summary(model4.pre.tv)
+summary(model5.pre.tv)
+```
+  
+#### post-COVID models  
+```{r}
+# check the summary of the post-COVID models
+summary(model1.post.tv)
+summary(model2.post.tv)
+summary(model3.post.tv)
+summary(model4.post.tv)
+summary(model5.post.tv)
+```
+  
+
+### Deviance  
+
+I tested the below hypothesis at a significance level $\alpha=0.05$:
+$$H_0: \ \rm{Reduced \ model \ is \ true.}$$
+$$H_1: \ \rm{Satureated \ model \ (Model \ 5) \ is \ true.}$$  
+
+
+**pre-COVID**  
+  
+$H_0$ is not rejected for Model 4.
+
+```{r}
+# test the hypothesis for pre-COVID models to check the goodness of fit
+pchisq(summary(model1.pre.tv)$deviance, summary(model1.pre.tv)$df.residual, lower.tail=FALSE)
+pchisq(summary(model2.pre.tv)$deviance, summary(model2.pre.tv)$df.residual, lower.tail=FALSE)
+pchisq(summary(model3.pre.tv)$deviance, summary(model3.pre.tv)$df.residual, lower.tail=FALSE)
+pchisq(summary(model4.pre.tv)$deviance, summary(model4.pre.tv)$df.residual, lower.tail=FALSE)
+```
+
+  
+**post-COVID**  
+  
+$H_0$ is not rejected for Model 4.
+
+```{r}
+# test the hypothesis for post-COVID models to check the goodness of fit
+pchisq(summary(model1.post.tv)$deviance, summary(model1.post.tv)$df.residual, lower.tail=FALSE)
+pchisq(summary(model2.post.tv)$deviance, summary(model2.post.tv)$df.residual, lower.tail=FALSE)
+pchisq(summary(model3.post.tv)$deviance, summary(model3.post.tv)$df.residual, lower.tail=FALSE)
+pchisq(summary(model4.post.tv)$deviance, summary(model4.post.tv)$df.residual, lower.tail=FALSE)
+```
+
+### AIC  and BIC
+Each model's AIC and BIC was as follows.  
+
+**pre-COVID**  
+
+Model 4 is the best in terms of AIC and BIC.  
+
+```{r}
+# AIC and BIC for pre-COVID models
+print("AIC")
+AIC(model1.pre.tv)
+AIC(model2.pre.tv)
+AIC(model3.pre.tv)
+AIC(model4.pre.tv)
+AIC(model5.pre.tv)
+
+print("BIC")
+BIC(model1.pre.tv)
+BIC(model2.pre.tv)
+BIC(model3.pre.tv)
+BIC(model4.pre.tv)
+BIC(model5.pre.tv)
+```
+  
+
+**post-COVID**  
+
+Model 5 is the best in terms of AIC, but Model 4 is the best from BIC. According to Chakrabarti & Ghosh (2011), "The Bayesian Information Criterion (BIC) is more useful in selecting a correct model while the AIC is more appropriate in finding the best model for predicting future observations." I want to select the correct model, not a model with high predictive power, so I will focus on the BIC results.
+  
+```{r}
+# AIC and BIC for post-COVID models
+print("AIC")
+AIC(model1.post.tv)
+AIC(model2.post.tv)
+AIC(model3.post.tv)
+AIC(model4.post.tv)
+AIC(model5.post.tv)
+
+print("BIC")
+BIC(model1.post.tv)
+BIC(model2.post.tv)
+BIC(model3.post.tv)
+BIC(model4.post.tv)
+BIC(model5.post.tv)
+```
+
+
+### Best Model  
+Independence model is the best for pre-COVID and post-COVID. 
+  
+#### Parameters  
+**pre-COVID**  
+All parameters are significant at a significance level $\alpha = 0.05$. The base lien levels are "1D" and "Weekend0". Therefore, for example, the relationship between the population parameter in 2D on weekend0 ($\mu_{2D,0}$) and the population parameter in 4D on weekend0 ($\mu_{4D,0}$) is like this: $\log(\mu_{2D,0}/\mu_{4D,0}) = 0.8877 \ ({\rm{the \ estimated \ 2D \ parameter}}) - 0.8935 \ ({\rm{the \ estimated \ 4D \ parameter}}) = -0.0058$.  
+```{r}
+# Showing the parameters, and CIs of the best model for pre-COVID  
+xkabledply(model4.pre.tv)
+createCIgraph(model4.pre.tv, 0.95, "95% Confidence Intervals of each parameter")
+```
+  
+  
+**post-COVID**  
+"3D" and "5D" parameters are insignificant at a significance level $\alpha = 0.05$. The base lien levels are "1D" and "Weekend0". Therefore, for example, the relationship between the population parameter in 2D on weekend0 ($\mu_{2D,0}$) and the population parameter in 4D on weekend0 ($\mu_{4D,0}$) is like this: $\log(\mu_{2D,0}/\mu_{4D,0}) = 1.7720 \ ({\rm{the \ estimated \ 2D \ parameter}}) - 0.8303 \ ({\rm{the \ estimated \ 4D \ parameter}}) = 0.9417$.  
+```{r}
+# Showing the parameters, and CIs of the best model for post-COVID
+xkabledply(model4.post.tv)
+createCIgraph(model4.post.tv, 0.95, "95% Confidence Intervals of each parameter")
+```
+
+
+## Theft
+```{r}
+DF_preCOVID_Th = subset(DF_preCOVID, Category == 'Theft')
+DF_postCOVID_Th = subset(DF_postCOVID, Category == 'Theft')
+```
+
+```{r}
+# This chunk is for creating two-way tables
+
+xtabs(Count ~ District + Weekend, data = DF_preCOVID_Th)
+xtabs(Count ~ District + Weekend, data = DF_postCOVID_Th)
+
+```
+
+
+```{r, include=FALSE}
+# models for pre-COVID
+
+model1.pre.th <- glm(Count ~ 1, data = DF_preCOVID_Th, family = poisson)
+model2.pre.th <- glm(Count ~ District, data = DF_preCOVID_Th, family = poisson)
+model3.pre.th <- glm(Count ~ Weekend, data = DF_preCOVID_Th, family = poisson)
+model4.pre.th <- glm(Count ~ District + Weekend, data = DF_preCOVID_Th, family = poisson)
+model5.pre.th <- glm(Count ~ District * Weekend, data = DF_preCOVID_Th, family = poisson)
+```
+
+```{r, include=FALSE}
+# models for post-COVID
+
+model1.post.th <- glm(Count ~ 1, data = DF_postCOVID_Th, family = poisson)
+model2.post.th <- glm(Count ~ District, data = DF_postCOVID_Th, family = poisson)
+model3.post.th <- glm(Count ~ Weekend, data = DF_postCOVID_Th, family = poisson)
+model4.post.th <- glm(Count ~ District + Weekend, data = DF_postCOVID_Th, family = poisson)
+model5.post.th <- glm(Count ~ District * Weekend, data = DF_postCOVID_Th, family = poisson)
+```
+  
+### Summary of the models  
+#### pre-COVID models  
+```{r}
+# check the summary of the pre-COVID models
+summary(model1.pre.th)
+summary(model2.pre.th)
+summary(model3.pre.th)
+summary(model4.pre.th)
+summary(model5.pre.th)
+```
+  
+#### post-COVID models  
+```{r}
+# check the summary of the post-COVID models
+summary(model1.post.th)
+summary(model2.post.th)
+summary(model3.post.th)
+summary(model4.post.th)
+summary(model5.post.th)
+```
+  
+### Deviance  
+
+I tested the below hypothesis at a significance level $\alpha=0.05$:
+$$H_0: \ \rm{Reduced \ model \ is \ true.}$$
+$$H_1: \ \rm{Satureated \ model \ (Model \ 5) \ is \ true.}$$  
+
+**pre-COVID**  
+  
+$H_0$ is not rejected for Model 4.
+
+```{r}
+# test the hypothesis for pre-COVID models to check the goodness of fit
+pchisq(summary(model1.pre.th)$deviance, summary(model1.pre.th)$df.residual, lower.tail=FALSE)
+pchisq(summary(model2.pre.th)$deviance, summary(model2.pre.th)$df.residual, lower.tail=FALSE)
+pchisq(summary(model3.pre.th)$deviance, summary(model3.pre.th)$df.residual, lower.tail=FALSE)
+pchisq(summary(model4.pre.th)$deviance, summary(model4.pre.th)$df.residual, lower.tail=FALSE)
+```
+
+  
+**post-COVID**  
+  
+$H_0$ is not rejected for Model 4.
+
+```{r}
+# test the hypothesis for post-COVID models to check the goodness of fit
+pchisq(summary(model1.post.th)$deviance, summary(model1.post.th)$df.residual, lower.tail=FALSE)
+pchisq(summary(model2.post.th)$deviance, summary(model2.post.th)$df.residual, lower.tail=FALSE)
+pchisq(summary(model3.post.th)$deviance, summary(model3.post.th)$df.residual, lower.tail=FALSE)
+pchisq(summary(model4.post.th)$deviance, summary(model4.post.th)$df.residual, lower.tail=FALSE)
+```
+
+
+### AIC and BIC   
+Each model's AIC and BIC was as follows.  
+
+**pre-COVID**  
+  
+Model 4 is the best in terms of AIC and BIC.
+  
+```{r}
+# AIC and BIC for pre-COVID models
+print("AIC")
+AIC(model1.pre.th)
+AIC(model2.pre.th)
+AIC(model3.pre.th)
+AIC(model4.pre.th)
+AIC(model5.pre.th)
+
+print("BIC")
+BIC(model1.pre.th)
+BIC(model2.pre.th)
+BIC(model3.pre.th)
+BIC(model4.pre.th)
+BIC(model5.pre.th)
+```
+
+**post-COVID**  
+
+Model 4 is the best in terms of AIC and BIC.
+  
+```{r}
+# AIC and BIC for post-COVID models
+print("AIC")
+AIC(model1.post.th)
+AIC(model2.post.th)
+AIC(model3.post.th)
+AIC(model4.post.th)
+AIC(model5.post.th)
+
+print("BIC")
+BIC(model1.post.th)
+BIC(model2.post.th)
+BIC(model3.post.th)
+BIC(model4.post.th)
+BIC(model5.post.th)
+```
+
+### Best Model  
+
+**pre-COVID**  
+"4D" and "5D" parameters are insignificant at a significance level $\alpha = 0.05$. The base lien levels are "1D" and "Weekend0". Therefore, for example, the relationship between the population parameter in 5D on weekend0 ($\mu_{5D,0}$) and the population parameter in 2D on weekend0 ($\mu_{2D,0}$) is like this: $\log(\mu_{5D,0}/\mu_{2D,0}) = 0.0953 \ ({\rm{the \ estimated \ 5D \ parameter}}) - 0.7479 \ ({\rm{the \ estimated \ 2D \ parameter}}) = -0.6526$.  
+```{r}
+# Showing the parameters, and CIs of the best model for pre-COVID
+xkabledply(model4.pre.th)
+createCIgraph(model4.pre.th, 0.95, "95% Confidence Intervals of each parameter")
+```
+  
+**post-COVID**  
+"3D" and "4D" parameters are insignificant at a significance level $\alpha = 0.05$. The base lien levels are "1D" and "Weekend0". Therefore, for example, the relationship between the population parameter in 5D on weekend0 ($\mu_{5D,0}$) and the population parameter in 2D on weekend0 ($\mu_{2D,0}$) is like this: $\log(\mu_{5D,0}/\mu_{2D,0}) = 1.2879 \ ({\rm{the \ estimated \ 5D \ parameter}}) - 1.0116 \ ({\rm{the \ estimated \ 2D \ parameter}}) = 0.2763$.  
+```{r}
+# Showing the parameters, and CIs of the best model for post-COVID
+xkabledply(model4.post.th)
+createCIgraph(model4.post.th, 0.95, "95% Confidence Intervals of each parameter")
+```
+
+# Analysis using 3 categorical variables  
+
+### Build a dataframe with 3 categories (District, weekdays, generation)
+
+District: 1D-5D
+
+Weekday: Monday-Sunday
+
+generation: A(18-24),B(25-39), C(40-59), D(60-80), the sample above 80 is not adequate for analysis
+```{r}
+Dist_ls<-list()
+#region<-c("1D","2D","3D","4D","5D","6D","7D")
+region<-c("1D","2D","3D","4D","5D")
+age_type<-c("A","B","C","D")
+weekday_tmp<-c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
+age_ls<-list()
+weekday_ls<-list()
+for(i in region){
+  for(j in weekday_tmp){
+    for(k in age_type){
+        Dist_ls<-append(Dist_ls,i)
+        weekday_ls<-append(weekday_ls,j)
+        age_ls<-append(age_ls,k)
+    }
+  }
+}
+generation <- unlist(age_ls)
+generation <- as.vector(age_ls,"character")
+
+ 
+Dist<- unlist(Dist_ls)
+Dist <- as.vector(Dist,"character")
+
+weekday<- unlist(weekday_ls)
+weekday <- as.vector(weekday,"character")
+#length(weekday)
+```
+
+
+```{r}
+DF_WM_pre<-subset(DF_WM,Arrest_Year%in%c(2016,2017,2018,2019))
+DF_WM_post<-subset(DF_WM,Arrest_Year%in%c(2020,2021))
+tail(DF_WM_pre)
+head(DF_WM_post)
+
+DF_WM<-DF_WM_pre
+```
+
+
+Count Pre-Covid Crimes
+```{r message=FALSE, warning=FALSE, include=FALSE}
+ 
+freq_sim_tmp<-list()
+
+for(j in region){
+  for(k in weekday_tmp){
+  
+  tmpDF_SIM<-subset(DF_WM_pre , Arrest_Category=="Simple Assault"&Arrest_Location_District==j&Weekday==k)
+  freq_sim_tmp<-table(tmpDF_SIM$Age >="18"&tmpDF_SIM$Age <="24")["TRUE"]%>%sum()%>%c(freq_sim_tmp,.)
+  freq_sim_tmp<-table(tmpDF_SIM$Age >="25"&tmpDF_SIM$Age <="39")["TRUE"]%>%sum()%>%c(freq_sim_tmp,.)
+  freq_sim_tmp<-table(tmpDF_SIM$Age >="40"&tmpDF_SIM$Age <="59")["TRUE"]%>%sum()%>%c(freq_sim_tmp,.)
+  freq_sim_tmp<-table(tmpDF_SIM$Age >="60"&tmpDF_SIM$Age <="80")["TRUE"]%>%sum()%>%c(freq_sim_tmp,.)
+  }
+}
+
+freq_TRA_tmp<-list()
+
+for(j in region){
+  for(k in weekday_tmp){
+  
+  tmpDF_TRA<-subset(DF_WM_pre , Arrest_Category=="Traffic Violations" &Arrest_Location_District==j&Weekday==k)
+  freq_TRA_tmp<-table(tmpDF_TRA$Age >="18"&tmpDF_TRA$Age <="24")["TRUE"]%>%sum()%>%c(freq_TRA_tmp,.)
+  freq_TRA_tmp<-table(tmpDF_TRA$Age >="25"&tmpDF_TRA$Age <="39")["TRUE"]%>%sum()%>%c(freq_TRA_tmp,.)
+  freq_TRA_tmp<-table(tmpDF_TRA$Age >="40"&tmpDF_TRA$Age <="59")["TRUE"]%>%sum()%>%c(freq_TRA_tmp,.)
+  freq_TRA_tmp<-table(tmpDF_TRA$Age >="60"&tmpDF_TRA$Age <="80")["TRUE"]%>%sum()%>%c(freq_TRA_tmp,.)
+  }
+}
+
+
+freq_Theft_tmp<-list()
+
+for(j in region){
+  for(k in weekday_tmp){
+  
+  tmpDF_Theft<-subset(DF_WM_pre , Arrest_Category=="Theft" &Arrest_Location_District==j&Weekday==k)
+  freq_Theft_tmp<-table(tmpDF_Theft$Age >="18"&tmpDF_Theft$Age <="24")["TRUE"]%>%sum()%>%c(freq_Theft_tmp,.)
+  freq_Theft_tmp<-table(tmpDF_Theft$Age >="25"&tmpDF_Theft$Age <="39")["TRUE"]%>%sum()%>%c(freq_Theft_tmp,.)
+  freq_Theft_tmp<-table(tmpDF_Theft$Age >="40"&tmpDF_Theft$Age <="59")["TRUE"]%>%sum()%>%c(freq_Theft_tmp,.)
+  freq_Theft_tmp<-table(tmpDF_Theft$Age >="60"&tmpDF_Theft$Age <="80")["TRUE"]%>%sum()%>%c(freq_Theft_tmp,.)
+  }
+}
+
+Theft_counts <- unlist(freq_Theft_tmp)
+Theft_counts <- as.vector(Theft_counts,'numeric')
+
+Traffic_Violations_counts <- unlist(freq_TRA_tmp)
+Traffic_Violations_counts <- as.vector(Traffic_Violations_counts,'numeric')
+Simple_Assult_counts <- unlist(freq_sim_tmp)
+Simple_Assult_counts <- as.vector(Simple_Assult_counts,'numeric')
+
+ 
+ 
+```
+
+Build Data Frame for Pre-Covid Crimes
+```{r}
+
+crime_dist_weekday_age<-data.frame(Dist,weekday,generation,Simple_Assult_counts,Traffic_Violations_counts,Theft_counts)
+ 
+crime_dist_weekday_age[,1] = as.factor(crime_dist_weekday_age[,1])
+crime_dist_weekday_age[,2] = as.factor(crime_dist_weekday_age[,2])
+crime_dist_weekday_age[,3] = as.factor(crime_dist_weekday_age[,3])
+#xkablesummary
+head(crime_dist_weekday_age)
+
+nrow(crime_dist_weekday_age)
+```
+
+Count Post-Covid Crimes
+```{r message=FALSE, warning=FALSE, include=FALSE}
+ 
+freq_sim_tmp<-list()
+
+for(j in region){
+  for(k in weekday_tmp){
+  
+  tmpDF_SIM<-subset(DF_WM_post , Arrest_Category=="Simple Assault"&Arrest_Location_District==j&Weekday==k)
+  freq_sim_tmp<-table(tmpDF_SIM$Age >="18"&tmpDF_SIM$Age <="24")["TRUE"]%>%sum()%>%c(freq_sim_tmp,.)
+  freq_sim_tmp<-table(tmpDF_SIM$Age >="25"&tmpDF_SIM$Age <="39")["TRUE"]%>%sum()%>%c(freq_sim_tmp,.)
+  freq_sim_tmp<-table(tmpDF_SIM$Age >="40"&tmpDF_SIM$Age <="59")["TRUE"]%>%sum()%>%c(freq_sim_tmp,.)
+  freq_sim_tmp<-table(tmpDF_SIM$Age >="60"&tmpDF_SIM$Age <="80")["TRUE"]%>%sum()%>%c(freq_sim_tmp,.)
+  }
+}
+
+freq_TRA_tmp<-list()
+
+for(j in region){
+  for(k in weekday_tmp){
+  
+  tmpDF_TRA<-subset(DF_WM_post , Arrest_Category=="Traffic Violations" &Arrest_Location_District==j&Weekday==k)
+  freq_TRA_tmp<-table(tmpDF_TRA$Age >="18"&tmpDF_TRA$Age <="24")["TRUE"]%>%sum()%>%c(freq_TRA_tmp,.)
+  freq_TRA_tmp<-table(tmpDF_TRA$Age >="25"&tmpDF_TRA$Age <="39")["TRUE"]%>%sum()%>%c(freq_TRA_tmp,.)
+  freq_TRA_tmp<-table(tmpDF_TRA$Age >="40"&tmpDF_TRA$Age <="59")["TRUE"]%>%sum()%>%c(freq_TRA_tmp,.)
+  freq_TRA_tmp<-table(tmpDF_TRA$Age >="60"&tmpDF_TRA$Age <="80")["TRUE"]%>%sum()%>%c(freq_TRA_tmp,.)
+  }
+}
+
+
+freq_Theft_tmp<-list()
+
+for(j in region){
+  for(k in weekday_tmp){
+  
+  tmpDF_Theft<-subset(DF_WM_post , Arrest_Category=="Theft" &Arrest_Location_District==j&Weekday==k)
+  freq_Theft_tmp<-table(tmpDF_Theft$Age >="18"&tmpDF_Theft$Age <="24")["TRUE"]%>%sum()%>%c(freq_Theft_tmp,.)
+  freq_Theft_tmp<-table(tmpDF_Theft$Age >="25"&tmpDF_Theft$Age <="39")["TRUE"]%>%sum()%>%c(freq_Theft_tmp,.)
+  freq_Theft_tmp<-table(tmpDF_Theft$Age >="40"&tmpDF_Theft$Age <="59")["TRUE"]%>%sum()%>%c(freq_Theft_tmp,.)
+  freq_Theft_tmp<-table(tmpDF_Theft$Age >="60"&tmpDF_Theft$Age <="80")["TRUE"]%>%sum()%>%c(freq_Theft_tmp,.)
+  }
+}
+
+Theft_counts <- unlist(freq_Theft_tmp)
+Theft_counts <- as.vector(Theft_counts,'numeric')
+
+Traffic_Violations_counts <- unlist(freq_TRA_tmp)
+Traffic_Violations_counts <- as.vector(Traffic_Violations_counts,'numeric')
+Simple_Assult_counts <- unlist(freq_sim_tmp)
+Simple_Assult_counts <- as.vector(Simple_Assult_counts,'numeric')
+
+ 
+ 
+```
+
+Build Data Frame for Post-Covid Crimes
+```{r}
+
+crime_dist_weekday_age_post<-data.frame(Dist,weekday,generation,Simple_Assult_counts,Traffic_Violations_counts,Theft_counts)
+ 
+crime_dist_weekday_age_post[,1] = as.factor(crime_dist_weekday_age_post[,1])
+crime_dist_weekday_age_post[,2] = as.factor(crime_dist_weekday_age_post[,2])
+crime_dist_weekday_age_post[,3] = as.factor(crime_dist_weekday_age_post[,3])
+#xkablesummary
+head(crime_dist_weekday_age_post)
+
+nrow(crime_dist_weekday_age_post)
+```
+
+ 
+
+### Doing Loglm 
+Modeling for three crime categories: **Simple Assult**, **Traffic Violations**, and **Theft**. 
+
+I will use **C** as the **generation** feature
+
+#### Independence model 	~A + B + C
+
+Pre-Covid
+```{r, echo=TRUE}
+library(MASS)
+loglm_independent_SA<- loglm(Simple_Assult_counts~Dist+weekday+generation, data=crime_dist_weekday_age )
+loglm_independent_TV<- loglm(Traffic_Violations_counts~Dist+weekday+generation, data=crime_dist_weekday_age )
+loglm_independent_Theft<- loglm(Theft_counts~Dist+weekday+generation, data=crime_dist_weekday_age )
+
+glm_independent_SA<-glm(Simple_Assult_counts~Dist+weekday+generation, data=crime_dist_weekday_age,family=poisson )
+
+glm_independent_TV<-glm(Traffic_Violations_counts~Dist+weekday+generation, data=crime_dist_weekday_age,family=poisson )
+
+glm_independent_Theft<-glm(Theft_counts~Dist+weekday+generation, data=crime_dist_weekday_age,family=poisson )
+
+#AIC(glm_independent_SA)
+#AIC(glm_independent_TV)
+#AIC(glm_independent_Theft)
+
+#BIC(glm_independent_SA)
+#BIC(glm_independent_TV)
+#BIC(glm_independent_Theft)
+ 
+```
+Post-Covid
+```{r, echo=TRUE}
+ 
+loglm_independent_SA_post<- loglm(Simple_Assult_counts~Dist+weekday+generation, data=crime_dist_weekday_age_post )
+loglm_independent_TV_post<- loglm(Traffic_Violations_counts~Dist+weekday+generation, data=crime_dist_weekday_age_post )
+loglm_independent_Theft_post<- loglm(Theft_counts~Dist+weekday+generation, data=crime_dist_weekday_age_post )
+
+glm_independent_SA_post<-glm(Simple_Assult_counts~Dist+weekday+generation, data=crime_dist_weekday_age_post,family=poisson )
+
+glm_independent_TV_post<-glm(Traffic_Violations_counts~Dist+weekday+generation, data=crime_dist_weekday_age_post,family=poisson )
+
+glm_independent_Theft_post<-glm(Theft_counts~Dist+weekday+generation, data=crime_dist_weekday_age_post,family=poisson )
+
+#AIC(glm_independent_SA_post)
+#AIC(glm_independent_TV_post)
+#AIC(glm_independent_Theft_post)
+
+#BIC(glm_independent_SA_post)
+#BIC(glm_independent_TV_post)
+#BIC(glm_independent_Theft_post)
+ 
+```
+
+
+
+#### Conditional independence  	~(A+B)*C
+
+Pre-Covid
+```{r,echo=TRUE}
+
+loglm_condition_SA <- loglm(Simple_Assult_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age)
+loglm_condition_TV <- loglm(Traffic_Violations_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age)
+loglm_condition_Theft <- loglm(Theft_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age)
+
+glm_condition_SA<-glm(Simple_Assult_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age,family = poisson)
+
+glm_condition_TV<-glm(Traffic_Violations_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age,family = poisson)
+
+glm_condition_Theft<-glm(Theft_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age,family = poisson)
+
+#AIC(glm_condition_SA)
+#AIC(glm_condition_TV)
+#AIC(glm_condition_Theft)
+
+#BIC(glm_condition_SA)
+#BIC(glm_condition_TV)
+#BIC(glm_condition_Theft)
+
+```
+Post-Covid
+```{r,echo=TRUE}
+
+loglm_condition_SA_post <- loglm(Simple_Assult_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age_post)
+loglm_condition_TV_post <- loglm(Traffic_Violations_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age_post)
+loglm_condition_Theft_post <- loglm(Theft_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age_post)
+
+glm_condition_SA_post<-glm(Simple_Assult_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age_post,family = poisson)
+
+glm_condition_TV_post<-glm(Traffic_Violations_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age_post,family = poisson)
+
+glm_condition_Theft_post<-glm(Theft_counts~(Dist + weekday) * generation, data=crime_dist_weekday_age_post,family = poisson)
+
+#AIC(glm_condition_SA_post)
+#AIC(glm_condition_TV_post)
+#AIC(glm_condition_Theft_post)
+
+#BIC(glm_condition_SA_post)
+#BIC(glm_condition_TV_post)
+#BIC(glm_condition_Theft_post)
+
+```
+
+#### Joint independence 	~A*B + C
+
+Pre-Covid
+```{r,echo=TRUE}
+ 
+loglm_joint_SA <- loglm(Simple_Assult_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age)
+loglm_joint_TV <- loglm(Traffic_Violations_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age)
+loglm_joint_Theft <- loglm(Theft_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age)
+
+
+glm_joint_SA <- glm(Simple_Assult_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age,family = poisson)
+
+glm_joint_TV <- glm(Traffic_Violations_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age,family = poisson)
+
+glm_joint_Theft <- glm(Theft_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age,family = poisson)
+ 
+#AIC(glm_joint_SA)
+#AIC(glm_joint_TV)
+#AIC(glm_joint_Theft)
+
+#BIC(glm_joint_SA)
+#BIC(glm_joint_TV)
+#BIC(glm_joint_Theft)
+```
+
+Post-Covid
+```{r,echo=TRUE}
+ 
+loglm_joint_SA_post <- loglm(Simple_Assult_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age_post)
+loglm_joint_TV_post <- loglm(Traffic_Violations_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age_post)
+loglm_joint_Theft_post <- loglm(Theft_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age_post)
+
+
+glm_joint_SA_post <- glm(Simple_Assult_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age_post,family = poisson)
+
+glm_joint_TV_post <- glm(Traffic_Violations_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age_post,family = poisson)
+
+glm_joint_Theft_post <- glm(Theft_counts~(Dist * weekday)+ generation, data=crime_dist_weekday_age_post,family = poisson)
+ 
+#AIC(glm_joint_SA_post)
+#AIC(glm_joint_TV_post)
+#AIC(glm_joint_Theft_post)
+
+#BIC(glm_joint_SA_post)
+#BIC(glm_joint_TV_post)
+#BIC(glm_joint_Theft_post)
+```
+
+#### All two-way associations 	~A*B + A*C + B*C
+
+Pre-Covid
+```{r,echo=TRUE}
+loglm_ATWA_SA <- loglm(Simple_Assult_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age)
+loglm_ATWA_TV <- loglm(Traffic_Violations_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age)
+loglm_ATWA_Theft <- loglm(Theft_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age)
+
+glm_ATWA_SA <- glm(Simple_Assult_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age,family = poisson)
+glm_ATWA_TV<- glm(Traffic_Violations_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age,family = poisson)
+glm_ATWA_Theft <- glm(Theft_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age,family = poisson)
+
+#AIC(glm_ATWA_SA)
+#AIC(glm_ATWA_TV)
+#AIC(glm_ATWA_Theft)
+
+#BIC(glm_ATWA_SA)
+#BIC(glm_ATWA_TV)
+#BIC(glm_ATWA_Theft)
+ 
+```
+
+Post-Covid
+```{r,echo=TRUE}
+loglm_ATWA_SA_post <- loglm(Simple_Assult_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age_post)
+loglm_ATWA_TV_post <- loglm(Traffic_Violations_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age_post)
+loglm_ATWA_Theft_post <- loglm(Theft_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age_post)
+
+glm_ATWA_SA_post <- glm(Simple_Assult_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age_post,family = poisson)
+glm_ATWA_TV_post<- glm(Traffic_Violations_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age_post,family = poisson)
+glm_ATWA_Theft_post <- glm(Theft_counts~(Dist * weekday)+ generation*weekday+Dist*generation, data=crime_dist_weekday_age_post,family = poisson)
+
+#AIC(glm_ATWA_SA_post)
+#AIC(glm_ATWA_TV_post)
+#AIC(glm_ATWA_Theft_post)
+
+#BIC(glm_ATWA_SA_post)
+#BIC(glm_ATWA_TV_post)
+#BIC(glm_ATWA_Theft_post)
+ 
+```
+
+#### Saturated model 	~A*B*C
+
+Pre-Covid
+```{r,echo=TRUE}
+loglm_sat_SA <- loglm(Simple_Assult_counts~Dist * weekday*generation , data=crime_dist_weekday_age)
+loglm_sat_TV <- loglm(Traffic_Violations_counts~Dist * weekday*generation , data=crime_dist_weekday_age)
+loglm_sat_Theft <- loglm(Theft_counts~Dist * weekday*generation , data=crime_dist_weekday_age)
+
+
+glm_sat_SA <- glm(Simple_Assult_counts~Dist * weekday*generation , data=crime_dist_weekday_age,family = poisson)
+
+glm_sat_TV <- glm(Traffic_Violations_counts~Dist * weekday*generation , data=crime_dist_weekday_age,family = poisson)
+
+glm_sat_Theft <- glm(Theft_counts~Dist * weekday*generation , data=crime_dist_weekday_age,family = poisson)
+
+#AIC(glm_sat_SA)
+#AIC(glm_sat_TV)
+#AIC(glm_sat_Theft)
+
+#BIC(glm_sat_SA)
+#BIC(glm_sat_TV)
+#BIC(glm_sat_Theft)
+ 
+```
+Post-Covid
+```{r,echo=TRUE}
+loglm_sat_SA_post <- loglm(Simple_Assult_counts~Dist * weekday*generation , data=crime_dist_weekday_age_post)
+loglm_sat_TV_post  <- loglm(Traffic_Violations_counts~Dist * weekday*generation , data=crime_dist_weekday_age_post)
+loglm_sat_Theft_post  <- loglm(Theft_counts~Dist * weekday*generation , data=crime_dist_weekday_age_post)
+
+
+glm_sat_SA_post  <- glm(Simple_Assult_counts~Dist * weekday*generation , data=crime_dist_weekday_age_post,family = poisson)
+
+glm_sat_TV_post <- glm(Traffic_Violations_counts~Dist * weekday*generation , data=crime_dist_weekday_age_post,family = poisson)
+
+glm_sat_Theft_post  <- glm(Theft_counts~Dist * weekday*generation , data=crime_dist_weekday_age_post ,family = poisson)
+
+#AIC(glm_sat_SA_post )
+#AIC(glm_sat_TV_post )
+#AIC(glm_sat_Theft_post )
+
+#BIC(glm_sat_SA_post )
+#BIC(glm_sat_TV_post )
+#BIC(glm_sat_Theft_post )
+ 
+```
+
+#### Table of AIC and BIC of different models
+
+**Pre-Covid**  
+
+| Crime | Simple Assault | Simple Assault | Traffic Violations | Traffic Violations | Theft | Theft |  
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:| 
+| **Model** | **AIC** | **BIC** | **AIC** | **BIC** | **AIC** | **BIC** |
+| Independent Model | `r AIC(glm_independent_SA )` | `r BIC(glm_independent_SA )` |  `r AIC(glm_independent_TV )` | `r BIC(glm_independent_TV )` | `r AIC(glm_independent_Theft )` |  `r BIC(glm_independent_Theft )` |
+| Condition Model | `r AIC(glm_condition_SA)` | `r BIC(glm_condition_SA)` | `r AIC(glm_condition_TV)` | `r BIC(glm_condition_TV)` | `r AIC(glm_condition_Theft)` | `r BIC(glm_condition_Theft)` |
+| Joint Model | `r AIC(glm_joint_SA)` | `r BIC(glm_joint_SA)` | `r AIC(glm_joint_TV)` | `r BIC(glm_joint_TV)` | `r AIC(glm_joint_Theft)` | `r BIC(glm_joint_Theft)` |
+| All two-way assciations Model | `r AIC(glm_ATWA_SA)` |  `r BIC(glm_ATWA_SA)` | `r AIC(glm_ATWA_TV)` | `r BIC(glm_ATWA_TV)` | `r AIC(glm_ATWA_Theft)` | `r BIC(glm_ATWA_Theft)` |
+| Saturated Model | `r AIC(glm_sat_SA)` |  `r BIC(glm_sat_SA)` | `r AIC(glm_sat_TV)` | `r BIC(glm_sat_TV)` | `r AIC(glm_sat_Theft)` | `r BIC(glm_sat_Theft)` | 
+
+**Post-Covid**  
+
+| Crime | Simple Assault | Simple Assault | Traffic Violations | Traffic Violations | Theft | Theft |
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:| 
+| **Model** | **AIC** | **BIC** | **AIC** | **BIC** | **AIC** | **BIC** |
+| Independent Model | `r AIC(glm_independent_SA_post )` | `r BIC(glm_independent_SA_post )` |  `r AIC(glm_independent_TV_post )` | `r BIC(glm_independent_TV_post )` | `r AIC(glm_independent_Theft_post )` |  `r BIC(glm_independent_Theft_post )` |
+| Condition Model | `r AIC(glm_condition_SA_post)` | `r BIC(glm_condition_SA_post)` | `r AIC(glm_condition_TV_post)` | | `r BIC(glm_condition_TV_post)` | `r AIC(glm_condition_Theft_post)` | `r BIC(glm_condition_Theft_post)` |
+| Joint Model | `r AIC(glm_joint_SA_post)` | `r BIC(glm_joint_SA_post)` | `r AIC(glm_joint_TV_post)` | `r BIC(glm_joint_TV_post)` | `r AIC(glm_joint_Theft_post)` | `r BIC(glm_joint_Theft_post)` |
+| All two-way assciations Model | `r AIC(glm_ATWA_SA_post)` |  `r BIC(glm_ATWA_SA_post)` | `r AIC(glm_ATWA_TV_post)` | `r BIC(glm_ATWA_TV_post)` | `r AIC(glm_ATWA_Theft_post)` | `r BIC(glm_ATWA_Theft_post)` |
+| Saturated Model | `r AIC(glm_sat_SA_post)` |  `r BIC(glm_sat_SA_post)` | `r AIC(glm_sat_TV_post)` | `r BIC(glm_sat_TV_post)` | `r AIC(glm_sat_Theft_post)` | `r BIC(glm_sat_Theft_post)` | 
+
+
+
+### Model Comparing with Saturated model 	~A*B*C
+
+Note that printing the model gives a brief summary of the goodness of fit. A set of models can be compared using the anova() function.
+
+For Pre-Covid
+```{r ,echo=TRUE,results='markup'}
+anova(loglm_independent_SA,loglm_condition_SA, loglm_joint_SA,loglm_ATWA_SA)
+anova(loglm_independent_TV,loglm_condition_TV, loglm_joint_TV,loglm_ATWA_TV)
+anova(loglm_independent_Theft,loglm_condition_Theft, loglm_joint_Theft,loglm_ATWA_Theft)
+
+```
+For Post-Covid
+```{r ,echo=TRUE,results='markup'}
+anova(loglm_independent_SA_post,loglm_condition_SA_post, loglm_joint_SA_post,loglm_ATWA_SA_post)
+anova(loglm_independent_TV_post,loglm_condition_TV_post, loglm_joint_TV_post,loglm_ATWA_TV_post)
+anova(loglm_independent_Theft_post,loglm_condition_Theft_post, loglm_joint_Theft_post,loglm_ATWA_Theft_post)
+```
+
+
+
+
+
+#### coefficient plots
+
+The best model determined by AIC/BIC is the **independent model** for all three crimes
+
+Pre-Covid
+```{r echo=FALSE, warning=FALSE}
+createCIgraph(glm_independent_SA, 0.95, "Pre Covid Simple Assault")
+createCIgraph(glm_independent_TV, 0.95, "Pre Covid Traffic Violation")
+createCIgraph(glm_independent_Theft, 0.95, "Pre Covid Theft")
+```
+　　
+Post-Covid
+```{r echo=FALSE, warning=FALSE}
+createCIgraph(glm_independent_SA_post, 0.95, "Post Covid Simple Assault")
+createCIgraph(glm_independent_TV_post, 0.95, "Post Covid Traffic Violation")
+createCIgraph(glm_independent_Theft_post, 0.95, "Post Covid Theft")
+```
+ 
+
+# Interpretation  
+### Models of using 2 variables ("District" and "Weekend")  
+* "Weekend = 1" has a negative parameter in all models. However, this does not mean that there are fewer crimes on weekends than on other weekdays. This is because only Saturdays and Sundays are classified as "Weekend = 1", and the number of days classified as "Weekend = 0" is 2.5 times greater.
+* Through pre-COVID and post-COVID, the fact that a district is 2D, 3D, or 4D tends to drive up the number of crimes. This is not surprising since these districts are in the Northwest area, which has a large population.  
+* The combination of 5D and "Weekend = 1" has the effect of pushing down the number of "Simple Assault" during post-COVID period. This may be due to the fact that the main tourist areas are in the Northwest District, which attracts more people to this area on weekends than to 5D. The interaction between 5D and "Weekend" may have disappeared because outings were suppressed in all districts after COVID-19 outbreak.  
+* Prior to 2019, 5D had the effect of pushing down the number of thefts relative to other districts, but after 2020, 5D has the effect of pushing up the number of thefts relative to other districts.  
+
+### Models of using 3 variables ("District", "Weekday", and "Generation")  
+* The 3 features of interest - Weekday, District and Generation - do not have strong relationships with crime incidence in this our analysis.
+  
+# Conclusion  
+
+COVID-19 appears to not only reduce the number of crimes, but also change crime trends. In particular, 5D seems to have changed crime trends compared to other districts.
+
+# Refereances  
+
+* 6.3.4 - analysis of deviance and Model Selection: Stat 504. PennState: Statistics Online Courses. (n.d.). Retrieved December 11, 2022, from https://online.stat.psu.edu/stat504/lesson/6/6.3/6.3.4  
+* 10: Log-Linear Models: Stat 504. PennState: Statistics Online Courses. (n.d.). Retrieved December 10, 2022, from https://online.stat.psu.edu/stat504/lesson/10  
+* Chakrabarti, A., & Ghosh, J. K. (2011). AIC, BIC and recent advances in model selection. Philosophy of statistics, 583-605.
