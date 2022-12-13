@@ -1,0 +1,320 @@
+---
+title: "Project report Team 5"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  word_document: default
+  pdf_document: default
+date: "2022-11-11"
+---
+
+```{r init, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+library(ezids)
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+```
+
+# Investigation in DC crime trend 2016-2021
+
+Professor: Dr. Farhana Faruqe
+
+DATS-6101: Introduction to Data Science
+
+Member: Xuanyu Chen, Yuchuan Feng, Ore Asaba, Osawa Kentaro  
+
+## Abstract
+
+### Objective
+
+* To run some Exploratory Data Analysis in order to figure out an appropriate sample group and size for which to base our analysis on regarding crime.  
+* To select a subgroup (White Male) and analyze crime incidence trends among this group.  
+* To identify some major crimes and perform our EDA and some statistical tests to determine changes in these crime categories. 
+* To determine if there have been any changes to the incidence of crime among white males since March 2020, when the COVID pandemic was announced.  
+* To spot any other striking or significant patterns that could be further investigated in future analyses.
+
+### Methods
+
+We assumed the number of each crime per day followed a Poisson distribution, because the Poisson distribution is used for describing the number of events in a large population over a unit of time.
+
+In addition, we assumed that each crime in 2016 to 2019 followed the same Poisson distribution, and each crime in 2020 and 2021 followed the same Poisson distribution. 
+
+First, we divided each major crime data into two parts: Before COVID-19 (2016-2019) and After COVID-19 (2020-2021). Next, we calculated lambdas of Before COVID-19 and After COVID-19.
+
+To confirm whether the assumption that the number of each crime per day follows a Poisson distribution, we plotted histograms of relative frequency and a Poisson distribution with the calculated lambda. Finally, we estimated 99% confidence interval (CI) of lambda by using the calculated lambda and compared the CIs of Before COVID-19 and After COVID-19.
+
+### Results
+
+There are statistically significant decreases in “Simple Assault”, “Traffic Violations”, and “Theft” after COVID-19. There is no significant difference in “Offenses Against Family & Children” before and after COVID-19.
+
+### Conclusion
+
+There are statistically significant decreases in “Simple Assault”, “Traffic Violations”, and “Theft” after COVID-19. This is probably because COVID-19 restricted people from going out. The curbing of curfews by COVID-19 is likely to increase “Offenses Against Family & Children”, but we could not see a statistically significant difference in “Offenses Against Family & Children” before and after COVID-19.
+
+## 1 Introduction
+
+**The goal of our project is to use data provided by the Metropolitan Police Department of Washington DC to gain a good understanding of crime trends in the District. The available data on the Met Police website contains data on adult arrests for years ranging between 2013 and 2021, with a wide range of variables.**
+
+Upon inspection of the data sets, we decided to investigate more specifically, the crime trends among Adult White Males in DC from 2016 to 2021, and to check if there have been any changes between time period 2016-2019 (Pre-COVID) and time period 2020- (Post COVID) in the incidence of the major crimes committed in the city. We ended up investigating the top 8 crimes in the city. This group accounts for about 8% of the entire dataset, with an absolute value of over 12.2k observations. We thought this was an appropriate sample size and useful enough to carry out the analysis.   
+
+
+## 2 Background and Dataset
+
+### 2.1 Information of the Dataset
+
+The entire dataset upon merging all the different CSV files came up to ~152k observations, while the adult white males came up to ~12k observations. The initial dataset contained 26 variables/columns, but we ended up taking 12 of them out, as they provided little to no use in our analysis. The removed variables are as follows: CCN (Central Complaint Number) which are anonymized, Arrest Number, Arrest Location PSA,  Arrest Block GEOX, Arrest Block GEOY, Arrest Latitude, Arrest Longitude, Offense Location PSA, Offense Block GEOX, Offense Block GEOY, Offense Latitude and Offense Longitude. We also created 3 other variables: day, month and weekday.
+
+
+The variables used are briefly described below:  
+
+* Arrestee Type - all of these were “Adult Arrests”.  
+
+* Arrest Year - the year in which the arrest happened.  
+
+* Arrest Date - the actual date of the arrest, in yyyy-mm-dd format.  
+
+* Month - the month of the arrest, coded with values ranging from 1-12 for each month of the year.  
+
+* Day - The day of the arrest, with values from 1-31 for each date within a month.  
+
+* Weekday - The day of the week for which crime was recorded.  
+
+* Arrest Hour - the hour of arrest, with values from 0 - 24 representing the hours of the day.  
+
+* Age: the arrestee’s self-reported age.  
+
+* Defendant PSA: the last known address of the arrestee - values could be “out of state”.  
+
+* Defendant District: the police district in which the defendant was last seen.  
+
+* Defendant Race: the race of the arrestee - Black, White, Asian, Unknown, Multiple.  
+
+* Defendant Ethnicity: Hispanic, Non-Hispanic and Unknown  
+
+* Defendant Sex: the sex of the arrestee - grouped into Male, Female and Unknown.  
+
+* Arrest Category: the broad name given to the crime types. 29 unique values.  
+
+* Charge Description: brief description of the charge leveled against the arrestee.  
+
+* Arrest Location District: The police district in which the arrest was made.  
+
+* Offense Location District: The police district in which the crime was committed.  
+
+
+### 2.2 Limitations of the Data
+
+There are a few call outs needed to be made about the data set.
+
+* For the CSV file derived from the Police website for 2019 Arrests Data, there was an issue with the times of the arrest. The data only reported for the first 12 hours (1-12), instead of all 24 (0-23). We believe this would have had an effect on the Hourly analysis we carried out. We removed the 2019 data in that aspect of the Exploratory Data Analysis.  
+
+* The Arrest Date column had to be formatted in the “yyyy-mm-dd” format in order to track the time series.
+
+* There were few inconsistencies in the Arrest Category column across the different years. The naming methods changed especially in the latter years, so we had to correct this and convert them into uniform values.
+
+* The observations for Defendant Gender, Race and Ethnicity are based on the police officer’s observations and these might not be completely accurate. It is an estimation for the most part.
+
+* Regarding address, the MPD are not able to release exact addresses to the general public unless a subpoena or proof of ownership is provided.
+
+* The date of birth of the arrestees may not be accurate as they are mostly self-reported. An arrestee may also outrightly refuse to provide their date of birth.
+
+
+
+
+## 3 Data Analysis and Results
+
+### 3.1 EDA
+#### 3.1.1 SMART Question
+
+* Is there a Post-COVID shift in the crime trends regarding adult, white men in the DC area?
+
+* Is there a difference in the crime trends among adult white males within the DC area between 2016 and 2021, and could COVID protocols play a role in these trend shifts?
+
+
+#### 3.1.2 SMART Analysis
+
+##### 3.1.2.1 Specific
+
+With datasets available for several years and across various crime categories, we decided to pick a specific time period and split these into pre and post COVID periods for a more straightforward analysis. The entire dataset also contains about 153k observations, with different racial groups represented. We decided to dig deeper into the Adult White Male subgroup for increased specificity, and ended up using ~12.2k observations for our analysis.
+
+##### 3.1.2.2 Measurable
+
+We worked on data that changed across time and our objective was to measure these changes. By investigating the incidence of crime i.e. the rate at which crime occurs, we selected a measurable metric, helping us achieve tangible results.
+
+
+##### 3.1.2.3 Achievable
+
+The data was readily available and we were able to get through with the data cleaning and manipulation in order to derive results. We were able to get some interesting results. We had the necessary tools and manpower to carry out the project.
+
+##### 3.1.2.4 Relevant
+
+Crime trends are seemingly important. And seeing that most of us live in or at least have to come into DC a good number of times a week, this project appealed to us. We want to get a sense of the trends, and how/if COVID is shaping or not shaping them in any way. 
+
+##### 3.1.2.5 Time-Oriented
+
+We had a deadline for the different parts of the project and we worked through this timeline in order to establish our findings and come up with a presentation of these findings. 
+
+
+
+#### 3.1.3 Crime Trend
+
+##### 3.1.3.1 Daily Crime Trend Graphs
+
+For the most part, the White Male graph mirrors the general one, with a few exceptions:
+
+For a date on/around Jan 17, 2017, there is a spike in crimes both ways.
+
+There are 2 major spikes in the White Male graph post-2020, and these represent the respective dates when the George Floyd Protests and the Capitol Invasion took place.
+
+Besides these spikes, we can assume that overall crime looks like it is on a decline.
+
+```{r echo=FALSE}
+knitr::include_graphics("1.png")
+```
+
+##### 3.1.3.2 Hourly Crime Trends
+
+Upon investigating the general observations and the White Male observations, we noticed a few things:
+
+Among the general observations, crime peaks in the evening time periods, especially between 4-6pm. In the hours leading to daybreak (5-8am), the crime incidence is at its lowest.
+
+For the White Male group, crime surprisingly peaks between late night and the wee hours of the morning, from 9pm to about 3am. Between 5-9am and 11am-1pm, crime among white males is at its lowest.
+
+##### 3.1.3.3 Day of the Month Crime Trends
+
+We did this analysis in order to find out if there is a pattern around what days of the month are high and low with crime.
+
+For both groups, we noticed that crimes got less as the month went by. The first few days of the months typically had the highest crime rates, and the 20th day was also high, surprisingly.
+
+##### 3.1.3.4 Weekday Trends
+
+The idea here was to get a sense of the crime incidence by day of the week.
+
+For the general group, crimes were prevalent during the week and peak on Wednesdays. Wednesdays to Fridays are highest, and crime on the weekends significantly drops through Monday.
+
+For the White Male group,  crime levels are high on the weekend, with a peak on Saturday. Starting from Tuesday, there is a steady rise in crime incidence.
+
+```{r echo=FALSE}
+knitr::include_graphics("2.png")
+```
+
+### 3.2 Some more EDA
+
+
+#### 3.2.1 Bar Plot
+
+In the barplot, we count all the crime categories among white males grouped by years 2016-2021. It is shown that some top crimes, like “Simple Assault”, “Traffic Violation”, ”Release Violations/Fugitive” take up the main proportion of the total crimes, which are our main research objectives. Then the crime counts exponentially decline from top crime, “Simple Assault”, to the rarest one, “Arson” with inadequate sample size. To extract the top crimes with abundant and representative samples, we conclude the top seven crime categories from 2016 to 2021 in the table above. It is shown that “Simple Assault” always takes the first position in every year, followed by some common crimes such as “Traffic Violation”, “Release Violation/Fugitive” which are ranked in tops in most of the years. However, for example, some crimes that appear in tops in only one out of six years, such as “Prosittution” and “Liquor Law Violation”, are not taken into consideration, since there is a potential risk associated with scarce samples in other years when they do not appear in the top crimes. Therefore, we are going to focus only on some common and top crimes with large sample sizes in the following part.
+
+```{r echo=FALSE}
+knitr::include_graphics("3.png")
+```
+
+The top 6 crimes (or 7 crimes when 'Other Crimes' are included) in each year are as follows.
+
+| Rank | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 |
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|1|Simple Assault|Simple Assault|Simple Assault|Simple Assault|Simple Assault|Simple Assault|
+|2|Traffic Violations|Traffic Violations|Traffic Violations|Traffic Violations|Driving/Boating While Intoxicated|Traffic Violations|
+|3|Release Violations/Fugitive|Release Violations/Fugitive|Release Violations/Fugitive|Prostitution|Release Violations/Fugitive|Driving/Boating While Intoxicated|
+|4|Driving/Boating While Intoxicated|Driving/Boating While Intoxicated|Driving/Boating While Intoxicated|Driving/Boating While Intoxicated|Traffic Violations|Release Violations/Fugitive|
+|5|Liquor Law Violations|Other Crimes|Narcotics|Release Violations/Fugitive|Offenses Against Family & Children|Other Crimes|
+|6|Narcotics|Disorderly Conduct|Theft|Other Crimes|Other Crimes|Offenses Against Family & Children|
+|7|NA|Liquor Law Violations|NA|Theft|Narcotics|Damage to Property|
+
+#### 3.2.2 Different generations
+
+We want to investigate one of the factors, “Age”, to see whether it has a significant effect on trends of top crimes. 
+First, the population of white males are divided into three generations, young people, middle-age people, elder people, with ages ranging from 18-29, 30-50, >50, respectively. The crime categories we are looking at are “Simple Assault”,“Release Violations/Fugitive”,“Traffic Violations”, “Narcotics”, “Theft”, “Other Crimes”
+
+```{r echo=FALSE}
+knitr::include_graphics("4.png")
+```
+
+
+
+These are the barplots of these six crime categories from 2016 to 2021 of the three generations shown separately. Though the sample sizes of different generations are not the same, it is observed that for these six crimes, there are no obvious differences. The analogous shapes of barplots of different generations indicate that the factor- “Age” does not have a significant effect on the trends of top crimes in the DC area among white males.
+
+
+
+#### 3.2.3 Time Series Change
+
+```{r echo=FALSE}
+knitr::include_graphics("5.png")
+```
+
+
+Then we go back to the trend of top crimes by year from the table above, which is shown above. Same with demonstrated before, those common top crimes, like “Simple Assault”, “Traffic Violations” have large amounts of counts and keep declining from 2016-2021 with a drastic drop in between 2019 and 2020, which is assumed caused by Covid-19 protocols. On the other hand, when we take a closer look, it is found that there exists some strange crime trends, for example, “Offenses Against Family & Children”, where there is one sudden surge from 2019 to 2020, and it is the only crime that is committed more after 2019. We guess it is because people spend more time at home, resulting in higher probability of hurting their family members, and we will investigate it later. Also, there are peaks in “Liquor Law”, and “Prostitution”,which corresponds to their one-time appearance in the table of top seven crimes.
+
+
+#### 3.2.4 Inference for the Coefficients
+
+##### 3.2.4.1 Simple Assault
+
+The number of “Simple Assault” per day before COVID-19 was 1.36 and after COVID-19 was 0.923. We showed relative frequencies and Poisson distributions in below figures. These Poisson distributions fitted well with relative frequencies. 99% CI of $\lambda$ before COVID-19 was [1.28, 1.44] and after COVID-19 was [0.831, 1.016]. As shown in the below figure, there was no overlap between the two CIs.
+
+
+```{r echo=FALSE}
+knitr::include_graphics("6.png")
+```
+
+##### 3.2.4.2 Traffic Violations
+
+The number of “Traffic Violations” per day before COVID-19 was 0.907 and after COVID-19 was 0.306. We showed relative frequencies and Poisson distributions in below figures. These Poisson distributions fitted well with relative frequencies. 99% CI of $\lambda$ before COVID-19 was [0.842, 0.972] and after COVID-19 was [0.252, 0.358]. As shown in the below figure, there was no overlap between the two CIs.
+
+
+```{r echo=FALSE}
+knitr::include_graphics("7.png")
+knitr::include_graphics("8.png")
+```
+
+##### 3.2.4.3 Theft
+
+The number of “Theft” per day before COVID-19 was 0.404 and after COVID-19 was 0.115. We showed relative frequencies and Poisson distributions in below figures. These Poisson distributions fitted well with relative frequencies. 99% CI of $\lambda$ before COVID-19 was [0.360, 0.447] and after COVID-19 was [0.0822, 0.1477]. As shown in the below figure, there was no overlap between the two CIs.
+
+```{r echo=FALSE}
+knitr::include_graphics("9.png")
+knitr::include_graphics("10.png")
+```
+
+
+##### 3.2.4.4 Offenses Against Family & Children
+
+There were two outliers in the number of “Offenses Against Family & Children” after COVID-19. The dates of these outliers were January 6th, 2021 and June 1st, 2020. June 1st, 2020 was during “George Floyd protests” in DC, and January 6th, 2021 corresponded to “Capitol Attack.” The charge description of all Offenses Against Family & Children in both dates was “Curfew Violation,” which means they were caused by these special events. Therefore, we removed these data when calculating $\lambda$ and estimating CI.
+The number of “Offenses Against Family & Children” per day before COVID-19 was 0.0678 and after COVID-19 was 0.0725. We showed relative frequencies and Poisson distributions in below figures. These Poisson distributions fitted well with relative frequencies. 99% CI of $\lambda$ before COVID-19 was [0.0500, 0.0856] and after COVID-19 was [0.0465, 0.0985]. As shown in the below figure, there was an overlap between the two CIs.
+
+```{r echo=FALSE}
+knitr::include_graphics("11.png")
+knitr::include_graphics("12.png")
+```
+
+##### 3.2.4.5 Some other major crimes
+
+We also analyzed “Release Violations/Fugitive”, “Driving/Boating While Intoxicated”, “Narcotics”, and “Liquor Law Violations”. There was a significant difference between the $\lambda$ of before COVID-19 and $\lambda$ of after COVID-19 in all these crimes.
+
+
+## 4 Conclusion
+
+Our results show that there is a difference in the Pre & Post-COVID crime across a good number of crime types/categories present in our data set.
+
+There are statistically significant decreases especially in Simple Assault, Traffic Violations, and Theft after COVID-19. There are also significant decreases in the incidence of Release Violations (Fugitives), Driving/Boating while Intoxicated, Narcotics and Liquor Law Violations.
+We can strongly assume that the COVID-19 lockdown restrictions strongly limited people from going out, thereby impacting crime trends significantly. 
+
+Despite this assumption, we did not see a statistically significant difference in “Offenses Against Family & Children” before and after COVID-19. Our basic assumption here is that requirement placed on people to stay indoors means that they have to spend far more time with their families than they did prior to the COVID lockdowns. As a result, we believe that it makes sense for such crime to potentially increase.
+
+## 5 References
+
+
+MPD Adult Arrests (2013) Metropolitan Police Department. Available at: https://mpdc.dc.gov/ (Accessed: October 20, 2022). 
+
+
+Diez, D. M., Barr, C. D., & Cetinkaya-Rundel, M. (2012). OpenIntro statistics (pp. 174-175). Boston, MA, USA:: OpenIntro.
+
